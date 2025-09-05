@@ -1,0 +1,411 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+
+// Drug library with different PK-PD profiles
+const DRUG_LIBRARY = {
+  "Antihypertensive A": {
+    name: "Antihypertensive A",
+    EC50: 2.0,
+    Emax: -75,
+    baseline: 160,
+    hillSlope: 1.2,
+    effectType: "Heart Rate",
+    effectUnits: "bpm",
+    description: "Beta blocker - reduces heart rate"
+  },
+  "Glucose Reducer B": {
+    name: "Glucose Reducer B", 
+    EC50: 5.0,
+    Emax: -60,
+    baseline: 120,
+    hillSlope: 0.8,
+    effectType: "Blood Glucose",
+    effectUnits: "mg/dL",
+    description: "Antidiabetic - lowers blood glucose"
+  },
+  "Bronchodilator C": {
+    name: "Bronchodilator C",
+    EC50: 1.5,
+    Emax: 40,
+    baseline: 100,
+    hillSlope: 1.5,
+    effectType: "FEV1",
+    effectUnits: "% predicted",
+    description: "Beta agonist - improves lung function"
+  },
+  "Custom Drug": {
+    name: "Custom Drug",
+    EC50: 2.0,
+    Emax: -50,
+    baseline: 100,
+    hillSlope: 1.0,
+    effectType: "Response",
+    effectUnits: "units",
+    description: "Customizable drug parameters"
+  }
+};
+
+const PKPDModel = () => {
+  // PK Parameters (from your Excel model)
+  const [pkParams, setPkParams] = useState({
+    dose: 50,
+    dissolutionRate: 0.1,
+    stomachAbsorption: 0.1,
+    smallIntestineAbsorption: 0.1,
+    largeIntestineAbsorption: 0.1,
+    stomachTransit: 0.1,
+    intestineTransit: 0.1,
+    elimination: 0.1,
+    bloodToTissue: 0.1,
+    tissueToBlood: 0.1
+  });
+
+  // PD Parameters
+  const [selectedDrug, setSelectedDrug] = useState("Antihypertensive A");
+  const [pdParams, setPdParams] = useState(DRUG_LIBRARY["Antihypertensive A"]);
+  
+  const [simulationTime, setSimulationTime] = useState(48);
+  const [isCustomDrug, setIsCustomDrug] = useState(false);
+
+  // Update PD params when drug changes
+  useEffect(() => {
+    if (selectedDrug !== "Custom Drug") {
+      setPdParams(DRUG_LIBRARY[selectedDrug]);
+      setIsCustomDrug(false);
+    } else {
+      setIsCustomDrug(true);
+    }
+  }, [selectedDrug]);
+
+  // Pharmacokinetic simulation
+  const pkData = useMemo(() => {
+    const data = [];
+    const dt = 0.1; // Time step
+    const steps = Math.floor(simulationTime / dt);
+    
+    // Initialize compartments
+    let tablet = pkParams.dose;
+    let stomach = 0;
+    let smallIntestine = 0;
+    let largeIntestine = 0;
+    let blood = 0;
+    let tissue = 0;
+    let urine = 0;
+    
+    for (let i = 0; i <= steps; i++) {
+      const time = i * dt;
+      
+      // Store current state
+      if (i % 10 === 0) { // Store every hour
+        data.push({
+          time: Math.round(time * 10) / 10,
+          tablet,
+          stomach,
+          smallIntestine,
+          largeIntestine,
+          blood,
+          tissue,
+          urine,
+          totalDrug: tablet + stomach + smallIntestine + largeIntestine + blood + tissue + urine
+        });
+      }
+      
+      // Calculate rates
+      const dissolutionRate = tablet * pkParams.dissolutionRate * dt;
+      const stomachAbsorptionRate = stomach * pkParams.stomachAbsorption * dt;
+      const siAbsorptionRate = smallIntestine * pkParams.smallIntestineAbsorption * dt;
+      const liAbsorptionRate = largeIntestine * pkParams.largeIntestineAbsorption * dt;
+      const stomachTransitRate = stomach * pkParams.stomachTransit * dt;
+      const intestineTransitRate = smallIntestine * pkParams.intestineTransit * dt;
+      const eliminationRate = blood * pkParams.elimination * dt;
+      const distributionRate = blood * pkParams.bloodToTissue * dt;
+      const redistributionRate = tissue * pkParams.tissueToBlood * dt;
+      
+      // Update compartments
+      tablet -= dissolutionRate;
+      stomach = stomach + dissolutionRate - stomachAbsorptionRate - stomachTransitRate;
+      smallIntestine = smallIntestine + stomachTransitRate - siAbsorptionRate - intestineTransitRate;
+      largeIntestine = largeIntestine + intestineTransitRate - liAbsorptionRate;
+      blood = blood + stomachAbsorptionRate + siAbsorptionRate + liAbsorptionRate - eliminationRate - distributionRate + redistributionRate;
+      tissue = tissue + distributionRate - redistributionRate;
+      urine += eliminationRate;
+      
+      // Prevent negative values
+      tablet = Math.max(0, tablet);
+      stomach = Math.max(0, stomach);
+      smallIntestine = Math.max(0, smallIntestine);
+      largeIntestine = Math.max(0, largeIntestine);
+      blood = Math.max(0, blood);
+      tissue = Math.max(0, tissue);
+    }
+    
+    return data;
+  }, [pkParams, simulationTime]);
+
+  // Pharmacodynamic calculation (4-parameter logistic)
+  const calculateEffect = (concentration) => {
+    const { EC50, Emax, baseline, hillSlope } = pdParams;
+    if (concentration <= 0) return baseline;
+    
+    return baseline + (Emax) / (1 + Math.pow(EC50 / concentration, hillSlope));
+  };
+
+  // Combined PK-PD data
+  const pkpdData = useMemo(() => {
+    return pkData.map(point => ({
+      ...point,
+      effect: calculateEffect(point.blood)
+    }));
+  }, [pkData, pdParams]);
+
+  // Dose-response curve data for static plot
+  const doseResponseData = useMemo(() => {
+    const concentrations = [];
+    for (let i = 0; i <= 100; i++) {
+      const conc = i * 0.1;
+      concentrations.push({
+        concentration: conc,
+        effect: calculateEffect(conc)
+      });
+    }
+    return concentrations;
+  }, [pdParams]);
+
+  return (
+    <div className="p-6 max-w-7xl mx-auto bg-gray-50 min-h-screen">
+      <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">
+          Interactive GI Pharmacokinetic-Pharmacodynamic Model
+        </h1>
+        <p className="text-gray-600 mb-4">
+          Simulates drug dissolution, GI transit, absorption, distribution, and biological effects
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Controls Panel */}
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <h2 className="text-xl font-semibold mb-4 text-gray-800">Model Parameters</h2>
+          
+          {/* Drug Selection */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Select Drug</label>
+            <select 
+              value={selectedDrug}
+              onChange={(e) => setSelectedDrug(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              {Object.keys(DRUG_LIBRARY).map(drug => (
+                <option key={drug} value={drug}>{drug}</option>
+              ))}
+            </select>
+            <p className="text-xs text-gray-500 mt-1">{pdParams.description}</p>
+          </div>
+
+          {/* PK Parameters */}
+          <div className="mb-6">
+            <h3 className="font-medium text-gray-800 mb-3">Pharmacokinetic Parameters</h3>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs text-gray-600">Dose (mg)</label>
+                <input
+                  type="range"
+                  min="10"
+                  max="200"
+                  step="5"
+                  value={pkParams.dose}
+                  onChange={(e) => setPkParams(prev => ({...prev, dose: Number(e.target.value)}))}
+                  className="w-full"
+                />
+                <span className="text-xs text-gray-500">{pkParams.dose} mg</span>
+              </div>
+              
+              <div>
+                <label className="block text-xs text-gray-600">Dissolution Rate (hr⁻¹)</label>
+                <input
+                  type="range"
+                  min="0.01"
+                  max="0.5"
+                  step="0.01"
+                  value={pkParams.dissolutionRate}
+                  onChange={(e) => setPkParams(prev => ({...prev, dissolutionRate: Number(e.target.value)}))}
+                  className="w-full"
+                />
+                <span className="text-xs text-gray-500">{pkParams.dissolutionRate}</span>
+              </div>
+
+              <div>
+                <label className="block text-xs text-gray-600">Stomach Absorption (hr⁻¹)</label>
+                <input
+                  type="range"
+                  min="0.01"
+                  max="0.5"
+                  step="0.01"
+                  value={pkParams.stomachAbsorption}
+                  onChange={(e) => setPkParams(prev => ({...prev, stomachAbsorption: Number(e.target.value)}))}
+                  className="w-full"
+                />
+                <span className="text-xs text-gray-500">{pkParams.stomachAbsorption}</span>
+              </div>
+
+              <div>
+                <label className="block text-xs text-gray-600">Elimination Rate (hr⁻¹)</label>
+                <input
+                  type="range"
+                  min="0.01"
+                  max="0.3"
+                  step="0.01"
+                  value={pkParams.elimination}
+                  onChange={(e) => setPkParams(prev => ({...prev, elimination: Number(e.target.value)}))}
+                  className="w-full"
+                />
+                <span className="text-xs text-gray-500">{pkParams.elimination}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* PD Parameters (Custom Drug Only) */}
+          {isCustomDrug && (
+            <div className="mb-6">
+              <h3 className="font-medium text-gray-800 mb-3">Pharmacodynamic Parameters</h3>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs text-gray-600">EC50 (concentration for 50% effect)</label>
+                  <input
+                    type="range"
+                    min="0.1"
+                    max="10"
+                    step="0.1"
+                    value={pdParams.EC50}
+                    onChange={(e) => setPdParams(prev => ({...prev, EC50: Number(e.target.value)}))}
+                    className="w-full"
+                  />
+                  <span className="text-xs text-gray-500">{pdParams.EC50}</span>
+                </div>
+
+                <div>
+                  <label className="block text-xs text-gray-600">Emax (maximum effect)</label>
+                  <input
+                    type="range"
+                    min="-100"
+                    max="100"
+                    step="5"
+                    value={pdParams.Emax}
+                    onChange={(e) => setPdParams(prev => ({...prev, Emax: Number(e.target.value)}))}
+                    className="w-full"
+                  />
+                  <span className="text-xs text-gray-500">{pdParams.Emax}</span>
+                </div>
+
+                <div>
+                  <label className="block text-xs text-gray-600">Baseline Response</label>
+                  <input
+                    type="range"
+                    min="50"
+                    max="200"
+                    step="5"
+                    value={pdParams.baseline}
+                    onChange={(e) => setPdParams(prev => ({...prev, baseline: Number(e.target.value)}))}
+                    className="w-full"
+                  />
+                  <span className="text-xs text-gray-500">{pdParams.baseline}</span>
+                </div>
+
+                <div>
+                  <label className="block text-xs text-gray-600">Hill Slope</label>
+                  <input
+                    type="range"
+                    min="0.5"
+                    max="3"
+                    step="0.1"
+                    value={pdParams.hillSlope}
+                    onChange={(e) => setPdParams(prev => ({...prev, hillSlope: Number(e.target.value)}))}
+                    className="w-full"
+                  />
+                  <span className="text-xs text-gray-500">{pdParams.hillSlope}</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div>
+            <label className="block text-xs text-gray-600">Simulation Time (hours)</label>
+            <input
+              type="range"
+              min="12"
+              max="72"
+              step="6"
+              value={simulationTime}
+              onChange={(e) => setSimulationTime(Number(e.target.value))}
+              className="w-full"
+            />
+            <span className="text-xs text-gray-500">{simulationTime} hours</span>
+          </div>
+        </div>
+
+        {/* Main Visualization */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Pharmacokinetic Profile */}
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h3 className="text-lg font-semibold mb-4 text-gray-800">Pharmacokinetic Profile</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={pkpdData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="time" label={{ value: 'Time (hours)', position: 'insideBottom', offset: -5 }} />
+                <YAxis label={{ value: 'Amount (mg)', angle: -90, position: 'insideLeft' }} />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="tablet" stroke="#8884d8" name="Tablet" strokeWidth={2} />
+                <Line type="monotone" dataKey="stomach" stroke="#82ca9d" name="Stomach" strokeWidth={2} />
+                <Line type="monotone" dataKey="smallIntestine" stroke="#ffc658" name="Small Intestine" strokeWidth={2} />
+                <Line type="monotone" dataKey="blood" stroke="#ff7300" name="Blood" strokeWidth={3} />
+                <Line type="monotone" dataKey="tissue" stroke="#8dd1e1" name="Tissue" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Pharmacodynamic Profile */}
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h3 className="text-lg font-semibold mb-4 text-gray-800">
+              Pharmacodynamic Profile - {pdParams.effectType}
+            </h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={pkpdData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="time" label={{ value: 'Time (hours)', position: 'insideBottom', offset: -5 }} />
+                <YAxis label={{ value: `${pdParams.effectType} (${pdParams.effectUnits})`, angle: -90, position: 'insideLeft' }} />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="effect" stroke="#e74c3c" name={pdParams.effectType} strokeWidth={3} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Dose-Response Curve */}
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h3 className="text-lg font-semibold mb-4 text-gray-800">Dose-Response Relationship</h3>
+            <ResponsiveContainer width="100%" height={250}>
+              <LineChart data={doseResponseData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis 
+                  dataKey="concentration" 
+                  label={{ value: 'Blood Concentration (mg/L)', position: 'insideBottom', offset: -5 }} 
+                />
+                <YAxis 
+                  label={{ value: `${pdParams.effectType} (${pdParams.effectUnits})`, angle: -90, position: 'insideLeft' }} 
+                />
+                <Tooltip />
+                <Line type="monotone" dataKey="effect" stroke="#9b59b6" strokeWidth={3} dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+            <div className="mt-2 text-sm text-gray-600">
+              <p><strong>EC50:</strong> {pdParams.EC50} mg/L | <strong>Emax:</strong> {pdParams.Emax} {pdParams.effectUnits} | <strong>Hill Slope:</strong> {pdParams.hillSlope}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default PKPDModel;
