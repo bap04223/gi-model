@@ -28,8 +28,11 @@
         .interaction-section { background: #fff3cd; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
         .run-button { background: #667eea; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 15px; }
         .stats { background: white; border-radius: 15px; padding: 20px; margin-top: 20px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-top: 15px; }
-        .stat-card { background: #667eea; color: white; padding: 15px; border-radius: 8px; text-align: center; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px; }
+        .stat-card { color: white; padding: 15px; border-radius: 8px; text-align: center; }
+        .stat-card.drug-a { background: #e74c3c; } /* Red for Drug A */
+        .stat-card.drug-b { background: #3498db; } /* Blue for Drug B */
+        .stat-card.combined { background: #9b59b6; } /* Purple for Combined */
         .stat-value { font-size: 1.2rem; font-weight: bold; }
         .stat-label { font-size: 0.8rem; }
         
@@ -306,13 +309,18 @@
                 <div class="chart-container">
                     <h4>Results</h4>
                     <div class="stats-grid">
-                        <div class="stat-card"><div class="stat-value" id="cmax1">-</div><div class="stat-label">Drug A Cmax</div></div>
-                        <div class="stat-card"><div class="stat-value" id="cmax2">-</div><div class="stat-label">Drug B Cmax</div></div>
-                        <div class="stat-card"><div class="stat-value" id="tmax1">-</div><div class="stat-label">Drug A Tmax</div></div>
-                        <div class="stat-card"><div class="stat-value" id="tmax2">-</div><div class="stat-label">Drug B Tmax</div></div>
-                        <div class="stat-card"><div class="stat-value" id="auc1">-</div><div class="stat-label">Drug A AUC</div></div>
-                        <div class="stat-card"><div class="stat-value" id="auc2">-</div><div class="stat-label">Drug B AUC</div></div>
-                        <div class="stat-card"><div class="stat-value" id="maxEffect">-</div><div class="stat-label">Max Effect</div></div>
+                        <!-- Drug A Column (Red) -->
+                        <div class="stat-card drug-a"><div class="stat-value" id="cmax1">-</div><div class="stat-label">Drug A Cmax</div></div>
+                        <div class="stat-card drug-a"><div class="stat-value" id="tmax1">-</div><div class="stat-label">Drug A Tmax</div></div>
+                        <div class="stat-card drug-a"><div class="stat-value" id="auc1">-</div><div class="stat-label">Drug A AUC</div></div>
+                        
+                        <!-- Drug B Column (Blue) -->
+                        <div class="stat-card drug-b"><div class="stat-value" id="cmax2">-</div><div class="stat-label">Drug B Cmax</div></div>
+                        <div class="stat-card drug-b"><div class="stat-value" id="tmax2">-</div><div class="stat-label">Drug B Tmax</div></div>
+                        <div class="stat-card drug-b"><div class="stat-value" id="auc2">-</div><div class="stat-label">Drug B AUC</div></div>
+                        
+                        <!-- Combined Column (Purple) -->
+                        <div class="stat-card combined"><div class="stat-value" id="maxEffect">-</div><div class="stat-label">Max Effect</div></div>
                     </div>
                 </div>
             </div>
