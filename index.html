@@ -7,7 +7,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
         body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; margin: 0; padding: 20px; }
-        .container { max-width: 1400px; margin: 0 auto; }
+        .container { width: 97%; margin: 0 auto; }
         .header { background: white; border-radius: 15px; padding: 20px; margin-bottom: 20px; text-align: center; }
         .main-grid { display: grid; grid-template-columns: 350px 1fr; gap: 20px; }
         .controls { background: white; border-radius: 15px; padding: 20px; height: fit-content; max-height: 90vh; overflow-y: auto; }
@@ -32,6 +32,21 @@
         .stat-card { background: #667eea; color: white; padding: 15px; border-radius: 8px; text-align: center; }
         .stat-value { font-size: 1.2rem; font-weight: bold; }
         .stat-label { font-size: 0.8rem; }
+        
+        /* Responsive adjustments for better screen usage */
+        @media (max-width: 1200px) {
+            .main-grid { grid-template-columns: 320px 1fr; }
+        }
+        
+        @media (max-width: 900px) {
+            .main-grid { grid-template-columns: 1fr; }
+            .charts { grid-template-columns: 1fr; }
+        }
+        
+        @media (min-width: 1800px) {
+            .charts { grid-template-columns: 1fr 1fr 1fr; }
+            .chart-wrapper { height: 350px; }
+        }
     </style>
 </head>
 <body>
@@ -104,6 +119,21 @@
                         <div class="value" id="intestineTransit1Val">0.15</div>
                     </div>
                     <div class="control-group">
+                        <label>Distribution to Tissue:</label>
+                        <input type="range" id="distribution1" min="0.01" max="0.5" step="0.01" value="0.1" oninput="updateVal('distribution1'); runSim();">
+                        <div class="value" id="distribution1Val">0.1</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Redistribution from Tissue:</label>
+                        <input type="range" id="redistribution1" min="0.01" max="0.3" step="0.01" value="0.05" oninput="updateVal('redistribution1'); runSim();">
+                        <div class="value" id="redistribution1Val">0.05</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Bioavailability:</label>
+                        <input type="range" id="bioavailability1" min="0.01" max="1.0" step="0.01" value="0.7" oninput="updateVal('bioavailability1'); runSim();">
+                        <div class="value" id="bioavailability1Val">0.7</div>
+                    </div>
+                    <div class="control-group">
                         <label>EC50:</label>
                         <input type="range" id="ec501" min="0.1" max="10" step="0.1" value="2.0" oninput="updateVal('ec501'); runSim();">
                         <div class="value" id="ec501Val">2.0</div>
@@ -173,6 +203,21 @@
                         <label>Intestine Transit:</label>
                         <input type="range" id="intestineTransit2" min="0.01" max="0.5" step="0.01" value="0.15" oninput="updateVal('intestineTransit2'); runSim();">
                         <div class="value" id="intestineTransit2Val">0.15</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Distribution to Tissue:</label>
+                        <input type="range" id="distribution2" min="0.01" max="0.5" step="0.01" value="0.1" oninput="updateVal('distribution2'); runSim();">
+                        <div class="value" id="distribution2Val">0.1</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Redistribution from Tissue:</label>
+                        <input type="range" id="redistribution2" min="0.01" max="0.3" step="0.01" value="0.05" oninput="updateVal('redistribution2'); runSim();">
+                        <div class="value" id="redistribution2Val">0.05</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Bioavailability:</label>
+                        <input type="range" id="bioavailability2" min="0.01" max="1.0" step="0.01" value="0.8" oninput="updateVal('bioavailability2'); runSim();">
+                        <div class="value" id="bioavailability2Val">0.8</div>
                     </div>
                     <div class="control-group">
                         <label>Elimination Rate:</label>
@@ -269,7 +314,6 @@
                         <div class="stat-card"><div class="stat-value" id="auc1">-</div><div class="stat-label">Drug A AUC</div></div>
                         <div class="stat-card"><div class="stat-value" id="auc2">-</div><div class="stat-label">Drug B AUC</div></div>
                         <div class="stat-card"><div class="stat-value" id="maxEffect">-</div><div class="stat-label">Max Effect</div></div>
-                        <div class="stat-card"><div class="stat-value" id="effectDuration">-</div><div class="stat-label">Effect Duration</div></div>
                     </div>
                 </div>
             </div>
@@ -422,21 +466,27 @@ function updateDrug(drug, drugNum, dt, elimRate) {
     var liAbs = Math.max(0, drug.li) * getVal('liAbs' + drugNum) * dt;
     var stomachTransit = Math.max(0, drug.stomach) * getVal('stomachTransit' + drugNum) * dt;
     var intestineTransit = Math.max(0, drug.si) * getVal('intestineTransit' + drugNum) * dt;
-    var distribution = Math.max(0, drug.plasma) * 0.1 * dt;
-    var redistribution = Math.max(0, drug.tissue) * 0.05 * dt;
+    var distribution = Math.max(0, drug.plasma) * getVal('distribution' + drugNum) * dt;
+    var redistribution = Math.max(0, drug.tissue) * getVal('redistribution' + drugNum) * dt;
     var elimination = Math.max(0, drug.plasma) * elimRate * dt;
+    
+    // Apply bioavailability to absorbed drug amounts
+    var bioavailability = getVal('bioavailability' + drugNum);
+    var bioavailableStomachAbs = stomachAbs * bioavailability;
+    var bioavailableSiAbs = siAbs * bioavailability;
+    var bioavailableLiAbs = liAbs * bioavailability;
     
     drug.tablet = Math.max(0, drug.tablet - dissolution);
     drug.stomach = Math.max(0, drug.stomach + dissolution - stomachAbs - stomachTransit);
     drug.si = Math.max(0, drug.si + stomachTransit - siAbs - intestineTransit);
     drug.li = Math.max(0, drug.li + intestineTransit - liAbs);
-    drug.plasma = Math.max(0, drug.plasma + stomachAbs + siAbs + liAbs - elimination - distribution + redistribution);
+    drug.plasma = Math.max(0, drug.plasma + bioavailableStomachAbs + bioavailableSiAbs + bioavailableLiAbs - elimination - distribution + redistribution);
     drug.tissue = Math.max(0, drug.tissue + distribution - redistribution);
 }
 
 function calcEffect(conc, ec50, emax) {
     if (conc <= 0) return 0;
-    return -(Math.abs(emax) * conc) / (ec50 + conc);
+    return (emax * conc) / (ec50 + conc);
 }
 
 function calculateStats(data) {
@@ -597,7 +647,6 @@ function runSim() {
         document.getElementById('auc1').textContent = stats.auc1.toFixed(1);
         document.getElementById('auc2').textContent = stats.auc2.toFixed(1);
         document.getElementById('maxEffect').textContent = stats.maxEffect.toFixed(1);
-        document.getElementById('effectDuration').textContent = stats.effectDuration.toFixed(1);
     } catch (error) {
         console.error('Error in runSim:', error);
     }
@@ -608,7 +657,9 @@ window.onload = function() {
                    'numDoses1', 'numDoses2', 'dissolution1', 'dissolution2',
                    'stomachAbs1', 'stomachAbs2', 'siAbs1', 'siAbs2', 'liAbs1', 'liAbs2',
                    'stomachTransit1', 'stomachTransit2', 'intestineTransit1', 'intestineTransit2',
-                   'elim1', 'elim2', 'ec501', 'ec502', 'emax1', 'emax2', 'halflife1', 'halflife2',
+                   'distribution1', 'distribution2', 'redistribution1', 'redistribution2',
+                   'bioavailability1', 'bioavailability2',
+                   'elim2', 'ec501', 'ec502', 'emax1', 'emax2', 'halflife1', 'halflife2',
                    'baseline', 'targetEffect', 'simTime', 'interactionFactor'];
     
     controls.forEach(function(id) { updateVal(id); });
