@@ -3,1345 +3,625 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comprehensive GI Pharmacokinetic-Pharmacodynamic Simulator</title>
+    <title>Dual Drug GI PKPD Simulator</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comprehensive GI Pharmacokinetic-Pharmacodynamic Simulator</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: #374151;
-            line-height: 1.6;
-        }
-        
-        .container {
-            max-width: 95vw;
-            margin: 0 auto;
-            padding: 1.5rem;
-        }
-        
-        .header {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            padding: 2rem;
-            margin-bottom: 1.5rem;
-            text-align: center;
-        }
-        
-        .header h1 {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #1f2937;
-            margin-bottom: 0.5rem;
-        }
-        
-        .header p {
-            color: #6b7280;
-            font-size: 1.1rem;
-        }
-        
-        .main-grid {
-            display: grid;
-            grid-template-columns: 380px 1fr;
-            gap: 1.5rem;
-        }
-        
-        .controls-panel {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            padding: 1.5rem;
-            height: fit-content;
-        }
-        
-        .controls-panel h2 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            color: #1f2937;
-            text-align: center;
-            border-bottom: 2px solid #e5e7eb;
-            padding-bottom: 0.5rem;
-        }
-        
-        .control-section {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            border: 1px solid #e9ecef;
-        }
-        
-        .control-section h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: #495057;
-            border-bottom: 1px solid #dee2e6;
-            padding-bottom: 0.5rem;
-            cursor: pointer;
-            user-select: none;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: color 0.2s ease;
-        }
-        
-        .control-section h3:hover {
-            color: #667eea;
-        }
-        
-        .control-section h3::after {
-            content: '▼';
-            font-size: 0.8rem;
-            transition: transform 0.3s ease;
-        }
-        
-        .control-section.collapsed h3::after {
-            transform: rotate(-180deg);
-        }
-        
-        .control-content {
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-            max-height: 1000px;
-        }
-        
-        .control-section.collapsed .control-content {
-            max-height: 0;
-            margin-bottom: 0;
-        }
-        
-        .control-group {
-            margin-bottom: 1rem;
-        }
-        
-        .control-group label {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: #495057;
-            margin-bottom: 0.25rem;
-        }
-        
-        .control-group input[type="range"] {
-            width: 100%;
-            margin-bottom: 0.25rem;
-            accent-color: #667eea;
-        }
-        
-        .control-group input[type="text"] {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 0.9rem;
-        }
-        
-        .control-group select {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            background: white;
-            font-size: 0.9rem;
-        }
-        
-        .control-group .value {
-            font-size: 0.75rem;
-            color: #6b7280;
-            font-weight: 500;
-        }
-        
-        .description {
-            font-size: 0.7rem;
-            color: #6b7280;
-            margin-top: 0.25rem;
-            font-style: italic;
-        }
-        
-        .charts-area {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-        }
-        
-        .chart-container {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            padding: 1.5rem;
-        }
-        
-        .chart-container h3 {
-            font-size: 1.125rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: #1f2937;
-            text-align: center;
-        }
-        
-        .chart-wrapper {
-            position: relative;
-            height: 300px;
-            margin-bottom: 1rem;
-        }
-        
-        .chart-wrapper.small {
-            height: 250px;
-        }
-        
-        .chart-info {
-            font-size: 0.8rem;
-            color: #6b7280;
-            background: #f8f9fa;
-            padding: 0.75rem;
-            border-radius: 6px;
-            margin-top: 0.5rem;
-        }
-        
-        .chart-section {
-            margin-bottom: 2rem;
-        }
-        
-        .chart-section:last-child {
-            margin-bottom: 0;
-        }
-        
-        .chart-section h4 {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: #1f2937;
-            text-align: center;
-        }
-        
-        .drug-profiles {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            padding: 1.5rem;
-            margin-top: 1.5rem;
-        }
-        
-        .profile-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        
-        .profile-card {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 1rem;
-            border: 2px solid #e9ecef;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-        
-        .profile-card:hover {
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transform: translateY(-2px);
-        }
-        
-        .profile-card.active {
-            border-color: #667eea;
-            background: #f0f4ff;
-        }
-        
-        .profile-card strong {
-            color: #1f2937;
-            font-size: 1rem;
-        }
-        
-        .profile-card small {
-            color: #6b7280;
-            font-size: 0.8rem;
-        }
-        
-        .results-panel {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            padding: 1.5rem;
-            margin-top: 1.5rem;
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        
-        .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 1rem;
-            border-radius: 8px;
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-        
-        .stat-label {
-            font-size: 0.8rem;
-            opacity: 0.9;
-        }
-        
-        .run-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: bold;
-            transition: transform 0.2s;
-            width: 100%;
-            margin-top: 1rem;
-        }
-        
-        .run-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-        
-        .run-button.success {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        }
-        
-        @media (max-width: 1200px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .charts-area {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .charts-area {
-                grid-template-columns: 1fr;
-            }
-            
-            .profile-cards {
-                grid-template-columns: 1fr;
-            }
-        }
+        body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; margin: 0; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header { background: white; border-radius: 15px; padding: 20px; margin-bottom: 20px; text-align: center; }
+        .main-grid { display: grid; grid-template-columns: 350px 1fr; gap: 20px; }
+        .controls { background: white; border-radius: 15px; padding: 20px; height: fit-content; max-height: 90vh; overflow-y: auto; }
+        .control-group { margin-bottom: 15px; }
+        .control-group label { display: block; font-size: 0.9rem; margin-bottom: 5px; }
+        .control-group input[type="range"] { width: 100%; margin-bottom: 5px; }
+        .control-group select { width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ddd; }
+        .value { font-size: 0.8rem; color: #666; }
+        .drug-tabs { display: flex; margin-bottom: 15px; }
+        .drug-tab { flex: 1; padding: 10px; background: #f0f0f0; border: none; cursor: pointer; }
+        .drug-tab.active { background: #667eea; color: white; }
+        .drug-panel { display: none; }
+        .drug-panel.active { display: block; }
+        .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .chart-container { background: white; border-radius: 15px; padding: 20px; }
+        .chart-wrapper { height: 300px; margin-bottom: 10px; }
+        .chart-info { font-size: 0.8rem; color: #666; background: #f8f8f8; padding: 10px; border-radius: 5px; }
+        .interaction-section { background: #fff3cd; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+        .run-button { background: #667eea; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 15px; }
+        .stats { background: white; border-radius: 15px; padding: 20px; margin-top: 20px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-top: 15px; }
+        .stat-card { background: #667eea; color: white; padding: 15px; border-radius: 8px; text-align: center; }
+        .stat-value { font-size: 1.2rem; font-weight: bold; }
+        .stat-label { font-size: 0.8rem; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>Comprehensive GI PKPD Simulator</h1>
-            <p>Advanced pharmacokinetic-pharmacodynamic modeling with detailed gastrointestinal absorption</p>
+            <h1>Dual Drug GI PKPD Simulator</h1>
         </div>
         
         <div class="main-grid">
-            <!-- Controls Panel -->
-            <div class="controls-panel">
-                <h2>Model Parameters</h2>
+            <div class="controls">
+                <h3>Parameters</h3>
                 
-                <!-- Google Sheets Integration -->
-                <div class="control-section">
-                    <h3 onclick="toggleSection(this)">Google Sheets Integration</h3>
-                    <div class="control-content">
-                        <div class="control-group">
-                            <label>Google Sheet ID:</label>
-                            <input type="text" id="sheetId" placeholder="Enter Google Sheet ID">
-                            <div class="description">Format: 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms</div>
-                        </div>
-                        <div class="control-group">
-                            <label>Sheet Name:</label>
-                            <input type="text" id="sheetName" value="Scenarios">
-                            <div class="description">Name of the sheet tab containing scenarios</div>
-                        </div>
-                        <div class="control-group">
-                            <label>Select Scenario:</label>
-                            <select id="scenarioSelect">
-                                <option value="">Load scenarios first...</option>
-                            </select>
-                        </div>
-                        <button class="run-button" onclick="loadScenariosFromSheet()">Load Scenarios</button>
-                        <button class="run-button success" onclick="applyScenariosFromSheet()">Apply Selected Scenario</button>
+                <div class="drug-tabs">
+                    <button class="drug-tab active" onclick="switchTab(1)">Drug A</button>
+                    <button class="drug-tab" onclick="switchTab(2)">Drug B</button>
+                </div>
+                
+                <div class="drug-panel active" id="panel1">
+                    <div class="control-group">
+                        <label><input type="checkbox" id="enabled1" checked onchange="runSim()"> Enable Drug A</label>
+                    </div>
+                    <div class="control-group">
+                        <label>Dose (mg):</label>
+                        <input type="range" id="dose1" min="10" max="200" value="50" oninput="updateVal('dose1'); runSim();">
+                        <div class="value" id="dose1Val">50 mg</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Admin Time (hrs):</label>
+                        <input type="range" id="adminTime1" min="0" max="12" step="0.5" value="0" oninput="updateVal('adminTime1'); runSim();">
+                        <div class="value" id="adminTime1Val">0 hrs</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Dosing Interval (hrs):</label>
+                        <input type="range" id="interval1" min="0" max="24" step="1" value="0" oninput="updateVal('interval1'); runSim();">
+                        <div class="value" id="interval1Val">0 hrs (single dose)</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Number of Doses:</label>
+                        <input type="range" id="numDoses1" min="1" max="10" step="1" value="1" oninput="updateVal('numDoses1'); runSim();">
+                        <div class="value" id="numDoses1Val">1</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Dissolution Rate:</label>
+                        <input type="range" id="dissolution1" min="0.01" max="0.5" step="0.01" value="0.1" oninput="updateVal('dissolution1'); runSim();">
+                        <div class="value" id="dissolution1Val">0.1</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Stomach Absorption:</label>
+                        <input type="range" id="stomachAbs1" min="0.01" max="0.5" step="0.01" value="0.05" oninput="updateVal('stomachAbs1'); runSim();">
+                        <div class="value" id="stomachAbs1Val">0.05</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Small Intestine Absorption:</label>
+                        <input type="range" id="siAbs1" min="0.01" max="0.8" step="0.01" value="0.3" oninput="updateVal('siAbs1'); runSim();">
+                        <div class="value" id="siAbs1Val">0.3</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Large Intestine Absorption:</label>
+                        <input type="range" id="liAbs1" min="0.01" max="0.3" step="0.01" value="0.1" oninput="updateVal('liAbs1'); runSim();">
+                        <div class="value" id="liAbs1Val">0.1</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Stomach Transit:</label>
+                        <input type="range" id="stomachTransit1" min="0.01" max="0.5" step="0.01" value="0.2" oninput="updateVal('stomachTransit1'); runSim();">
+                        <div class="value" id="stomachTransit1Val">0.2</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Intestine Transit:</label>
+                        <input type="range" id="intestineTransit1" min="0.01" max="0.5" step="0.01" value="0.15" oninput="updateVal('intestineTransit1'); runSim();">
+                        <div class="value" id="intestineTransit1Val">0.15</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Elimination Rate:</label>
+                        <input type="range" id="elim1" min="0.01" max="0.3" step="0.01" value="0.1" oninput="updateVal('elim1'); runSim();">
+                        <div class="value" id="elim1Val">0.1</div>
+                    </div>
+                    <div class="control-group">
+                        <label>EC50:</label>
+                        <input type="range" id="ec501" min="0.1" max="10" step="0.1" value="2.0" oninput="updateVal('ec501'); runSim();">
+                        <div class="value" id="ec501Val">2.0</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Emax:</label>
+                        <input type="range" id="emax1" min="-100" max="100" step="5" value="-50" oninput="updateVal('emax1'); runSim();">
+                        <div class="value" id="emax1Val">-50</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Half-life (hrs):</label>
+                        <input type="range" id="halflife1" min="0.5" max="24" step="0.5" value="6.9" oninput="updateVal('halflife1'); runSim();">
+                        <div class="value" id="halflife1Val">6.9 hrs</div>
                     </div>
                 </div>
                 
-                <!-- Drug Selection -->
-                <div class="control-section">
-                    <h3 onclick="toggleSection(this)">Drug Selection</h3>
-                    <div class="control-content">
-                        <div class="control-group">
-                            <label>Select Drug Profile:</label>
-                            <select id="drugSelect">
-                                <option value="cardiac">Cardiac Drug (Heart Rate)</option>
-                                <option value="glucose">Antidiabetic (Glucose)</option>
-                                <option value="analgesic">Analgesic (Pain Relief)</option>
-                                <option value="sedative">Sedative (Alertness)</option>
-                                <option value="bronchodilator">Bronchodilator (FEV1)</option>
-                                <option value="custom">Custom Drug</option>
-                            </select>
-                            <div class="description" id="drugDescription">Beta blocker - reduces heart rate</div>
-                        </div>
+                <div class="drug-panel" id="panel2">
+                    <div class="control-group">
+                        <label><input type="checkbox" id="enabled2" checked onchange="runSim()"> Enable Drug B</label>
+                    </div>
+                    <div class="control-group">
+                        <label>Dose (mg):</label>
+                        <input type="range" id="dose2" min="10" max="200" value="75" oninput="updateVal('dose2'); runSim();">
+                        <div class="value" id="dose2Val">75 mg</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Admin Time (hrs):</label>
+                        <input type="range" id="adminTime2" min="0" max="12" step="0.5" value="2" oninput="updateVal('adminTime2'); runSim();">
+                        <div class="value" id="adminTime2Val">2 hrs</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Dosing Interval (hrs):</label>
+                        <input type="range" id="interval2" min="0" max="24" step="1" value="0" oninput="updateVal('interval2'); runSim();">
+                        <div class="value" id="interval2Val">0 hrs (single dose)</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Number of Doses:</label>
+                        <input type="range" id="numDoses2" min="1" max="10" step="1" value="1" oninput="updateVal('numDoses2'); runSim();">
+                        <div class="value" id="numDoses2Val">1</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Dissolution Rate:</label>
+                        <input type="range" id="dissolution2" min="0.01" max="0.5" step="0.01" value="0.15" oninput="updateVal('dissolution2'); runSim();">
+                        <div class="value" id="dissolution2Val">0.15</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Stomach Absorption:</label>
+                        <input type="range" id="stomachAbs2" min="0.01" max="0.5" step="0.01" value="0.03" oninput="updateVal('stomachAbs2'); runSim();">
+                        <div class="value" id="stomachAbs2Val">0.03</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Small Intestine Absorption:</label>
+                        <input type="range" id="siAbs2" min="0.01" max="0.8" step="0.01" value="0.4" oninput="updateVal('siAbs2'); runSim();">
+                        <div class="value" id="siAbs2Val">0.4</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Large Intestine Absorption:</label>
+                        <input type="range" id="liAbs2" min="0.01" max="0.3" step="0.01" value="0.08" oninput="updateVal('liAbs2'); runSim();">
+                        <div class="value" id="liAbs2Val">0.08</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Stomach Transit:</label>
+                        <input type="range" id="stomachTransit2" min="0.01" max="0.5" step="0.01" value="0.2" oninput="updateVal('stomachTransit2'); runSim();">
+                        <div class="value" id="stomachTransit2Val">0.2</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Intestine Transit:</label>
+                        <input type="range" id="intestineTransit2" min="0.01" max="0.5" step="0.01" value="0.15" oninput="updateVal('intestineTransit2'); runSim();">
+                        <div class="value" id="intestineTransit2Val">0.15</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Elimination Rate:</label>
+                        <input type="range" id="elim2" min="0.01" max="0.3" step="0.01" value="0.08" oninput="updateVal('elim2'); runSim();">
+                        <div class="value" id="elim2Val">0.08</div>
+                    </div>
+                    <div class="control-group">
+                        <label>EC50:</label>
+                        <input type="range" id="ec502" min="0.1" max="10" step="0.1" value="5.0" oninput="updateVal('ec502'); runSim();">
+                        <div class="value" id="ec502Val">5.0</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Emax:</label>
+                        <input type="range" id="emax2" min="-100" max="100" step="5" value="-60" oninput="updateVal('emax2'); runSim();">
+                        <div class="value" id="emax2Val">-60</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Half-life (hrs):</label>
+                        <input type="range" id="halflife2" min="0.5" max="24" step="0.5" value="8.7" oninput="updateVal('halflife2'); runSim();">
+                        <div class="value" id="halflife2Val">8.7 hrs</div>
                     </div>
                 </div>
                 
-                <!-- Dose Parameters -->
-                <div class="control-section">
-                    <h3 onclick="toggleSection(this)">Dose Parameters</h3>
-                    <div class="control-content">
-                        <div class="control-group">
-                            <label>Dose (mg):</label>
-                            <input type="range" id="dose" min="10" max="200" step="5" value="50">
-                            <div class="value" id="doseValue">50 mg</div>
-                        </div>
-                        <div class="control-group">
-                            <label>Dissolution Rate (hr⁻¹):</label>
-                            <input type="range" id="dissolutionRate" min="0.01" max="0.5" step="0.01" value="0.1">
-                            <div class="value" id="dissolutionRateValue">0.1</div>
-                            <div class="description">Rate of tablet dissolution in stomach</div>
-                        </div>
+                <div class="interaction-section">
+                    <h3>Drug Interactions</h3>
+                    <div class="control-group">
+                        <label>Interaction Type:</label>
+                        <select id="interactionType" onchange="runSim()">
+                            <option value="additive">Additive</option>
+                            <option value="synergistic">Synergistic</option>
+                            <option value="antagonistic">Antagonistic</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Interaction Factor:</label>
+                        <input type="range" id="interactionFactor" min="0.5" max="2.0" step="0.1" value="1.0" oninput="updateVal('interactionFactor'); runSim();">
+                        <div class="value" id="interactionFactorVal">1.0</div>
                     </div>
                 </div>
                 
-                <!-- GI Absorption Parameters -->
-                <div class="control-section">
-                    <h3 onclick="toggleSection(this)">GI Absorption</h3>
-                    <div class="control-content">
-                        <div class="control-group">
-                            <label>Stomach Absorption (hr⁻¹):</label>
-                            <input type="range" id="stomachAbsorption" min="0.01" max="0.5" step="0.01" value="0.05">
-                            <div class="value" id="stomachAbsorptionValue">0.05</div>
-                        </div>
-                        <div class="control-group">
-                            <label>Small Intestine Absorption (hr⁻¹):</label>
-                            <input type="range" id="smallIntestineAbsorption" min="0.01" max="0.8" step="0.01" value="0.3">
-                            <div class="value" id="smallIntestineAbsorptionValue">0.3</div>
-                        </div>
-                        <div class="control-group">
-                            <label>Large Intestine Absorption (hr⁻¹):</label>
-                            <input type="range" id="largeIntestineAbsorption" min="0.01" max="0.3" step="0.01" value="0.1">
-                            <div class="value" id="largeIntestineAbsorptionValue">0.1</div>
-                        </div>
-                    </div>
+                <div class="control-group">
+                    <label>Baseline Effect:</label>
+                    <input type="range" id="baseline" min="50" max="200" step="5" value="120" oninput="updateVal('baseline'); runSim();">
+                    <div class="value" id="baselineVal">120</div>
                 </div>
                 
-                <!-- GI Transit Parameters -->
-                <div class="control-section">
-                    <h3 onclick="toggleSection(this)">GI Transit</h3>
-                    <div class="control-content">
-                        <div class="control-group">
-                            <label>Stomach Transit (hr⁻¹):</label>
-                            <input type="range" id="stomachTransit" min="0.01" max="0.5" step="0.01" value="0.2">
-                            <div class="value" id="stomachTransitValue">0.2</div>
-                        </div>
-                        <div class="control-group">
-                            <label>Intestine Transit (hr⁻¹):</label>
-                            <input type="range" id="intestineTransit" min="0.01" max="0.5" step="0.01" value="0.15">
-                            <div class="value" id="intestineTransitValue">0.15</div>
-                        </div>
-                    </div>
+                <div class="control-group">
+                    <label>Target Effect:</label>
+                    <input type="range" id="targetEffect" min="50" max="200" step="5" value="90" oninput="updateVal('targetEffect'); runSim();">
+                    <div class="value" id="targetEffectVal">90</div>
                 </div>
                 
-                <!-- Distribution & Elimination -->
-                <div class="control-section">
-                    <h3 onclick="toggleSection(this)">Distribution & Elimination</h3>
-                    <div class="control-content">
-                        <div class="control-group">
-                            <label>K12 (Plasma → Tissue, hr⁻¹):</label>
-                            <input type="range" id="distributionRate" min="0.01" max="1.0" step="0.01" value="0.1">
-                            <div class="value" id="distributionRateValue">0.1</div>
-                        </div>
-                        <div class="control-group">
-                            <label>K21 (Tissue → Plasma, hr⁻¹):</label>
-                            <input type="range" id="redistributionRate" min="0.01" max="1.0" step="0.01" value="0.1">
-                            <div class="value" id="redistributionRateValue">0.1</div>
-                        </div>
-                        <div class="control-group">
-                            <label>Half-life (hours):</label>
-                            <input type="range" id="halfLife" min="0.1" max="48" step="0.1" value="6.9">
-                            <div class="value" id="halfLifeValue">6.9 hours</div>
-                            <div class="description">Development control - automatically updates elimination rate</div>
-                        </div>
-                        <div class="control-group">
-                            <label>Elimination Rate (hr⁻¹):</label>
-                            <input type="range" id="elimination" min="0.01" max="0.3" step="0.01" value="0.1">
-                            <div class="value" id="eliminationValue">0.1</div>
-                        </div>
-                    </div>
+                <div class="control-group">
+                    <label>Simulation Time (hrs):</label>
+                    <input type="range" id="simTime" min="12" max="72" step="6" value="48" oninput="updateVal('simTime'); runSim();">
+                    <div class="value" id="simTimeVal">48 hrs</div>
                 </div>
                 
-                <!-- Pharmacodynamic Parameters -->
-                <div class="control-section" id="pdSection" style="display: none;">
-                    <h3 onclick="toggleSection(this)">Pharmacodynamics</h3>
-                    <div class="control-content">
-                        <div class="control-group">
-                            <label>EC50 (mg/L):</label>
-                            <input type="range" id="ec50" min="0.1" max="10" step="0.1" value="2.0">
-                            <div class="value" id="ec50Value">2.0</div>
-                        </div>
-                        <div class="control-group">
-                            <label>Emax:</label>
-                            <input type="range" id="emax" min="-100" max="100" step="5" value="-50">
-                            <div class="value" id="emaxValue">-50</div>
-                        </div>
-                        <div class="control-group">
-                            <label>E0 (Baseline):</label>
-                            <input type="range" id="baseline" min="50" max="200" step="5" value="100">
-                            <div class="value" id="baselineValue">100</div>
-                        </div>
-                        <div class="control-group">
-                            <label>Hill Coefficient:</label>
-                            <input type="range" id="hillSlope" min="0.5" max="3" step="0.1" value="1.0">
-                            <div class="value" id="hillSlopeValue">1.0</div>
-                        </div>
-                        <div class="control-group">
-                            <label>Effect Type:</label>
-                            <select id="effectType">
-                                <option value="agonist">Agonist (↑ concentration → ↑ effect)</option>
-                                <option value="antagonist">Antagonist (↑ concentration → ↓ effect)</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Simulation Settings -->
-                <div class="control-section">
-                    <h3 onclick="toggleSection(this)">Simulation Settings</h3>
-                    <div class="control-content">
-                        <div class="control-group">
-                            <label>Simulation Time (hours):</label>
-                            <input type="range" id="simulationTime" min="12" max="72" step="6" value="48">
-                            <div class="value" id="simulationTimeValue">48 hours</div>
-                        </div>
-                        <button class="run-button" onclick="runSimulation()">Run Simulation</button>
-                    </div>
-                </div>
+                <button class="run-button" onclick="runSim()">Run Simulation</button>
             </div>
             
-            <!-- Charts Area -->
-            <div class="charts-area">
-                <!-- Left Card: Drug Release & GI Transit -->
+            <div class="charts">
                 <div class="chart-container">
-                    <div class="chart-section">
-                        <h4>Drug Release Profile</h4>
-                        <div class="chart-wrapper small">
-                            <canvas id="dissolutionChart"></canvas>
-                        </div>
-                        <div class="chart-info">
-                            <strong>Model:</strong> First-order dissolution kinetics in stomach compartment
-                        </div>
+                    <h4>Drug Release & Dissolution</h4>
+                    <div class="chart-wrapper">
+                        <canvas id="chart1"></canvas>
                     </div>
-                    
-                    <div class="chart-section">
-                        <h4>GI Transit & Pharmacokinetics</h4>
-                        <div class="chart-wrapper small">
-                            <canvas id="combinedPKChart"></canvas>
-                        </div>
-                        <div class="chart-info">
-                            <strong>Model:</strong> GI compartments and two-compartment PK model
-                        </div>
-                    </div>
+                    <div class="chart-info">Tablet dissolution and dissolved drug profiles</div>
                 </div>
                 
-                <!-- Right Card: Dose-Response & Pharmacodynamics -->
                 <div class="chart-container">
-                    <div class="chart-section">
-                        <h4>Dose-Response Relationship</h4>
-                        <div class="chart-wrapper small">
-                            <canvas id="doseResponseChart"></canvas>
-                        </div>
-                        <div class="chart-info" id="doseResponseInfo">
-                            <strong>Parameters:</strong> EC50: 2.0 mg/L | Emax: -50 | Hill: 1.0
-                        </div>
+                    <h4>GI Distribution & Plasma</h4>
+                    <div class="chart-wrapper">
+                        <canvas id="chart2"></canvas>
                     </div>
-                    
-                    <div class="chart-section">
-                        <h4 id="pdTitle">Pharmacodynamic Profile - Heart Rate</h4>
-                        <div class="chart-wrapper small">
-                            <canvas id="pdChart"></canvas>
-                        </div>
-                        <div class="chart-info" id="pdInfo">
-                            <strong>Model:</strong> Sigmoidal Emax model with concentration-response relationship
-                        </div>
+                    <div class="chart-info">Complete drug journey: GI + plasma + tissue distribution</div>
+                </div>
+                
+                <div class="chart-container">
+                    <h4>Combined Pharmacodynamic Effects</h4>
+                    <div class="chart-wrapper">
+                        <canvas id="chart3"></canvas>
                     </div>
+                    <div class="chart-info">Individual and combined drug effects with interactions</div>
                 </div>
-            </div>
-        </div>
-        
-        <!-- Drug Profiles -->
-        <div class="drug-profiles">
-            <h2>Predefined Drug Profiles</h2>
-            <div class="profile-cards">
-                <div class="profile-card" onclick="loadDrugProfile('cardiac')">
-                    <strong>Cardiac Drug</strong><br>
-                    <small>Heart rate modulation • EC50: 2.0 mg/L • Emax: -50 bpm</small>
-                </div>
-                <div class="profile-card" onclick="loadDrugProfile('glucose')">
-                    <strong>Antidiabetic Drug</strong><br>
-                    <small>Glucose reduction • EC50: 5.0 mg/L • Emax: -60 mg/dL</small>
-                </div>
-                <div class="profile-card" onclick="loadDrugProfile('analgesic')">
-                    <strong>Analgesic</strong><br>
-                    <small>Pain relief • EC50: 1.5 mg/L • Emax: -80% pain</small>
-                </div>
-                <div class="profile-card" onclick="loadDrugProfile('sedative')">
-                    <strong>Sedative</strong><br>
-                    <small>Alertness reduction • EC50: 4.0 mg/L • Emax: -70% alertness</small>
-                </div>
-                <div class="profile-card" onclick="loadDrugProfile('bronchodilator')">
-                    <strong>Bronchodilator</strong><br>
-                    <small>Lung function improvement • EC50: 1.0 mg/L • Emax: +40% FEV1</small>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Results Panel -->
-        <div class="results-panel">
-            <h2>Simulation Results</h2>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-value" id="cmaxValue">-</div>
-                    <div class="stat-label">Cmax (mg/L)</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="tmaxValue">-</div>
-                    <div class="stat-label">Tmax (hours)</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="aucValue">-</div>
-                    <div class="stat-label">AUC (mg·h/L)</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="maxEffectValue">-</div>
-                    <div class="stat-label">Max Effect</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="durationValue">-</div>
-                    <div class="stat-label">Duration >50% (hours)</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="bioavailabilityValue">-</div>
-                    <div class="stat-label">Bioavailability (%)</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="halfLifeValue">-</div>
-                    <div class="stat-label">Half-life (hours)</div>
+                
+                <div class="chart-container">
+                    <h4>Results</h4>
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="stat-value" id="cmax1">-</div><div class="stat-label">Drug A Cmax</div></div>
+                        <div class="stat-card"><div class="stat-value" id="cmax2">-</div><div class="stat-label">Drug B Cmax</div></div>
+                        <div class="stat-card"><div class="stat-value" id="tmax1">-</div><div class="stat-label">Drug A Tmax</div></div>
+                        <div class="stat-card"><div class="stat-value" id="tmax2">-</div><div class="stat-label">Drug B Tmax</div></div>
+                        <div class="stat-card"><div class="stat-value" id="auc1">-</div><div class="stat-label">Drug A AUC</div></div>
+                        <div class="stat-card"><div class="stat-value" id="auc2">-</div><div class="stat-label">Drug B AUC</div></div>
+                        <div class="stat-card"><div class="stat-value" id="maxEffect">-</div><div class="stat-label">Max Effect</div></div>
+                        <div class="stat-card"><div class="stat-value" id="effectDuration">-</div><div class="stat-label">Effect Duration</div></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script>
-        // Drug profile definitions
-        const drugProfiles = {
-            cardiac: {
-                name: "Cardiac Drug",
-                ec50: 2.0,
-                emax: -50,
-                baseline: 120,
-                hill: 1.2,
-                effectType: "antagonist",
-                unit: "bpm",
-                description: "Beta blocker - reduces heart rate",
-                effectName: "Heart Rate"
-            },
-            glucose: {
-                name: "Antidiabetic Drug",
-                ec50: 5.0,
-                emax: -60,
-                baseline: 120,
-                hill: 0.8,
-                effectType: "antagonist",
-                unit: "mg/dL",
-                description: "Antidiabetic - lowers blood glucose",
-                effectName: "Blood Glucose"
-            },
-            analgesic: {
-                name: "Analgesic",
-                ec50: 1.5,
-                emax: -80,
-                baseline: 100,
-                hill: 2.0,
-                effectType: "antagonist",
-                unit: "% pain",
-                description: "Analgesic - reduces pain sensation",
-                effectName: "Pain Level"
-            },
-            sedative: {
-                name: "Sedative",
-                ec50: 4.0,
-                emax: -70,
-                baseline: 100,
-                hill: 1.8,
-                effectType: "antagonist",
-                unit: "% alertness",
-                description: "Sedative - reduces alertness level",
-                effectName: "Alertness"
-            },
-            bronchodilator: {
-                name: "Bronchodilator",
-                ec50: 1.0,
-                emax: 40,
-                baseline: 100,
-                hill: 1.5,
-                effectType: "agonist",
-                unit: "% predicted",
-                description: "Beta agonist - improves lung function",
-                effectName: "FEV1"
-            },
-            custom: {
-                name: "Custom Drug",
-                ec50: 2.0,
-                emax: -50,
-                baseline: 100,
-                hill: 1.0,
-                effectType: "antagonist",
-                unit: "units",
-                description: "Customizable drug parameters",
-                effectName: "Response"
-            }
-        };
+<script>
+var charts = {};
 
-        // Global variables
-        let currentDrug = drugProfiles.cardiac;
-        let charts = {};
-        let scenariosData = [];
+function switchTab(n) {
+    document.querySelectorAll('.drug-tab').forEach(function(t) { t.classList.remove('active'); });
+    document.querySelectorAll('.drug-panel').forEach(function(p) { p.classList.remove('active'); });
+    document.querySelector('.drug-tab:nth-child(' + n + ')').classList.add('active');
+    document.getElementById('panel' + n).classList.add('active');
+}
+
+function updateVal(id) {
+    var el = document.getElementById(id);
+    var val = document.getElementById(id + 'Val');
+    if (el && val) {
+        var v = el.value;
+        if (id.includes('dose')) v += ' mg';
+        else if (id.includes('Time') || id.includes('halflife')) v += ' hrs';
+        else if (id.includes('interval')) {
+            if (parseFloat(v) === 0) v += ' hrs (single dose)';
+            else v += ' hrs';
+        }
+        val.textContent = v;
+    }
+}
+
+function getVal(id) {
+    var el = document.getElementById(id);
+    return el ? parseFloat(el.value) : 0;
+}
+
+function getCheck(id) {
+    var el = document.getElementById(id);
+    return el ? el.checked : false;
+}
+
+function getSelect(id) {
+    var el = document.getElementById(id);
+    return el ? el.value : '';
+}
+
+function calculateElimFromHalflife(halflife) {
+    return Math.log(2) / halflife;
+}
+
+function combineEffects(e1, e2, type, factor) {
+    switch (type) {
+        case 'additive': return e1 + e2;
+        case 'synergistic': return (e1 + e2) * factor;
+        case 'antagonistic': return (e1 + e2) / factor;
+        default: return e1 + e2;
+    }
+}
+
+function simulate() {
+    var data = [];
+    var dt = 0.1;
+    var simTime = getVal('simTime');
+    var steps = Math.floor(simTime / dt);
+    var baseline = getVal('baseline');
+    var interactionType = getSelect('interactionType') || 'additive';
+    var interactionFactor = getVal('interactionFactor') || 1.0;
+    
+    var drug1Params = {
+        enabled: getCheck('enabled1'),
+        dose: getVal('dose1'),
+        adminTime: getVal('adminTime1'),
+        interval: getVal('interval1'),
+        numDoses: getVal('numDoses1'),
+        elim: calculateElimFromHalflife(getVal('halflife1') || 6.9)
+    };
+    
+    var drug2Params = {
+        enabled: getCheck('enabled2'),
+        dose: getVal('dose2'),
+        adminTime: getVal('adminTime2'),
+        interval: getVal('interval2'),
+        numDoses: getVal('numDoses2'),
+        elim: calculateElimFromHalflife(getVal('halflife2') || 8.7)
+    };
+    
+    var drug1DoseTimes = [];
+    var drug2DoseTimes = [];
+    
+    if (drug1Params.enabled) {
+        for (var d = 0; d < drug1Params.numDoses; d++) {
+            var doseTime = drug1Params.adminTime + (d * drug1Params.interval);
+            if (doseTime <= simTime) drug1DoseTimes.push(Math.round(doseTime * 10) / 10);
+        }
+    }
+    
+    if (drug2Params.enabled) {
+        for (var d = 0; d < drug2Params.numDoses; d++) {
+            var doseTime = drug2Params.adminTime + (d * drug2Params.interval);
+            if (doseTime <= simTime) drug2DoseTimes.push(Math.round(doseTime * 10) / 10);
+        }
+    }
+    
+    var drug1 = { tablet: 0, stomach: 0, si: 0, li: 0, plasma: 0, tissue: 0 };
+    var drug2 = { tablet: 0, stomach: 0, si: 0, li: 0, plasma: 0, tissue: 0 };
+    
+    for (var i = 0; i <= steps; i++) {
+        var time = i * dt;
+        var currentTime = Math.round(time * 10) / 10;
         
-        // Initialize the application
-        function init() {
-            setupEventListeners();
-            setupCharts();
-            
-            // Initialize half-life based on default elimination rate
-            const eliminationRate = parseFloat(document.getElementById('elimination').value);
-            const halfLife = Math.log(2) / eliminationRate;
-            const halfLifeElement = document.getElementById('halfLife');
-            if (halfLifeElement) {
-                halfLifeElement.value = halfLife;
-                updateValueDisplay('halfLife');
-            }
-            
-            runSimulation();
+        if (drug1DoseTimes.includes(currentTime)) {
+            drug1.tablet += drug1Params.dose;
+        }
+        if (drug2DoseTimes.includes(currentTime)) {
+            drug2.tablet += drug2Params.dose;
         }
         
-        // Toggle section collapse/expand
-        function toggleSection(header) {
-            const section = header.parentElement;
-            section.classList.toggle('collapsed');
-        }
-        
-        // Google Sheets Integration
-        async function loadScenariosFromSheet() {
-            const sheetId = document.getElementById('sheetId').value.trim();
-            const sheetName = document.getElementById('sheetName').value.trim();
+        if (i % 10 === 0) {
+            var e1 = drug1Params.enabled ? calcEffect(drug1.plasma, getVal('ec501'), getVal('emax1')) : 0;
+            var e2 = drug2Params.enabled ? calcEffect(drug2.plasma, getVal('ec502'), getVal('emax2')) : 0;
+            var combinedE = combineEffects(e1, e2, interactionType, interactionFactor);
             
-            if (!sheetId) {
-                alert('Please enter a Google Sheet ID');
-                return;
-            }
-            
-            try {
-                const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
-                
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const csvData = await response.text();
-                scenariosData = parseCSV(csvData);
-                
-                populateScenarioDropdown();
-                alert(`Successfully loaded ${scenariosData.length} scenarios from Google Sheets`);
-                
-            } catch (error) {
-                console.error('Error loading scenarios:', error);
-                alert('Error loading scenarios. Please check:\n1. Sheet ID is correct\n2. Sheet is publicly viewable\n3. Sheet name exists\n4. Internet connection is working');
-            }
-        }
-        
-        function parseCSV(csvData) {
-            const lines = csvData.split('\n');
-            const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim().toLowerCase());
-            const scenarios = [];
-            
-            for (let i = 1; i < lines.length; i++) {
-                if (lines[i].trim()) {
-                    const values = lines[i].split(',').map(v => v.replace(/"/g, '').trim());
-                    const scenario = {};
-                    
-                    headers.forEach((header, index) => {
-                        const value = values[index];
-                        scenario[header] = isNaN(value) ? value : parseFloat(value);
-                    });
-                    
-                    scenarios.push(scenario);
-                }
-            }
-            
-            return scenarios;
-        }
-        
-        function populateScenarioDropdown() {
-            const select = document.getElementById('scenarioSelect');
-            select.innerHTML = '<option value="">Select a scenario...</option>';
-            
-            scenariosData.forEach((scenario, index) => {
-                const option = document.createElement('option');
-                option.value = index;
-                option.textContent = scenario.name || scenario.scenario || `Scenario ${index + 1}`;
-                select.appendChild(option);
+            data.push({
+                time: currentTime,
+                drug1: JSON.parse(JSON.stringify(drug1)),
+                drug2: JSON.parse(JSON.stringify(drug2)),
+                effect1: e1,
+                effect2: e2,
+                combinedEffect: baseline + combinedE,
+                dissolvedDrug1: (drug1Params.numDoses * drug1Params.dose) - drug1.tablet,
+                dissolvedDrug2: (drug2Params.numDoses * drug2Params.dose) - drug2.tablet
             });
         }
         
-        function applyScenariosFromSheet() {
-            const selectedIndex = document.getElementById('scenarioSelect').value;
-            
-            if (selectedIndex === '') {
-                alert('Please select a scenario first');
-                return;
-            }
-            
-            const scenario = scenariosData[selectedIndex];
-            
-            const parameterMappings = {
-                'dose': 'dose',
-                'dissolution_rate': 'dissolutionRate',
-                'stomach_absorption': 'stomachAbsorption',
-                'small_intestine_absorption': 'smallIntestineAbsorption',
-                'large_intestine_absorption': 'largeIntestineAbsorption',
-                'stomach_transit': 'stomachTransit',
-                'intestine_transit': 'intestineTransit',
-                'distribution_rate': 'distributionRate',
-                'redistribution_rate': 'redistributionRate',
-                'elimination_rate': 'elimination',
-                'simulation_time': 'simulationTime'
-            };
-            
-            Object.keys(parameterMappings).forEach(sheetKey => {
-                const elementId = parameterMappings[sheetKey];
-                const element = document.getElementById(elementId);
-                
-                if (scenario[sheetKey] !== undefined && element) {
-                    element.value = scenario[sheetKey];
-                    updateValueDisplay(elementId);
-                }
-            });
-            
-            // Handle half-life to elimination rate conversion
-            if (scenario['half_life'] !== undefined) {
-                const halfLife = parseFloat(scenario['half_life']);
-                if (halfLife > 0) {
-                    const eliminationRate = Math.log(2) / halfLife;
-                    const eliminationElement = document.getElementById('elimination');
-                    if (eliminationElement) {
-                        eliminationElement.value = eliminationRate;
-                        updateValueDisplay('elimination');
-                    }
-                }
-            }
-            
-            runSimulation();
-            alert(`Applied scenario: ${scenario.name || scenario.scenario || 'Selected scenario'}`);
+        if (drug1.tablet > 0 || drug1.stomach > 0 || drug1.si > 0 || drug1.li > 0 || drug1.plasma > 0) {
+            updateDrug(drug1, 1, dt, drug1Params.elim);
         }
-        
-        function setupEventListeners() {
-            document.getElementById('drugSelect').addEventListener('change', handleDrugChange);
-            
-            const params = ['dose', 'dissolutionRate', 'stomachAbsorption', 'smallIntestineAbsorption', 
-                           'largeIntestineAbsorption', 'stomachTransit', 'intestineTransit', 'elimination', 
-                           'distributionRate', 'redistributionRate', 'simulationTime', 'ec50', 'emax', 
-                           'baseline', 'hillSlope'];
-            
-            params.forEach(param => {
-                const element = document.getElementById(param);
-                if (element) {
-                    element.addEventListener('input', () => {
-                        updateValueDisplay(param);
-                        if (document.getElementById('drugSelect').value === 'custom') {
-                            updateCustomDrug();
-                        }
-                        runSimulation();
-                    });
-                    updateValueDisplay(param);
-                }
-            });
-            
-            const effectTypeEl = document.getElementById('effectType');
-            if (effectTypeEl) {
-                effectTypeEl.addEventListener('change', () => {
-                    if (document.getElementById('drugSelect').value === 'custom') {
-                        updateCustomDrug();
-                    }
-                    runSimulation();
-                });
-            }
+        if (drug2.tablet > 0 || drug2.stomach > 0 || drug2.si > 0 || drug2.li > 0 || drug2.plasma > 0) {
+            updateDrug(drug2, 2, dt, drug2Params.elim);
         }
-        
-        function updateValueDisplay(param) {
-            const element = document.getElementById(param);
-            const valueElement = document.getElementById(param + 'Value');
-            if (element && valueElement) {
-                let value = element.value;
-                if (param === 'dose') value += ' mg';
-                else if (param === 'simulationTime') value += ' hours';
-                else if (param === 'halfLife') value += ' hours';
-                valueElement.textContent = value;
-            }
+    }
+    
+    return data;
+}
+
+function updateDrug(drug, drugNum, dt, elimRate) {
+    var dissolution = Math.max(0, drug.tablet) * getVal('dissolution' + drugNum) * dt;
+    var stomachAbs = Math.max(0, drug.stomach) * getVal('stomachAbs' + drugNum) * dt;
+    var siAbs = Math.max(0, drug.si) * getVal('siAbs' + drugNum) * dt;
+    var liAbs = Math.max(0, drug.li) * getVal('liAbs' + drugNum) * dt;
+    var stomachTransit = Math.max(0, drug.stomach) * getVal('stomachTransit' + drugNum) * dt;
+    var intestineTransit = Math.max(0, drug.si) * getVal('intestineTransit' + drugNum) * dt;
+    var distribution = Math.max(0, drug.plasma) * 0.1 * dt;
+    var redistribution = Math.max(0, drug.tissue) * 0.05 * dt;
+    var elimination = Math.max(0, drug.plasma) * elimRate * dt;
+    
+    drug.tablet = Math.max(0, drug.tablet - dissolution);
+    drug.stomach = Math.max(0, drug.stomach + dissolution - stomachAbs - stomachTransit);
+    drug.si = Math.max(0, drug.si + stomachTransit - siAbs - intestineTransit);
+    drug.li = Math.max(0, drug.li + intestineTransit - liAbs);
+    drug.plasma = Math.max(0, drug.plasma + stomachAbs + siAbs + liAbs - elimination - distribution + redistribution);
+    drug.tissue = Math.max(0, drug.tissue + distribution - redistribution);
+}
+
+function calcEffect(conc, ec50, emax) {
+    if (conc <= 0) return 0;
+    return -(Math.abs(emax) * conc) / (ec50 + conc);
+}
+
+function calculateStats(data) {
+    if (!data.length) return {cmax1: 0, cmax2: 0, tmax1: 0, tmax2: 0, auc1: 0, auc2: 0, maxEffect: 0, effectDuration: 0};
+    
+    var plasma1 = data.map(function(d) { return d.drug1.plasma; });
+    var plasma2 = data.map(function(d) { return d.drug2.plasma; });
+    var effects = data.map(function(d) { return Math.abs(d.combinedEffect - getVal('baseline')); });
+    
+    var cmax1 = Math.max.apply(Math, plasma1);
+    var cmax2 = Math.max.apply(Math, plasma2);
+    var tmax1 = plasma1.length > 0 ? data[plasma1.indexOf(cmax1)].time : 0;
+    var tmax2 = plasma2.length > 0 ? data[plasma2.indexOf(cmax2)].time : 0;
+    
+    var auc1 = 0, auc2 = 0;
+    for (var i = 1; i < data.length; i++) {
+        var dt = data[i].time - data[i-1].time;
+        auc1 += (plasma1[i] + plasma1[i-1]) * dt / 2;
+        auc2 += (plasma2[i] + plasma2[i-1]) * dt / 2;
+    }
+    
+    var maxEffect = Math.max.apply(Math, effects);
+    var effectDuration = data.filter(function(d) { 
+        return Math.abs(d.combinedEffect - getVal('baseline')) > maxEffect * 0.1; 
+    }).length * 0.1;
+    
+    return {
+        cmax1: cmax1,
+        cmax2: cmax2,
+        tmax1: tmax1,
+        tmax2: tmax2,
+        auc1: auc1,
+        auc2: auc2,
+        maxEffect: maxEffect,
+        effectDuration: effectDuration
+    };
+}
+
+function setupCharts() {
+    var opts = {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            x: { title: { display: true, text: 'Time (hrs)' } },
+            y: { title: { display: true, text: 'Amount/Effect' } }
         }
-        
-        function handleDrugChange() {
-            const selectedDrug = document.getElementById('drugSelect').value;
-            currentDrug = drugProfiles[selectedDrug];
-            
-            document.getElementById('drugDescription').textContent = currentDrug.description;
-            
-            if (selectedDrug !== 'custom') {
-                document.getElementById('ec50').value = currentDrug.ec50;
-                document.getElementById('emax').value = currentDrug.emax;
-                document.getElementById('baseline').value = currentDrug.baseline;
-                document.getElementById('hillSlope').value = currentDrug.hill;
-                document.getElementById('effectType').value = currentDrug.effectType;
-                
-                updateValueDisplay('ec50');
-                updateValueDisplay('emax');
-                updateValueDisplay('baseline');
-                updateValueDisplay('hillSlope');
-            }
-            
-            const pdSection = document.getElementById('pdSection');
-            if (selectedDrug === 'custom') {
-                pdSection.style.display = 'block';
-            } else {
-                pdSection.style.display = 'none';
-            }
-            
-            updatePDTitle();
-            runSimulation();
+    };
+    
+    charts.release = new Chart(document.getElementById('chart1').getContext('2d'), {
+        type: 'line',
+        data: { labels: [], datasets: [
+            { label: 'Drug A Tablet', data: [], borderColor: '#e74c3c', borderWidth: 3, fill: false, pointRadius: 0 },
+            { label: 'Drug B Tablet', data: [], borderColor: '#3498db', borderWidth: 3, fill: false, pointRadius: 0 },
+            { label: 'Drug A Dissolved', data: [], borderColor: '#e74c3c', borderWidth: 2, borderDash: [5, 5], fill: false, pointRadius: 0 },
+            { label: 'Drug B Dissolved', data: [], borderColor: '#3498db', borderWidth: 2, borderDash: [5, 5], fill: false, pointRadius: 0 }
+        ]},
+        options: opts
+    });
+    
+    charts.gi = new Chart(document.getElementById('chart2').getContext('2d'), {
+        type: 'line',
+        data: { labels: [], datasets: [
+            { label: 'Drug A Stomach', data: [], borderColor: '#e74c3c', borderWidth: 2, fill: false, pointRadius: 0 },
+            { label: 'Drug A Small Intestine', data: [], borderColor: '#c0392b', borderWidth: 2, fill: false, pointRadius: 0 },
+            { label: 'Drug A Large Intestine', data: [], borderColor: '#a93226', borderWidth: 2, fill: false, pointRadius: 0 },
+            { label: 'Drug A Plasma', data: [], borderColor: '#e74c3c', borderWidth: 4, fill: false, pointRadius: 0 },
+            { label: 'Drug A Tissue', data: [], borderColor: '#e74c3c', borderWidth: 2, borderDash: [3, 3], fill: false, pointRadius: 0 },
+            { label: 'Drug B Stomach', data: [], borderColor: '#3498db', borderWidth: 2, fill: false, pointRadius: 0 },
+            { label: 'Drug B Small Intestine', data: [], borderColor: '#2980b9', borderWidth: 2, fill: false, pointRadius: 0 },
+            { label: 'Drug B Large Intestine', data: [], borderColor: '#1f618d', borderWidth: 2, fill: false, pointRadius: 0 },
+            { label: 'Drug B Plasma', data: [], borderColor: '#3498db', borderWidth: 4, fill: false, pointRadius: 0 },
+            { label: 'Drug B Tissue', data: [], borderColor: '#3498db', borderWidth: 2, borderDash: [3, 3], fill: false, pointRadius: 0 }
+        ]},
+        options: opts
+    });
+    
+    var effectOpts = {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            x: { title: { display: true, text: 'Time (hrs)' } },
+            y: { title: { display: true, text: 'Effect' } }
         }
+    };
+    
+    charts.effects = new Chart(document.getElementById('chart3').getContext('2d'), {
+        type: 'line',
+        data: { labels: [], datasets: [
+            { label: 'Drug A Effect', data: [], borderColor: '#e74c3c', borderWidth: 2, fill: false, pointRadius: 0 },
+            { label: 'Drug B Effect', data: [], borderColor: '#3498db', borderWidth: 2, fill: false, pointRadius: 0 },
+            { label: 'Combined Effect', data: [], borderColor: '#9b59b6', borderWidth: 4, fill: false, pointRadius: 0 },
+            { label: 'Baseline', data: [], borderColor: '#95a5a6', borderWidth: 2, borderDash: [5, 5], fill: false, pointRadius: 0 },
+            { label: 'Target Effect', data: [], borderColor: '#27ae60', borderWidth: 2, borderDash: [10, 3], fill: false, pointRadius: 0 }
+        ]},
+        options: effectOpts
+    });
+}
+
+function runSim() {
+    try {
+        var data = simulate();
+        if (!data.length) return;
         
-        function updateCustomDrug() {
-            if (document.getElementById('drugSelect').value === 'custom') {
-                currentDrug.ec50 = parseFloat(document.getElementById('ec50').value);
-                currentDrug.emax = parseFloat(document.getElementById('emax').value);
-                currentDrug.baseline = parseFloat(document.getElementById('baseline').value);
-                currentDrug.hill = parseFloat(document.getElementById('hillSlope').value);
-                currentDrug.effectType = document.getElementById('effectType').value;
-            }
-        }
+        var times = data.map(function(d) { return d.time; });
+        var baseline = getVal('baseline');
+        var target = getVal('targetEffect');
+        var stats = calculateStats(data);
         
-        function updatePDTitle() {
-            document.getElementById('pdTitle').textContent = `Pharmacodynamic Profile - ${currentDrug.effectName}`;
-        }
+        var allEffects = [];
+        data.forEach(function(d) {
+            allEffects.push(baseline + d.effect1);
+            allEffects.push(baseline + d.effect2);
+            allEffects.push(d.combinedEffect);
+        });
+        allEffects.push(baseline);
+        allEffects.push(target);
         
-        function loadDrugProfile(profileName) {
-            document.getElementById('drugSelect').value = profileName;
-            handleDrugChange();
-            
-            document.querySelectorAll('.profile-card').forEach(card => {
-                card.classList.remove('active');
-            });
-            
-            event.target.closest('.profile-card').classList.add('active');
-        }
+        var minEffect = Math.min.apply(Math, allEffects);
+        var maxEffect = Math.max.apply(Math, allEffects);
+        var range = maxEffect - minEffect;
+        var padding = Math.max(10, range * 0.1);
         
-        function getParameters() {
-            return {
-                dose: parseFloat(document.getElementById('dose').value),
-                dissolutionRate: parseFloat(document.getElementById('dissolutionRate').value),
-                stomachAbsorption: parseFloat(document.getElementById('stomachAbsorption').value),
-                smallIntestineAbsorption: parseFloat(document.getElementById('smallIntestineAbsorption').value),
-                largeIntestineAbsorption: parseFloat(document.getElementById('largeIntestineAbsorption').value),
-                stomachTransit: parseFloat(document.getElementById('stomachTransit').value),
-                intestineTransit: parseFloat(document.getElementById('intestineTransit').value),
-                elimination: parseFloat(document.getElementById('elimination').value),
-                distributionRate: parseFloat(document.getElementById('distributionRate').value),
-                redistributionRate: parseFloat(document.getElementById('redistributionRate').value),
-                simulationTime: parseFloat(document.getElementById('simulationTime').value)
-            };
-        }
+        charts.effects.options.scales.y.min = minEffect - padding;
+        charts.effects.options.scales.y.max = maxEffect + padding;
         
-        function calculateEffect(concentration) {
-            const { ec50, emax, baseline, hill, effectType } = currentDrug;
-            if (concentration <= 0) return baseline;
-            
-            if (effectType === 'agonist') {
-                return baseline + (emax * Math.pow(concentration, hill)) / (Math.pow(ec50, hill) + Math.pow(concentration, hill));
-            } else {
-                return baseline - (Math.abs(emax) * Math.pow(concentration, hill)) / (Math.pow(ec50, hill) + Math.pow(concentration, hill));
-            }
-        }
+        charts.release.data.labels = times;
+        charts.release.data.datasets[0].data = data.map(function(d) { return d.drug1.tablet; });
+        charts.release.data.datasets[1].data = data.map(function(d) { return d.drug2.tablet; });
+        charts.release.data.datasets[2].data = data.map(function(d) { return d.dissolvedDrug1; });
+        charts.release.data.datasets[3].data = data.map(function(d) { return d.dissolvedDrug2; });
+        charts.release.update();
         
-        function runPKPDSimulation() {
-            const params = getParameters();
-            const data = [];
-            const dt = 0.1;
-            const steps = Math.floor(params.simulationTime / dt);
-            
-            let tablet = params.dose;
-            let stomach = 0;
-            let smallIntestine = 0;
-            let largeIntestine = 0;
-            let plasma = 0;
-            let tissue = 0;
-            let urine = 0;
-            
-            for (let i = 0; i <= steps; i++) {
-                const time = i * dt;
-                
-                if (i % 10 === 0) {
-                    data.push({
-                        time: Math.round(time * 10) / 10,
-                        tablet: Math.max(0, tablet),
-                        stomach: Math.max(0, stomach),
-                        smallIntestine: Math.max(0, smallIntestine),
-                        largeIntestine: Math.max(0, largeIntestine),
-                        plasma: Math.max(0, plasma),
-                        tissue: Math.max(0, tissue),
-                        urine: urine,
-                        dissolved: params.dose - Math.max(0, tablet),
-                        totalAbsorbed: Math.max(0, plasma) + Math.max(0, tissue) + urine,
-                        effect: calculateEffect(Math.max(0, plasma))
-                    });
-                }
-                
-                const dissolutionRate = Math.max(0, tablet) * params.dissolutionRate * dt;
-                const stomachAbsorptionRate = Math.max(0, stomach) * params.stomachAbsorption * dt;
-                const siAbsorptionRate = Math.max(0, smallIntestine) * params.smallIntestineAbsorption * dt;
-                const liAbsorptionRate = Math.max(0, largeIntestine) * params.largeIntestineAbsorption * dt;
-                const stomachTransitRate = Math.max(0, stomach) * params.stomachTransit * dt;
-                const intestineTransitRate = Math.max(0, smallIntestine) * params.intestineTransit * dt;
-                const eliminationRate = Math.max(0, plasma) * params.elimination * dt;
-                const distributionRateCalc = Math.max(0, plasma) * params.distributionRate * dt;
-                const redistributionRateCalc = Math.max(0, tissue) * params.redistributionRate * dt;
-                
-                tablet -= dissolutionRate;
-                stomach = stomach + dissolutionRate - stomachAbsorptionRate - stomachTransitRate;
-                smallIntestine = smallIntestine + stomachTransitRate - siAbsorptionRate - intestineTransitRate;
-                largeIntestine = largeIntestine + intestineTransitRate - liAbsorptionRate;
-                plasma = plasma + stomachAbsorptionRate + siAbsorptionRate + liAbsorptionRate - eliminationRate - distributionRateCalc + redistributionRateCalc;
-                tissue = tissue + distributionRateCalc - redistributionRateCalc;
-                urine += eliminationRate;
-                
-                tablet = Math.max(0, tablet);
-                stomach = Math.max(0, stomach);
-                smallIntestine = Math.max(0, smallIntestine);
-                largeIntestine = Math.max(0, largeIntestine);
-                plasma = Math.max(0, plasma);
-                tissue = Math.max(0, tissue);
-            }
-            
-            return data;
-        }
+        charts.gi.data.labels = times;
+        charts.gi.data.datasets[0].data = data.map(function(d) { return d.drug1.stomach; });
+        charts.gi.data.datasets[1].data = data.map(function(d) { return d.drug1.si; });
+        charts.gi.data.datasets[2].data = data.map(function(d) { return d.drug1.li; });
+        charts.gi.data.datasets[3].data = data.map(function(d) { return d.drug1.plasma; });
+        charts.gi.data.datasets[4].data = data.map(function(d) { return d.drug1.tissue; });
+        charts.gi.data.datasets[5].data = data.map(function(d) { return d.drug2.stomach; });
+        charts.gi.data.datasets[6].data = data.map(function(d) { return d.drug2.si; });
+        charts.gi.data.datasets[7].data = data.map(function(d) { return d.drug2.li; });
+        charts.gi.data.datasets[8].data = data.map(function(d) { return d.drug2.plasma; });
+        charts.gi.data.datasets[9].data = data.map(function(d) { return d.drug2.tissue; });
+        charts.gi.update();
         
-        function generateDoseResponseData() {
-            const data = [];
-            for (let i = 0; i <= 100; i++) {
-                const concentration = i * 0.1;
-                data.push({
-                    concentration,
-                    effect: calculateEffect(concentration)
-                });
-            }
-            return data;
-        }
+        charts.effects.data.labels = times;
+        charts.effects.data.datasets[0].data = data.map(function(d) { return baseline + d.effect1; });
+        charts.effects.data.datasets[1].data = data.map(function(d) { return baseline + d.effect2; });
+        charts.effects.data.datasets[2].data = data.map(function(d) { return d.combinedEffect; });
+        charts.effects.data.datasets[3].data = data.map(function(d) { return baseline; });
+        charts.effects.data.datasets[4].data = data.map(function(d) { return target; });
+        charts.effects.update();
         
-        function calculateStatistics(pkData) {
-            const plasmaConcentrations = pkData.map(d => d.plasma);
-            const effects = pkData.map(d => d.effect);
-            
-            const cmax = Math.max(...plasmaConcentrations);
-            const cmaxIndex = plasmaConcentrations.indexOf(cmax);
-            const tmax = pkData[cmaxIndex].time;
-            
-            let auc = 0;
-            for (let i = 1; i < pkData.length; i++) {
-                const dt = pkData[i].time - pkData[i-1].time;
-                auc += (pkData[i].plasma + pkData[i-1].plasma) * dt / 2;
-            }
-            
-            const maxEffect = currentDrug.effectType === 'agonist' ? Math.max(...effects) : Math.min(...effects);
-            
-            const halfMaxEffect = currentDrug.baseline + (maxEffect - currentDrug.baseline) * 0.5;
-            let duration = 0;
-            let inDuration = false;
-            let startTime = 0;
-            
-            for (let i = 0; i < effects.length; i++) {
-                const aboveThreshold = currentDrug.effectType === 'agonist' ? 
-                    effects[i] >= halfMaxEffect : effects[i] <= halfMaxEffect;
-                    
-                if (aboveThreshold && !inDuration) {
-                    inDuration = true;
-                    startTime = pkData[i].time;
-                } else if (!aboveThreshold && inDuration) {
-                    duration += pkData[i].time - startTime;
-                    inDuration = false;
-                }
-            }
-            if (inDuration) {
-                duration += pkData[pkData.length - 1].time - startTime;
-            }
-            
-            const totalAbsorbed = pkData[pkData.length - 1].totalAbsorbed;
-            const bioavailability = (totalAbsorbed / getParameters().dose) * 100;
-            
-            const ke = getParameters().elimination;
-            const halfLife = Math.log(2) / ke;
-            
-            return { cmax, tmax, auc, maxEffect, duration, bioavailability, halfLife };
-        }
-        
-        function setupCharts() {
-            const dissolutionCtx = document.getElementById('dissolutionChart').getContext('2d');
-            charts.dissolution = new Chart(dissolutionCtx, {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [
-                        {
-                            label: 'Undissolved Tablet',
-                            data: [],
-                            borderColor: '#8884d8',
-                            backgroundColor: 'rgba(136, 132, 216, 0.1)',
-                            borderWidth: 3,
-                            fill: false,
-                            pointRadius: 0
-                        },
-                        {
-                            label: 'Dissolved Drug',
-                            data: [],
-                            borderColor: '#e74c3c',
-                            backgroundColor: 'rgba(231, 76, 60, 0.1)',
-                            borderWidth: 3,
-                            fill: false,
-                            pointRadius: 0
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: { 
-                            title: { display: true, text: 'Time (hours)' },
-                            ticks: { maxTicksLimit: 10, callback: function(value) { return parseFloat(value).toFixed(1); } }
-                        },
-                        y: { 
-                            title: { display: true, text: 'Amount (mg)' },
-                            ticks: { callback: function(value) { return parseFloat(value).toFixed(1); } }
-                        }
-                    }
-                }
-            });
-            
-            const combinedPKCtx = document.getElementById('combinedPKChart').getContext('2d');
-            charts.combinedPK = new Chart(combinedPKCtx, {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [
-                        {
-                            label: 'Stomach',
-                            data: [],
-                            borderColor: '#8884d8',
-                            borderWidth: 3,
-                            fill: false,
-                            pointRadius: 0
-                        },
-                        {
-                            label: 'Small Intestine',
-                            data: [],
-                            borderColor: '#82ca9d',
-                            borderWidth: 3,
-                            fill: false,
-                            pointRadius: 0
-                        },
-                        {
-                            label: 'Large Intestine',
-                            data: [],
-                            borderColor: '#ffc658',
-                            borderWidth: 3,
-                            fill: false,
-                            pointRadius: 0
-                        },
-                        {
-                            label: 'Plasma',
-                            data: [],
-                            borderColor: '#e74c3c',
-                            borderWidth: 4,
-                            fill: false,
-                            pointRadius: 0
-                        },
-                        {
-                            label: 'Tissue',
-                            data: [],
-                            borderColor: '#3498db',
-                            borderWidth: 3,
-                            fill: false,
-                            pointRadius: 0
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: { 
-                            title: { display: true, text: 'Time (hours)' },
-                            ticks: { maxTicksLimit: 10, callback: function(value) { return parseFloat(value).toFixed(1); } }
-                        },
-                        y: { 
-                            title: { display: true, text: 'Amount (mg)' },
-                            ticks: { callback: function(value) { return parseFloat(value).toFixed(1); } }
-                        }
-                    }
-                }
-            });
-            
-            const pdCtx = document.getElementById('pdChart').getContext('2d');
-            charts.pd = new Chart(pdCtx, {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [
-                        {
-                            label: 'Effect',
-                            data: [],
-                            borderColor: '#9b59b6',
-                            borderWidth: 4,
-                            fill: false,
-                            pointRadius: 0
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: { 
-                            title: { display: true, text: 'Time (hours)' },
-                            ticks: { maxTicksLimit: 10, callback: function(value) { return parseFloat(value).toFixed(1); } }
-                        },
-                        y: { 
-                            title: { display: true, text: 'Effect' },
-                            ticks: { callback: function(value) { return parseFloat(value).toFixed(1); } }
-                        }
-                    }
-                }
-            });
-            
-            const drCtx = document.getElementById('doseResponseChart').getContext('2d');
-            charts.doseResponse = new Chart(drCtx, {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [
-                        {
-                            label: 'Dose-Response',
-                            data: [],
-                            borderColor: '#f39c12',
-                            borderWidth: 3,
-                            fill: false,
-                            pointRadius: 0
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: { 
-                            title: { display: true, text: 'Concentration (mg/L)' },
-                            ticks: { callback: function(value) { return parseFloat(value).toFixed(1); } }
-                        },
-                        y: { 
-                            title: { display: true, text: 'Effect' },
-                            ticks: { callback: function(value) { return parseFloat(value).toFixed(1); } }
-                        }
-                    }
-                }
-            });
-        }
-        
-        function runSimulation() {
-            const pkData = runPKPDSimulation();
-            const drData = generateDoseResponseData();
-            const stats = calculateStatistics(pkData);
-            
-            charts.dissolution.data.labels = pkData.map(d => d.time);
-            charts.dissolution.data.datasets[0].data = pkData.map(d => d.tablet);
-            charts.dissolution.data.datasets[1].data = pkData.map(d => d.dissolved);
-            charts.dissolution.update();
-            
-            charts.combinedPK.data.labels = pkData.map(d => d.time);
-            charts.combinedPK.data.datasets[0].data = pkData.map(d => d.stomach);
-            charts.combinedPK.data.datasets[1].data = pkData.map(d => d.smallIntestine);
-            charts.combinedPK.data.datasets[2].data = pkData.map(d => d.largeIntestine);
-            charts.combinedPK.data.datasets[3].data = pkData.map(d => d.plasma);
-            charts.combinedPK.data.datasets[4].data = pkData.map(d => d.tissue);
-            charts.combinedPK.update();
-            
-            charts.pd.data.labels = pkData.map(d => d.time);
-            charts.pd.data.datasets[0].data = pkData.map(d => d.effect);
-            charts.pd.data.datasets[0].label = currentDrug.effectName;
-            charts.pd.options.scales.y.title.text = `${currentDrug.effectName} (${currentDrug.unit})`;
-            charts.pd.update();
-            
-            charts.doseResponse.data.labels = drData.map(d => d.concentration);
-            charts.doseResponse.data.datasets[0].data = drData.map(d => d.effect);
-            charts.doseResponse.options.scales.y.title.text = `${currentDrug.effectName} (${currentDrug.unit})`;
-            charts.doseResponse.update();
-            
-            updateStatistics(stats);
-            
-            document.getElementById('doseResponseInfo').innerHTML = 
-                `<strong>Parameters:</strong> EC50: ${currentDrug.ec50} mg/L | Emax: ${currentDrug.emax} | Hill: ${currentDrug.hill}`;
-        }
-        
-        function updateStatistics(stats) {
-            document.getElementById('cmaxValue').textContent = stats.cmax.toFixed(1);
-            document.getElementById('tmaxValue').textContent = stats.tmax.toFixed(1);
-            document.getElementById('aucValue').textContent = stats.auc.toFixed(1);
-            document.getElementById('maxEffectValue').textContent = stats.maxEffect.toFixed(1);
-            document.getElementById('durationValue').textContent = stats.duration.toFixed(1);
-            document.getElementById('bioavailabilityValue').textContent = stats.bioavailability.toFixed(1);
-            document.getElementById('halfLifeValue').textContent = stats.halfLife.toFixed(1);
-        }
-        
-        // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', init);
-    </script>
+        document.getElementById('cmax1').textContent = stats.cmax1.toFixed(2);
+        document.getElementById('cmax2').textContent = stats.cmax2.toFixed(2);
+        document.getElementById('tmax1').textContent = stats.tmax1.toFixed(1);
+        document.getElementById('tmax2').textContent = stats.tmax2.toFixed(1);
+        document.getElementById('auc1').textContent = stats.auc1.toFixed(1);
+        document.getElementById('auc2').textContent = stats.auc2.toFixed(1);
+        document.getElementById('maxEffect').textContent = stats.maxEffect.toFixed(1);
+        document.getElementById('effectDuration').textContent = stats.effectDuration.toFixed(1);
+    } catch (error) {
+        console.error('Error in runSim:', error);
+    }
+}
+
+window.onload = function() {
+    var controls = ['dose1', 'dose2', 'adminTime1', 'adminTime2', 'interval1', 'interval2', 
+                   'numDoses1', 'numDoses2', 'dissolution1', 'dissolution2',
+                   'stomachAbs1', 'stomachAbs2', 'siAbs1', 'siAbs2', 'liAbs1', 'liAbs2',
+                   'stomachTransit1', 'stomachTransit2', 'intestineTransit1', 'intestineTransit2',
+                   'elim1', 'elim2', 'ec501', 'ec502', 'emax1', 'emax2', 'halflife1', 'halflife2',
+                   'baseline', 'targetEffect', 'simTime', 'interactionFactor'];
+    
+    controls.forEach(function(id) { updateVal(id); });
+    
+    setupCharts();
+    runSim();
+};
+</script>
 </body>
 </html>
                     
