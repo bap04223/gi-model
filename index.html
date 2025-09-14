@@ -27,21 +27,27 @@
         .chart-info { font-size: 0.8rem; color: #666; background: #f8f8f8; padding: 10px; border-radius: 5px; }
         .interaction-section { background: #fff3cd; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
         .run-button { background: #667eea; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 15px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 15px; }
         .stat-card { color: white; padding: 15px; border-radius: 8px; text-align: center; }
         .stat-card.drug-a { background: #e74c3c; }
         .stat-card.drug-b { background: #3498db; }
         .stat-card.combined { background: #9b59b6; }
+        .stat-card.assessment { background: #2c3e50; }
+        .stat-card.assessment.pass { background: #27ae60; }
+        .stat-card.assessment.fail { background: #e74c3c; }
         .stat-value { font-size: 1.2rem; font-weight: bold; }
         .stat-label { font-size: 0.8rem; }
+        .assessment-feedback { margin-top: 15px; padding: 10px; border-radius: 5px; font-size: 0.9rem; }
         
         @media (max-width: 1200px) {
             .main-grid { grid-template-columns: 320px 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
         }
         
         @media (max-width: 900px) {
             .main-grid { grid-template-columns: 1fr; }
             .charts { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
         }
         
         @media (min-width: 1400px) {
@@ -316,11 +322,13 @@
                         <div class="stat-card drug-a"><div class="stat-value" id="cmax1">-</div><div class="stat-label">Drug A Cmax</div></div>
                         <div class="stat-card drug-a"><div class="stat-value" id="tmax1">-</div><div class="stat-label">Drug A Tmax</div></div>
                         <div class="stat-card drug-a"><div class="stat-value" id="auc1">-</div><div class="stat-label">Drug A AUC</div></div>
+                        <div class="stat-card combined"><div class="stat-value" id="maxEffect">-</div><div class="stat-label">Max Effect</div></div>
                         <div class="stat-card drug-b"><div class="stat-value" id="cmax2">-</div><div class="stat-label">Drug B Cmax</div></div>
                         <div class="stat-card drug-b"><div class="stat-value" id="tmax2">-</div><div class="stat-label">Drug B Tmax</div></div>
                         <div class="stat-card drug-b"><div class="stat-value" id="auc2">-</div><div class="stat-label">Drug B AUC</div></div>
-                        <div class="stat-card combined"><div class="stat-value" id="maxEffect">-</div><div class="stat-label">Max Effect</div></div>
+                        <div class="stat-card assessment"><div class="stat-value" id="assessmentGrade">-</div><div class="stat-label">Assessment</div></div>
                     </div>
+                    <div class="assessment-feedback" id="assessmentFeedback"></div>
                 </div>
             </div>
         </div>
@@ -378,6 +386,80 @@ function combineEffects(e1, e2, type, factor) {
         case 'antagonistic': return (e1 + e2) / factor;
         default: return e1 + e2;
     }
+}
+
+function assessTherapeuticWindow(data, baseline, target, targetUpper, targetLower) {
+    var firstInRange = -1;
+    var totalInRange = 0;
+    var totalOutOfRange = 0;
+    var consecutiveInRange = 0;
+    var maxConsecutiveInRange = 0;
+    var failureAfterSuccess = false;
+    
+    for (var i = 0; i < data.length; i++) {
+        var effect = data[i].combinedEffect;
+        var inRange = effect >= targetLower && effect <= targetUpper;
+        
+        if (inRange) {
+            if (firstInRange === -1) firstInRange = i;
+            totalInRange++;
+            consecutiveInRange++;
+            maxConsecutiveInRange = Math.max(maxConsecutiveInRange, consecutiveInRange);
+        } else {
+            if (firstInRange !== -1 && consecutiveInRange > 0) {
+                failureAfterSuccess = true;
+            }
+            totalOutOfRange++;
+            consecutiveInRange = 0;
+        }
+    }
+    
+    var percentInRange = (totalInRange / data.length) * 100;
+    var timeToTarget = firstInRange !== -1 ? data[firstInRange].time : null;
+    var sustainedSuccess = firstInRange !== -1 && !failureAfterSuccess && 
+                          (maxConsecutiveInRange / data.length) > 0.8;
+    
+    var maxAllowedTime = data[data.length - 1].time * 0.75;
+    var reachesTarget = timeToTarget !== null && timeToTarget <= maxAllowedTime;
+    var maintainsTarget = sustainedSuccess && percentInRange >= 80;
+    
+    var passed = reachesTarget && maintainsTarget;
+    
+    return {
+        passed: passed,
+        percentInRange: percentInRange,
+        timeToTarget: timeToTarget,
+        sustainedSuccess: sustainedSuccess,
+        reachesTarget: reachesTarget,
+        maintainsTarget: maintainsTarget,
+        grade: passed ? 'PASS' : 'FAIL',
+        feedback: generateFeedback(passed, reachesTarget, maintainsTarget, percentInRange, timeToTarget)
+    };
+}
+
+function generateFeedback(passed, reachesTarget, maintainsTarget, percentInRange, timeToTarget) {
+    if (passed) {
+        return 'Excellent! Therapeutic target achieved and maintained.';
+    }
+    
+    var feedback = [];
+    if (!reachesTarget) {
+        if (timeToTarget === null) {
+            feedback.push('Target effect never reached - adjust doses or timing');
+        } else {
+            feedback.push('Target reached too late - consider faster-acting formulation');
+        }
+    }
+    
+    if (!maintainsTarget) {
+        if (percentInRange < 50) {
+            feedback.push('Poor target maintenance (' + percentInRange.toFixed(1) + '%) - optimize dosing intervals');
+        } else if (percentInRange < 80) {
+            feedback.push('Adequate but suboptimal maintenance (' + percentInRange.toFixed(1) + '%) - fine-tune parameters');
+        }
+    }
+    
+    return feedback.join('. ');
 }
 
 function simulate() {
@@ -438,7 +520,7 @@ function simulate() {
             drug2.tablet += drug2Params.dose;
         }
         
-        if (i % 10 === 0) {
+        if (i % 2 === 0) {
             var e1 = drug1Params.enabled ? calcEffect(drug1.plasma, getVal('ec501'), getVal('emax1')) : 0;
             var e2 = drug2Params.enabled ? calcEffect(drug2.plasma, getVal('ec502'), getVal('emax2')) : 0;
             var combinedE = combineEffects(e1, e2, interactionType, interactionFactor);
@@ -601,6 +683,7 @@ function runSim() {
         var targetUpper = target + (Math.abs(target - baseline) * guidelinePercent);
         var targetLower = target - (Math.abs(target - baseline) * guidelinePercent);
         var stats = calculateStats(data);
+        var assessment = assessTherapeuticWindow(data, baseline, target, targetUpper, targetLower);
         
         var allEffects = [];
         data.forEach(function(d) {
@@ -663,6 +746,19 @@ function runSim() {
         document.getElementById('auc1').textContent = stats.auc1.toFixed(1);
         document.getElementById('auc2').textContent = stats.auc2.toFixed(1);
         document.getElementById('maxEffect').textContent = stats.maxEffect.toFixed(1);
+        
+        var assessmentCard = document.getElementById('assessmentGrade').parentElement;
+        var assessmentGrade = document.getElementById('assessmentGrade');
+        var assessmentFeedback = document.getElementById('assessmentFeedback');
+        
+        assessmentGrade.textContent = assessment.grade;
+        assessmentFeedback.textContent = assessment.feedback;
+        
+        assessmentCard.className = 'stat-card assessment ' + (assessment.passed ? 'pass' : 'fail');
+        assessmentFeedback.style.backgroundColor = assessment.passed ? '#d4edda' : '#f8d7da';
+        assessmentFeedback.style.color = assessment.passed ? '#155724' : '#721c24';
+        assessmentFeedback.style.border = '1px solid ' + (assessment.passed ? '#c3e6cb' : '#f5c6cb');
+        
     } catch (error) {
         console.error('Error in runSim:', error);
     }
