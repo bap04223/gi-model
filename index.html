@@ -103,15 +103,10 @@
                             <input type="range" id="numDoses1" min="1" max="90" step="1" value="1" oninput="updateVal('numDoses1'); runSim();">
                             <div class="value" id="numDoses1Val">1</div>
                         </div>
-                        <div class="control-group">
-                            <label>Dissolution Rate:</label>
-                            <input type="range" id="dissolution1" min="0" max="10" step="0.01" value="0.1" oninput="updateVal('dissolution1'); runSim();">
-                            <div class="value" id="dissolution1Val">0.1</div>
-                        </div>
                     </div>
                     
                     <div class="absorption-section">
-                        <h4>Absorption & Distribution</h4>
+                        <h4>Absorption Parameters</h4>
                         <div class="control-group">
                             <label>Stomach Absorption:</label>
                             <input type="range" id="stomachAbs1" min="0.01" max="0.5" step="0.01" value="0.05" oninput="updateVal('stomachAbs1'); runSim();">
@@ -132,18 +127,13 @@
                             <input type="range" id="wasteElim1" min="0" max="50" step="1" value="10" oninput="updateVal('wasteElim1'); runSim();">
                             <div class="value" id="wasteElim1Val">10%</div>
                         </div>
-                        <div class="control-group">
-                            <label>Distribution to Tissue:</label>
-                            <input type="range" id="distribution1" min="0.01" max="0.5" step="0.01" value="0.1" oninput="updateVal('distribution1'); runSim();">
-                            <div class="value" id="distribution1Val">0.1</div>
-                        </div>
-                        <div class="control-group">
-                            <label>Redistribution from Tissue:</label>
-                            <input type="range" id="redistribution1" min="0.01" max="0.3" step="0.01" value="0.05" oninput="updateVal('redistribution1'); runSim();">
-                            <div class="value" id="redistribution1Val">0.05</div>
-                        </div>
                     </div>
                     
+                    <div class="control-group">
+                        <label>Dissolution Rate:</label>
+                        <input type="range" id="dissolution1" min="0" max="10" step="0.01" value="0.1" oninput="updateVal('dissolution1'); runSim();">
+                        <div class="value" id="dissolution1Val">0.1</div>
+                    </div>
                     <div class="control-group">
                         <label>Stomach Transit:</label>
                         <input type="range" id="stomachTransit1" min="0.01" max="0.5" step="0.01" value="0.2" oninput="updateVal('stomachTransit1'); runSim();">
@@ -153,6 +143,16 @@
                         <label>Intestine Transit:</label>
                         <input type="range" id="intestineTransit1" min="0.01" max="0.5" step="0.01" value="0.15" oninput="updateVal('intestineTransit1'); runSim();">
                         <div class="value" id="intestineTransit1Val">0.15</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Distribution to Tissue:</label>
+                        <input type="range" id="distribution1" min="0.01" max="0.5" step="0.01" value="0.1" oninput="updateVal('distribution1'); runSim();">
+                        <div class="value" id="distribution1Val">0.1</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Redistribution from Tissue:</label>
+                        <input type="range" id="redistribution1" min="0.01" max="0.3" step="0.01" value="0.05" oninput="updateVal('redistribution1'); runSim();">
+                        <div class="value" id="redistribution1Val">0.05</div>
                     </div>
                     <div class="control-group">
                         <label>Bioavailability:</label>
@@ -203,15 +203,10 @@
                             <input type="range" id="numDoses2" min="1" max="90" step="1" value="1" oninput="updateVal('numDoses2'); runSim();">
                             <div class="value" id="numDoses2Val">1</div>
                         </div>
-                        <div class="control-group">
-                            <label>Dissolution Rate:</label>
-                            <input type="range" id="dissolution2" min="0" max="10" step="0.01" value="0.15" oninput="updateVal('dissolution2'); runSim();">
-                            <div class="value" id="dissolution2Val">0.15</div>
-                        </div>
                     </div>
                     
                     <div class="absorption-section">
-                        <h4>Absorption & Distribution</h4>
+                        <h4>Absorption Parameters</h4>
                         <div class="control-group">
                             <label>Stomach Absorption:</label>
                             <input type="range" id="stomachAbs2" min="0.01" max="0.5" step="0.01" value="0.03" oninput="updateVal('stomachAbs2'); runSim();">
@@ -228,34 +223,26 @@
                             <div class="value" id="liAbs2Val">0.08</div>
                         </div>
                         <div class="control-group">
-                            <label>Distribution to Tissue:</label>
-                            <input type="range" id="distribution2" min="0.01" max="0.5" step="0.01" value="0.1" oninput="updateVal('distribution2'); runSim();">
-                            <div class="value" id="distribution2Val">0.1</div>
-                        </div>
-                        <div class="control-group">
-                            <label>Redistribution from Tissue:</label>
-                            <input type="range" id="redistribution2" min="0.01" max="0.3" step="0.01" value="0.05" oninput="updateVal('redistribution2'); runSim();">
-                            <div class="value" id="redistribution2Val">0.05</div>
-                        </div>
-                    </div>
-                    
-                    <div class="absorption-section">
-                        <h4>GI Transit & Elimination</h4>
-                        <div class="control-group">
-                            <label>Stomach Transit:</label>
-                            <input type="range" id="stomachTransit2" min="0.01" max="0.5" step="0.01" value="0.2" oninput="updateVal('stomachTransit2'); runSim();">
-                            <div class="value" id="stomachTransit2Val">0.2</div>
-                        </div>
-                        <div class="control-group">
-                            <label>Intestine Transit:</label>
-                            <input type="range" id="intestineTransit2" min="0.01" max="0.5" step="0.01" value="0.15" oninput="updateVal('intestineTransit2'); runSim();">
-                            <div class="value" id="intestineTransit2Val">0.15</div>
-                        </div>
-                        <div class="control-group">
                             <label>Waste Elimination (%):</label>
                             <input type="range" id="wasteElim2" min="0" max="50" step="1" value="10" oninput="updateVal('wasteElim2'); runSim();">
                             <div class="value" id="wasteElim2Val">10%</div>
                         </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>Dissolution Rate:</label>
+                        <input type="range" id="dissolution2" min="0" max="10" step="0.01" value="0.15" oninput="updateVal('dissolution2'); runSim();">
+                        <div class="value" id="dissolution2Val">0.15</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Stomach Transit:</label>
+                        <input type="range" id="stomachTransit2" min="0.01" max="0.5" step="0.01" value="0.2" oninput="updateVal('stomachTransit2'); runSim();">
+                        <div class="value" id="stomachTransit2Val">0.2</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Intestine Transit:</label>
+                        <input type="range" id="intestineTransit2" min="0.01" max="0.5" step="0.01" value="0.15" oninput="updateVal('intestineTransit2'); runSim();">
+                        <div class="value" id="intestineTransit2Val">0.15</div>
                     </div>
                     <div class="control-group">
                         <label>Bioavailability:</label>
@@ -969,6 +956,12 @@ function runSim() {
 
 window.onload = function() {
     var controls = ['dose1', 'dose2', 'adminTime1', 'adminTime2', 'interval1', 'interval2', 
+                   'numDoses1', 'numDoses2', 'dissolution1', 'dissolution2',
+                   'stomachAbs1', 'stomachAbs2', 'siAbs1', 'siAbs2', 'liAbs1', 'liAbs2',
+                   'wasteElim1', 'wasteElim2',
+                   'stomachTransit1', 'stomachTransit2', 'intestineTransit1', 'intestineTransit2',
+                   'distribution1', 'distribution2', 'redistribution1', 'redistribution2',
+                   'bioavailability1', 'bioavailability2',
                    'elim2', 'ec501', 'ec502', 'emax1', 'emax2', 'halflife1', 'halflife2',
                    'baseline', 'giTargetEffect', 'giTargetMax', 'giTargetMin', 
                    'pdTargetEffect', 'pdTargetMax', 'pdTargetMin', 'simTime', 'interactionFactor'];
@@ -980,11 +973,4 @@ window.onload = function() {
 };
 </script>
 </body>
-</html>numDoses1', 'numDoses2', 'dissolution1', 'dissolution2',
-                   'stomachAbs1', 'stomachAbs2', 'siAbs1', 'siAbs2', 'liAbs1', 'liAbs2',
-                   'wasteElim1', 'wasteElim2',
-                   'stomachTransit1', 'stomachTransit2', 'intestineTransit1', 'intestineTransit2',
-                   'distribution1', 'distribution2', 'redistribution1', 'redistribution2',
-                   'bioavailability1', 'bioavailability2',
-                   '
-                    
+</html>
