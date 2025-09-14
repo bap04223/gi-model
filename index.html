@@ -103,7 +103,12 @@
                             <input type="range" id="numDoses1" min="1" max="90" step="1" value="1" oninput="updateVal('numDoses1'); runSim();">
                             <div class="value" id="numDoses1Val">1</div>
                         </div>
+                        <div class="control-group">
+                        <label>Dissolution Rate:</label>
+                        <input type="range" id="dissolution1" min="0" max="10" step="0.01" value="0.1" oninput="updateVal('dissolution1'); runSim();">
+                        <div class="value" id="dissolution1Val">0.1</div>
                     </div>
+                </div>
                     
                     <div class="absorption-section">
                         <h4>Absorption Parameters</h4>
@@ -122,18 +127,20 @@
                             <input type="range" id="liAbs1" min="0.01" max="0.3" step="0.01" value="0.1" oninput="updateVal('liAbs1'); runSim();">
                             <div class="value" id="liAbs1Val">0.1</div>
                         </div>
-                        <div class="control-group">
-                            <label>Waste Elimination (%):</label>
-                            <input type="range" id="wasteElim1" min="0" max="50" step="1" value="10" oninput="updateVal('wasteElim1'); runSim();">
-                            <div class="value" id="wasteElim1Val">10%</div>
-                        </div>
-                    </div>
-                    
                     <div class="control-group">
-                        <label>Dissolution Rate:</label>
-                        <input type="range" id="dissolution1" min="0" max="10" step="0.01" value="0.1" oninput="updateVal('dissolution1'); runSim();">
-                        <div class="value" id="dissolution1Val">0.1</div>
+                        <label>Distribution to Tissue:</label>
+                        <input type="range" id="distribution1" min="0.01" max="0.5" step="0.01" value="0.1" oninput="updateVal('distribution1'); runSim();">
+                        <div class="value" id="distribution1Val">0.1</div>
                     </div>
+                    <div class="control-group">
+                        <label>Redistribution from Tissue:</label>
+                        <input type="range" id="redistribution1" min="0.01" max="0.3" step="0.01" value="0.05" oninput="updateVal('redistribution1'); runSim();">
+                        <div class="value" id="redistribution1Val">0.05</div>
+                    </div>
+                </div>
+
+                    <div class="absorption-section">
+                      <h4>Transit Parameters</h4>
                     <div class="control-group">
                         <label>Stomach Transit:</label>
                         <input type="range" id="stomachTransit1" min="0.01" max="0.5" step="0.01" value="0.2" oninput="updateVal('stomachTransit1'); runSim();">
@@ -145,20 +152,14 @@
                         <div class="value" id="intestineTransit1Val">0.15</div>
                     </div>
                     <div class="control-group">
-                        <label>Distribution to Tissue:</label>
-                        <input type="range" id="distribution1" min="0.01" max="0.5" step="0.01" value="0.1" oninput="updateVal('distribution1'); runSim();">
-                        <div class="value" id="distribution1Val">0.1</div>
+                        <label>Waste Elimination (%):</label>
+                        <input type="range" id="wasteElim1" min="0" max="50" step="1" value="10" oninput="updateVal('wasteElim1'); runSim();">
+                        <div class="value" id="wasteElim1Val">10%</div>
                     </div>
-                    <div class="control-group">
-                        <label>Redistribution from Tissue:</label>
-                        <input type="range" id="redistribution1" min="0.01" max="0.3" step="0.01" value="0.05" oninput="updateVal('redistribution1'); runSim();">
-                        <div class="value" id="redistribution1Val">0.05</div>
-                    </div>
-                    <div class="control-group">
-                        <label>Bioavailability:</label>
-                        <input type="range" id="bioavailability1" min="0.01" max="1.0" step="0.01" value="0.7" oninput="updateVal('bioavailability1'); runSim();">
-                        <div class="value" id="bioavailability1Val">0.7</div>
-                    </div>
+                </div>
+                    
+                       <div class="absorption-section">
+                      <h4>PK/PD Parameters</h4> 
                     <div class="control-group">
                         <label>EC50:</label>
                         <input type="range" id="ec501" min="0.1" max="10" step="0.1" value="2.0" oninput="updateVal('ec501'); runSim();">
@@ -168,6 +169,11 @@
                         <label>Emax:</label>
                         <input type="range" id="emax1" min="-100" max="100" step="5" value="-50" oninput="updateVal('emax1'); runSim();">
                         <div class="value" id="emax1Val">-50</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Bioavailability:</label>
+                        <input type="range" id="bioavailability1" min="0.01" max="1.0" step="0.01" value="0.7" oninput="updateVal('bioavailability1'); runSim();">
+                        <div class="value" id="bioavailability1Val">0.7</div>
                     </div>
                     <div class="control-group">
                         <label>Half-life (hrs):</label>
@@ -203,6 +209,11 @@
                             <input type="range" id="numDoses2" min="1" max="90" step="1" value="1" oninput="updateVal('numDoses2'); runSim();">
                             <div class="value" id="numDoses2Val">1</div>
                         </div>
+                        <div class="control-group">
+                            <label>Dissolution Rate:</label>
+                            <input type="range" id="dissolution2" min="0" max="10" step="0.01" value="0.15" oninput="updateVal('dissolution2'); runSim();">
+                            <div class="value" id="dissolution2Val">0.15</div>
+                        </div>
                     </div>
                     
                     <div class="absorption-section">
@@ -221,19 +232,12 @@
                             <label>Large Intestine Absorption:</label>
                             <input type="range" id="liAbs2" min="0.01" max="0.3" step="0.01" value="0.08" oninput="updateVal('liAbs2'); runSim();">
                             <div class="value" id="liAbs2Val">0.08</div>
-                        </div>
-                        <div class="control-group">
-                            <label>Waste Elimination (%):</label>
-                            <input type="range" id="wasteElim2" min="0" max="50" step="1" value="10" oninput="updateVal('wasteElim2'); runSim();">
-                            <div class="value" id="wasteElim2Val">10%</div>
-                        </div>
+                        </div>     
                     </div>
                     
-                    <div class="control-group">
-                        <label>Dissolution Rate:</label>
-                        <input type="range" id="dissolution2" min="0" max="10" step="0.01" value="0.15" oninput="updateVal('dissolution2'); runSim();">
-                        <div class="value" id="dissolution2Val">0.15</div>
-                    </div>
+                    
+                     <div class="absorption-section">
+                        <h4>Transit Parameters</h4>
                     <div class="control-group">
                         <label>Stomach Transit:</label>
                         <input type="range" id="stomachTransit2" min="0.01" max="0.5" step="0.01" value="0.2" oninput="updateVal('stomachTransit2'); runSim();">
@@ -244,16 +248,13 @@
                         <input type="range" id="intestineTransit2" min="0.01" max="0.5" step="0.01" value="0.15" oninput="updateVal('intestineTransit2'); runSim();">
                         <div class="value" id="intestineTransit2Val">0.15</div>
                     </div>
-                    <div class="control-group">
-                        <label>Bioavailability:</label>
-                        <input type="range" id="bioavailability2" min="0.01" max="1.0" step="0.01" value="0.8" oninput="updateVal('bioavailability2'); runSim();">
-                        <div class="value" id="bioavailability2Val">0.8</div>
-                    </div>
-                    <div class="control-group">
-                        <label>Elimination Rate:</label>
-                        <input type="range" id="elim2" min="0.01" max="0.3" step="0.01" value="0.08" oninput="updateVal('elim2'); runSim();">
-                        <div class="value" id="elim2Val">0.08</div>
-                    </div>
+                         <div class="control-group">
+                            <label>Waste Elimination (%):</label>
+                            <input type="range" id="wasteElim2" min="0" max="50" step="1" value="10" oninput="updateVal('wasteElim2'); runSim();">
+                            <div class="value" id="wasteElim2Val">10%</div>
+                        </div>
+                  </div>
+                    
                     <div class="control-group">
                         <label>EC50:</label>
                         <input type="range" id="ec502" min="0.1" max="10" step="0.1" value="5.0" oninput="updateVal('ec502'); runSim();">
@@ -263,6 +264,11 @@
                         <label>Emax:</label>
                         <input type="range" id="emax2" min="-100" max="100" step="5" value="-60" oninput="updateVal('emax2'); runSim();">
                         <div class="value" id="emax2Val">-60</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Bioavailability:</label>
+                        <input type="range" id="bioavailability2" min="0.01" max="1.0" step="0.01" value="0.8" oninput="updateVal('bioavailability2'); runSim();">
+                        <div class="value" id="bioavailability2Val">0.8</div>
                     </div>
                     <div class="control-group">
                         <label>Half-life (hrs):</label>
