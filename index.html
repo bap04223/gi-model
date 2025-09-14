@@ -27,16 +27,14 @@
         .chart-info { font-size: 0.8rem; color: #666; background: #f8f8f8; padding: 10px; border-radius: 5px; }
         .interaction-section { background: #fff3cd; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
         .run-button { background: #667eea; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 15px; }
-        .stats { background: white; border-radius: 15px; padding: 20px; margin-top: 20px; }
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px; }
         .stat-card { color: white; padding: 15px; border-radius: 8px; text-align: center; }
-        .stat-card.drug-a { background: #e74c3c; } /* Red for Drug A */
-        .stat-card.drug-b { background: #3498db; } /* Blue for Drug B */
-        .stat-card.combined { background: #9b59b6; } /* Purple for Combined */
+        .stat-card.drug-a { background: #e74c3c; }
+        .stat-card.drug-b { background: #3498db; }
+        .stat-card.combined { background: #9b59b6; }
         .stat-value { font-size: 1.2rem; font-weight: bold; }
         .stat-label { font-size: 0.8rem; }
         
-        /* Responsive adjustments for better screen usage */
         @media (max-width: 1200px) {
             .main-grid { grid-template-columns: 320px 1fr; }
         }
@@ -273,6 +271,12 @@
                 </div>
                 
                 <div class="control-group">
+                    <label>Target Guidelines (±%):</label>
+                    <input type="range" id="targetGuidelines" min="1" max="30" step="1" value="10" oninput="updateVal('targetGuidelines'); runSim();">
+                    <div class="value" id="targetGuidelinesVal">10%</div>
+                </div>
+                
+                <div class="control-group">
                     <label>Simulation Time (hrs):</label>
                     <input type="range" id="simTime" min="0" max="720" step="6" value="48" oninput="updateVal('simTime'); runSim();">
                     <div class="value" id="simTimeVal">48 hrs</div>
@@ -309,17 +313,12 @@
                 <div class="chart-container">
                     <h4>Results</h4>
                     <div class="stats-grid">
-                        <!-- Drug A Column (Red) -->
                         <div class="stat-card drug-a"><div class="stat-value" id="cmax1">-</div><div class="stat-label">Drug A Cmax</div></div>
                         <div class="stat-card drug-a"><div class="stat-value" id="tmax1">-</div><div class="stat-label">Drug A Tmax</div></div>
                         <div class="stat-card drug-a"><div class="stat-value" id="auc1">-</div><div class="stat-label">Drug A AUC</div></div>
-                        
-                        <!-- Drug B Column (Blue) -->
                         <div class="stat-card drug-b"><div class="stat-value" id="cmax2">-</div><div class="stat-label">Drug B Cmax</div></div>
                         <div class="stat-card drug-b"><div class="stat-value" id="tmax2">-</div><div class="stat-label">Drug B Tmax</div></div>
                         <div class="stat-card drug-b"><div class="stat-value" id="auc2">-</div><div class="stat-label">Drug B AUC</div></div>
-                        
-                        <!-- Combined Column (Purple) -->
                         <div class="stat-card combined"><div class="stat-value" id="maxEffect">-</div><div class="stat-label">Max Effect</div></div>
                     </div>
                 </div>
@@ -344,6 +343,7 @@ function updateVal(id) {
         var v = el.value;
         if (id.includes('dose')) v += ' mg';
         else if (id.includes('Time') || id.includes('halflife')) v += ' hrs';
+        else if (id.includes('targetGuidelines')) v += '%';
         else if (id.includes('interval')) {
             if (parseFloat(v) === 0) v += ' hrs (single dose)';
             else v += ' hrs';
@@ -477,7 +477,6 @@ function updateDrug(drug, drugNum, dt, elimRate) {
     var redistribution = Math.max(0, drug.tissue) * getVal('redistribution' + drugNum) * dt;
     var elimination = Math.max(0, drug.plasma) * elimRate * dt;
     
-    // Apply bioavailability to absorbed drug amounts
     var bioavailability = getVal('bioavailability' + drugNum);
     var bioavailableStomachAbs = stomachAbs * bioavailability;
     var bioavailableSiAbs = siAbs * bioavailability;
@@ -497,7 +496,7 @@ function calcEffect(conc, ec50, emax) {
 }
 
 function calculateStats(data) {
-    if (!data.length) return {cmax1: 0, cmax2: 0, tmax1: 0, tmax2: 0, auc1: 0, auc2: 0, maxEffect: 0, effectDuration: 0};
+    if (!data.length) return {cmax1: 0, cmax2: 0, tmax1: 0, tmax2: 0, auc1: 0, auc2: 0, maxEffect: 0};
     
     var plasma1 = data.map(function(d) { return d.drug1.plasma; });
     var plasma2 = data.map(function(d) { return d.drug2.plasma; });
@@ -516,9 +515,6 @@ function calculateStats(data) {
     }
     
     var maxEffect = Math.max.apply(Math, effects);
-    var effectDuration = data.filter(function(d) { 
-        return Math.abs(d.combinedEffect - getVal('baseline')) > maxEffect * 0.1; 
-    }).length * 0.1;
     
     return {
         cmax1: cmax1,
@@ -527,8 +523,7 @@ function calculateStats(data) {
         tmax2: tmax2,
         auc1: auc1,
         auc2: auc2,
-        maxEffect: maxEffect,
-        effectDuration: effectDuration
+        maxEffect: maxEffect
     };
 }
 
@@ -586,7 +581,9 @@ function setupCharts() {
             { label: 'Drug B Effect', data: [], borderColor: '#3498db', borderWidth: 2, fill: false, pointRadius: 0 },
             { label: 'Combined Effect', data: [], borderColor: '#9b59b6', borderWidth: 4, fill: false, pointRadius: 0 },
             { label: 'Baseline', data: [], borderColor: '#95a5a6', borderWidth: 2, borderDash: [5, 5], fill: false, pointRadius: 0 },
-            { label: 'Target Effect', data: [], borderColor: '#27ae60', borderWidth: 2, borderDash: [10, 3], fill: false, pointRadius: 0 }
+            { label: 'Target Effect', data: [], borderColor: '#27ae60', borderWidth: 2, borderDash: [10, 3], fill: false, pointRadius: 0 },
+            { label: 'Target +10%', data: [], borderColor: '#f39c12', borderWidth: 1, borderDash: [3, 3], fill: false, pointRadius: 0 },
+            { label: 'Target -10%', data: [], borderColor: '#f39c12', borderWidth: 1, borderDash: [3, 3], fill: false, pointRadius: 0 }
         ]},
         options: effectOpts
     });
@@ -600,6 +597,9 @@ function runSim() {
         var times = data.map(function(d) { return d.time; });
         var baseline = getVal('baseline');
         var target = getVal('targetEffect');
+        var guidelinePercent = getVal('targetGuidelines') / 100;
+        var targetUpper = target + (Math.abs(target - baseline) * guidelinePercent);
+        var targetLower = target - (Math.abs(target - baseline) * guidelinePercent);
         var stats = calculateStats(data);
         
         var allEffects = [];
@@ -610,6 +610,8 @@ function runSim() {
         });
         allEffects.push(baseline);
         allEffects.push(target);
+        allEffects.push(targetUpper);
+        allEffects.push(targetLower);
         
         var minEffect = Math.min.apply(Math, allEffects);
         var maxEffect = Math.max.apply(Math, allEffects);
@@ -643,8 +645,15 @@ function runSim() {
         charts.effects.data.datasets[0].data = data.map(function(d) { return baseline + d.effect1; });
         charts.effects.data.datasets[1].data = data.map(function(d) { return baseline + d.effect2; });
         charts.effects.data.datasets[2].data = data.map(function(d) { return d.combinedEffect; });
-        charts.effects.data.datasets[3].data = data.map(function(d) { return baseline; });
-        charts.effects.data.datasets[4].data = data.map(function(d) { return target; });
+        charts.effects.data.datasets[3].data = times.map(function() { return baseline; });
+        charts.effects.data.datasets[4].data = times.map(function() { return target; });
+        charts.effects.data.datasets[5].data = times.map(function() { return targetUpper; });
+        charts.effects.data.datasets[6].data = times.map(function() { return targetLower; });
+        
+        var guidelinePercentValue = getVal('targetGuidelines');
+        charts.effects.data.datasets[5].label = 'Target +' + guidelinePercentValue + '%';
+        charts.effects.data.datasets[6].label = 'Target -' + guidelinePercentValue + '%';
+        
         charts.effects.update();
         
         document.getElementById('cmax1').textContent = stats.cmax1.toFixed(2);
@@ -667,7 +676,7 @@ window.onload = function() {
                    'distribution1', 'distribution2', 'redistribution1', 'redistribution2',
                    'bioavailability1', 'bioavailability2',
                    'elim2', 'ec501', 'ec502', 'emax1', 'emax2', 'halflife1', 'halflife2',
-                   'baseline', 'targetEffect', 'simTime', 'interactionFactor'];
+                   'baseline', 'targetEffect', 'targetGuidelines', 'simTime', 'interactionFactor'];
     
     controls.forEach(function(id) { updateVal(id); });
     
