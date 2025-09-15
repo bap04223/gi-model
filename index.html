@@ -85,6 +85,29 @@
         .stat-label { font-size: 0.8rem; }
         .assessment-feedback { margin-top: 15px; padding: 10px; border-radius: 5px; font-size: 0.9rem; }
         
+        /* Max effects grid under PD chart */
+        .max-effects-grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 10px; 
+            margin-top: 15px; 
+        }
+        .max-effect-card { 
+            color: white; 
+            padding: 12px; 
+            border-radius: 8px; 
+            text-align: center; 
+            min-height: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .max-effect-card.drug-a { background: #27ae60; }
+        .max-effect-card.drug-b { background: #3498db; }
+        .max-effect-card.combined { background: #9b59b6; }
+        .max-effect-value { font-size: 1.1rem; font-weight: bold; margin-bottom: 4px; }
+        .max-effect-label { font-size: 0.75rem; }
+        
         @media (max-width: 1200px) {
             .main-grid { grid-template-columns: 320px 1fr; }
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
@@ -491,6 +514,21 @@
                         <canvas id="chart3"></canvas>
                     </div>
                     <div class="chart-info">Individual and combined drug effects with PD-specific interactions and targets</div>
+                    
+                    <div class="max-effects-grid">
+                        <div class="max-effect-card drug-a">
+                            <div class="max-effect-value" id="maxEffect1">-</div>
+                            <div class="max-effect-label">Max Effect A</div>
+                        </div>
+                        <div class="max-effect-card drug-b">
+                            <div class="max-effect-value" id="maxEffect2">-</div>
+                            <div class="max-effect-label">Max Effect B</div>
+                        </div>
+                        <div class="max-effect-card combined">
+                            <div class="max-effect-value" id="maxEffect">-</div>
+                            <div class="max-effect-label">Max Combined Effect</div>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="chart-container">
@@ -505,7 +543,6 @@
                         <div class="stat-card assessment"><div class="stat-value" id="giAssessmentGrade1">-</div><div class="stat-label">GI A Assessment</div></div>
                         <div class="stat-card assessment"><div class="stat-value" id="giAssessmentGrade2">-</div><div class="stat-label">GI B Assessment</div></div>
                         <div class="stat-card assessment"><div class="stat-value" id="assessmentGrade">-</div><div class="stat-label">PD Assessment</div></div>
-                        <div class="stat-card combined"><div class="stat-value" id="maxEffect">-</div><div class="stat-label">Max Effect</div></div>
                     </div>
                     <div class="assessment-feedback" id="giAssessmentFeedback1"></div>
                     <div class="assessment-feedback" id="giAssessmentFeedback2"></div>
@@ -869,10 +906,12 @@ function calcEffect(conc, ec50, emax) {
 }
 
 function calculateStats(data) {
-    if (!data.length) return {cmax1: 0, cmax2: 0, tmax1: 0, tmax2: 0, auc1: 0, auc2: 0, maxEffect: 0};
+    if (!data.length) return {cmax1: 0, cmax2: 0, tmax1: 0, tmax2: 0, auc1: 0, auc2: 0, maxEffect1: 0, maxEffect2: 0, maxEffect: 0};
     
     var plasma1 = data.map(function(d) { return d.drug1.plasma; });
     var plasma2 = data.map(function(d) { return d.drug2.plasma; });
+    var effects1 = data.map(function(d) { return Math.abs(d.effect1); });
+    var effects2 = data.map(function(d) { return Math.abs(d.effect2); });
     var effects = data.map(function(d) { return Math.abs(d.combinedEffect - getVal('baseline')); });
     
     var cmax1 = Math.max.apply(Math, plasma1);
@@ -887,6 +926,8 @@ function calculateStats(data) {
         auc2 += (plasma2[i] + plasma2[i-1]) * dt / 2;
     }
     
+    var maxEffect1 = Math.max.apply(Math, effects1);
+    var maxEffect2 = Math.max.apply(Math, effects2);
     var maxEffect = Math.max.apply(Math, effects);
     
     return {
@@ -896,6 +937,8 @@ function calculateStats(data) {
         tmax2: tmax2,
         auc1: auc1,
         auc2: auc2,
+        maxEffect1: maxEffect1,
+        maxEffect2: maxEffect2,
         maxEffect: maxEffect
     };
 }
@@ -1097,7 +1140,15 @@ function runSim() {
         document.getElementById('tmax2').textContent = stats.tmax2.toFixed(1);
         document.getElementById('auc1').textContent = stats.auc1.toFixed(1);
         document.getElementById('auc2').textContent = stats.auc2.toFixed(1);
-        document.getElementById('maxEffect').textContent = stats.maxEffect.toFixed(1);
+        
+        // Update max effect values with null checks
+        var maxEffect1El = document.getElementById('maxEffect1');
+        var maxEffect2El = document.getElementById('maxEffect2');
+        var maxEffectEl = document.getElementById('maxEffect');
+        
+        if (maxEffect1El) maxEffect1El.textContent = stats.maxEffect1.toFixed(1);
+        if (maxEffect2El) maxEffect2El.textContent = stats.maxEffect2.toFixed(1);
+        if (maxEffectEl) maxEffectEl.textContent = stats.maxEffect.toFixed(1);
         
         // PD Assessment
         var assessmentCard = document.getElementById('assessmentGrade').parentElement;
