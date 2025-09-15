@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,7 +23,7 @@
         .drug-panel.active { display: block; }
         .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .chart-container { background: white; border-radius: 15px; padding: 20px; }
-        .chart-wrapper { height: 300px; margin-bottom: 10px; position: relative; }
+        .chart-wrapper { height: 300px; margin-bottom: 10px; }
         .chart-info { font-size: 0.8rem; color: #666; background: #f8f8f8; padding: 10px; border-radius: 5px; }
         .interaction-section { background: #fff3cd; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
         .target-section { background: #e8f5e8; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
@@ -33,12 +32,10 @@
         .dosing-section h4 { margin-top: 0; color: #1565c0; }
         .absorption-section { background: #e1f5fe; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
         .absorption-section h4 { margin-top: 0; color: #0277bd; }
-        .transit-section { background: #e8f4fd; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
-        .transit-section h4 { margin-top: 0; color: #1e88e5; }
         .run-button { background: #667eea; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 15px; }
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px; }
         .stat-card { color: white; padding: 15px; border-radius: 8px; text-align: center; }
-        .stat-card.drug-a { background: #27ae60; }
+        .stat-card.drug-a { background: #e74c3c; }
         .stat-card.drug-b { background: #3498db; }
         .stat-card.combined { background: #9b59b6; }
         .stat-card.assessment { background: #2c3e50; }
@@ -47,32 +44,6 @@
         .stat-value { font-size: 1.2rem; font-weight: bold; }
         .stat-label { font-size: 0.8rem; }
         .assessment-feedback { margin-top: 15px; padding: 10px; border-radius: 5px; font-size: 0.9rem; }
-        
-        /* Collapsible Section Styles */
-        .collapsible-header { 
-            cursor: pointer; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin: 0; 
-            padding: 10px 0; 
-            border-bottom: 1px solid rgba(255,255,255,0.3);
-            user-select: none;
-        }
-        .collapsible-header:hover { opacity: 0.8; }
-        .collapsible-arrow { 
-            font-size: 1.2rem; 
-            transition: transform 0.3s ease; 
-            font-weight: bold;
-        }
-        .collapsible-arrow.expanded { transform: rotate(90deg); }
-        .collapsible-content { 
-            overflow: hidden; 
-            transition: max-height 0.3s ease; 
-            max-height: 0; 
-        }
-        .collapsible-content.expanded { max-height: 1000px; }
-        .collapsible-inner { padding: 15px 0 0 0; }
         
         @media (max-width: 1200px) {
             .main-grid { grid-template-columns: 320px 1fr; }
@@ -88,8 +59,6 @@
         @media (min-width: 1400px) {
             .chart-wrapper { height: 350px; }
         }
-
-        
     </style>
 </head>
 <body>
@@ -113,157 +82,97 @@
                     </div>
                     
                     <div class="dosing-section">
-                        <h4 class="collapsible-header" onclick="toggleSection(this)">
-                            Dosing Parameters
-                            <span class="collapsible-arrow expanded">▶</span>
-                        </h4>
-                            <div class="collapsible-inner">
-                                <div class="control-group">
-                                    <label>Dose (mg):</label>
-                                    <input type="range" id="dose1" min="0" max="500" value="50" oninput="updateVal('dose1'); runSim();">
-                                    <div class="value" id="dose1Val">50 mg</div>
-                                </div>
-                                <div class="control-group">
-                                    <label>Admin Time (hrs):</label>
-                                    <input type="range" id="adminTime1" min="0" max="12" step="0.5" value="0" oninput="updateVal('adminTime1'); runSim();">
-                                    <div class="value" id="adminTime1Val">0 hrs</div>
-                                </div>
-                                <div class="control-group">
-                                    <label>Dosing Interval (hrs):</label>
-                                    <input type="range" id="interval1" min="0" max="24" step="1" value="0" oninput="updateVal('interval1'); runSim();">
-                                    <div class="value" id="interval1Val">0 hrs (single dose)</div>
-                                </div>
-                                <div class="control-group">
-                                    <label>Number of Doses:</label>
-                                    <input type="range" id="numDoses1" min="1" max="90" step="1" value="1" oninput="updateVal('numDoses1'); runSim();">
-                                    <div class="value" id="numDoses1Val">1</div>
-                                </div>
-                                <div class="control-group">
-                                    <label>Dissolution Rate:</label>
-                                    <input type="range" id="dissolution1" min="0" max="10" step="0.01" value="0.1" oninput="updateVal('dissolution1'); runSim();">
-                                    <div class="value" id="dissolution1Val">0.1</div>
-                                </div>
-                            </div>
+                        <h4>Dosing Parameters</h4>
+                        <div class="control-group">
+                            <label>Dose (mg):</label>
+                            <input type="range" id="dose1" min="0" max="500" value="50" oninput="updateVal('dose1'); runSim();">
+                            <div class="value" id="dose1Val">50 mg</div>
                         </div>
-                    </div>
-                    
-                    <div class="transit-section">
-                        <h4 class="collapsible-header" onclick="toggleSection(this)">
-                            Transit Parameters
-                            <span class="collapsible-arrow">▶</span>
-                        </h4>
-                        <div class="collapsible-content">
-                            <div class="collapsible-inner">
-                                <div class="control-group">
-                                    <label>Stomach Transit:</label>
-                                    <input type="range" id="stomachTransit1" min="0.01" max="0.5" step="0.01" value="0.2" oninput="updateVal('stomachTransit1'); runSim();">
-                                    <div class="value" id="stomachTransit1Val">0.2</div>
-                                </div>
-                                <div class="control-group">
-                                    <label>Intestine Transit:</label>
-                                    <input type="range" id="intestineTransit1" min="0.01" max="0.5" step="0.01" value="0.15" oninput="updateVal('intestineTransit1'); runSim();">
-                                    <div class="value" id="intestineTransit1Val">0.15</div>
-                                </div>
-                                <div class="control-group">
-                                    <label>Waste Elimination (%):</label>
-                                    <input type="range" id="wasteElim1" min="0" max="50" step="1" value="10" oninput="updateVal('wasteElim1'); runSim();">
-                                    <div class="value" id="wasteElim1Val">10%</div>
-                                </div>
-                            </div>
+                        <div class="control-group">
+                            <label>Admin Time (hrs):</label>
+                            <input type="range" id="adminTime1" min="0" max="12" step="0.5" value="0" oninput="updateVal('adminTime1'); runSim();">
+                            <div class="value" id="adminTime1Val">0 hrs</div>
+                        </div>
+                        <div class="control-group">
+                            <label>Dosing Interval (hrs):</label>
+                            <input type="range" id="interval1" min="0" max="24" step="1" value="0" oninput="updateVal('interval1'); runSim();">
+                            <div class="value" id="interval1Val">0 hrs (single dose)</div>
+                        </div>
+                        <div class="control-group">
+                            <label>Number of Doses:</label>
+                            <input type="range" id="numDoses1" min="1" max="90" step="1" value="1" oninput="updateVal('numDoses1'); runSim();">
+                            <div class="value" id="numDoses1Val">1</div>
                         </div>
                     </div>
                     
                     <div class="absorption-section">
-                        <h4 class="collapsible-header" onclick="toggleSection(this)">
-                            Absorption Parameters
-                            <span class="collapsible-arrow">▶</span>
-                        </h4>
-                        <div class="collapsible-content">
-                            <div class="collapsible-inner">
-                                <div class="control-group">
-                                    <label>Stomach Absorption:</label>
-                                    <input type="range" id="stomachAbs1" min="0.01" max="0.5" step="0.01" value="0.05" oninput="updateVal('stomachAbs1'); runSim();">
-                                    <div class="value" id="stomachAbs1Val">0.05</div>
-                                </div>
-                                <div class="control-group">
-                                    <label>Small Intestine Absorption:</label>
-                                    <input type="range" id="siAbs1" min="0.01" max="0.8" step="0.01" value="0.3" oninput="updateVal('siAbs1'); runSim();">
-                                    <div class="value" id="siAbs1Val">0.3</div>
-                                </div>
-                                <div class="control-group">
-                                    <label>Large Intestine Absorption:</label>
-                                    <input type="range" id="liAbs1" min="0.01" max="0.3" step="0.01" value="0.1" oninput="updateVal('liAbs1'); runSim();">
-                                    <div class="value" id="liAbs1Val">0.1</div>
-                                </div>
-                                <div class="control-group">
-                                    <label>Distribution to Tissue:</label>
-                                    <input type="range" id="distribution1" min="0.01" max="0.5" step="0.01" value="0.1" oninput="updateVal('distribution1'); runSim();">
-                                    <div class="value" id="distribution1Val">0.1</div>
-                                </div>
-                                <div class="control-group">
-                                    <label>Redistribution from Tissue:</label>
-                                    <input type="range" id="redistribution1" min="0.01" max="0.3" step="0.01" value="0.05" oninput="updateVal('redistribution1'); runSim();">
-                                    <div class="value" id="redistribution1Val">0.05</div>
-                                </div>
-                            </div>
+                        <h4>Absorption Parameters</h4>
+                        <div class="control-group">
+                            <label>Stomach Absorption:</label>
+                            <input type="range" id="stomachAbs1" min="0.01" max="0.5" step="0.01" value="0.05" oninput="updateVal('stomachAbs1'); runSim();">
+                            <div class="value" id="stomachAbs1Val">0.05</div>
+                        </div>
+                        <div class="control-group">
+                            <label>Small Intestine Absorption:</label>
+                            <input type="range" id="siAbs1" min="0.01" max="0.8" step="0.01" value="0.3" oninput="updateVal('siAbs1'); runSim();">
+                            <div class="value" id="siAbs1Val">0.3</div>
+                        </div>
+                        <div class="control-group">
+                            <label>Large Intestine Absorption:</label>
+                            <input type="range" id="liAbs1" min="0.01" max="0.3" step="0.01" value="0.1" oninput="updateVal('liAbs1'); runSim();">
+                            <div class="value" id="liAbs1Val">0.1</div>
+                        </div>
+                        <div class="control-group">
+                            <label>Waste Elimination (%):</label>
+                            <input type="range" id="wasteElim1" min="0" max="50" step="1" value="10" oninput="updateVal('wasteElim1'); runSim();">
+                            <div class="value" id="wasteElim1Val">10%</div>
                         </div>
                     </div>
                     
-                    <div class="absorption-section">
-                        <h4 class="collapsible-header" onclick="toggleSection(this)">
-                            PK/PD Parameters
-                            <span class="collapsible-arrow">▶</span>
-                        </h4>
-                        <div class="collapsible-content">
-                            <div class="collapsible-inner">
-                                <div class="control-group">
-                                    <label>Bioavailability:</label>
-                                    <input type="range" id="bioavailability1" min="0.01" max="1.0" step="0.01" value="0.7" oninput="updateVal('bioavailability1'); runSim();">
-                                    <div class="value" id="bioavailability1Val">0.7</div>
-                                </div>
-                                <div class="control-group">
-                                    <label>EC50:</label>
-                                    <input type="range" id="ec501" min="0.1" max="50" step="0.1" value="2.0" oninput="updateVal('ec501'); runSim();">
-                                    <div class="value" id="ec501Val">2.0</div>
-                                </div>
-                                <div class="control-group">
-                                    <label>Emax:</label>
-                                    <input type="range" id="emax1" min="-100" max="100" step="5" value="-50" oninput="updateVal('emax1'); runSim();">
-                                    <div class="value" id="emax1Val">-50</div>
-                                </div>
-                                <div class="control-group">
-                                    <label>Half-life (hrs):</label>
-                                    <input type="range" id="halflife1" min="0.5" max="24" step="0.5" value="6.9" oninput="updateVal('halflife1'); runSim();">
-                                    <div class="value" id="halflife1Val">6.9 hrs</div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="control-group">
+                        <label>Dissolution Rate:</label>
+                        <input type="range" id="dissolution1" min="0" max="10" step="0.01" value="0.1" oninput="updateVal('dissolution1'); runSim();">
+                        <div class="value" id="dissolution1Val">0.1</div>
                     </div>
-
-                    <div class="target-section">
-                        <h4 class="collapsible-header" onclick="toggleSection(this)">
-                            Drug A GI Target
-                            <span class="collapsible-arrow">▶</span>
-                        </h4>
-                        <div class="collapsible-content">
-                            <div class="collapsible-inner">
-                                <div class="control-group">
-                                    <label>GI Target Effect:</label>
-                                    <input type="range" id="giTargetEffect1" min="0" max="200" step="5" value="90" oninput="updateVal('giTargetEffect1'); runSim();">
-                                    <div class="value" id="giTargetEffect1Val">90</div>
-                                </div>
-                                <div class="control-group">
-                                    <label>GI Target Max (%):</label>
-                                    <input type="range" id="giTargetMax1" min="0" max="100" step="1" value="15" oninput="updateVal('giTargetMax1'); runSim();">
-                                    <div class="value" id="giTargetMax1Val">15%</div>
-                                </div>
-                                <div class="control-group">
-                                    <label>GI Target Min (%):</label>
-                                    <input type="range" id="giTargetMin1" min="0" max="100" step="1" value="10" oninput="updateVal('giTargetMin1'); runSim();">
-                                    <div class="value" id="giTargetMin1Val">10%</div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="control-group">
+                        <label>Stomach Transit:</label>
+                        <input type="range" id="stomachTransit1" min="0.01" max="0.5" step="0.01" value="0.2" oninput="updateVal('stomachTransit1'); runSim();">
+                        <div class="value" id="stomachTransit1Val">0.2</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Intestine Transit:</label>
+                        <input type="range" id="intestineTransit1" min="0.01" max="0.5" step="0.01" value="0.15" oninput="updateVal('intestineTransit1'); runSim();">
+                        <div class="value" id="intestineTransit1Val">0.15</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Distribution to Tissue:</label>
+                        <input type="range" id="distribution1" min="0.01" max="0.5" step="0.01" value="0.1" oninput="updateVal('distribution1'); runSim();">
+                        <div class="value" id="distribution1Val">0.1</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Redistribution from Tissue:</label>
+                        <input type="range" id="redistribution1" min="0.01" max="0.3" step="0.01" value="0.05" oninput="updateVal('redistribution1'); runSim();">
+                        <div class="value" id="redistribution1Val">0.05</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Bioavailability:</label>
+                        <input type="range" id="bioavailability1" min="0.01" max="1.0" step="0.01" value="0.7" oninput="updateVal('bioavailability1'); runSim();">
+                        <div class="value" id="bioavailability1Val">0.7</div>
+                    </div>
+                    <div class="control-group">
+                        <label>EC50:</label>
+                        <input type="range" id="ec501" min="0.1" max="50" step="0.1" value="2.0" oninput="updateVal('ec501'); runSim();">
+                        <div class="value" id="ec501Val">2.0</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Emax:</label>
+                        <input type="range" id="emax1" min="-100" max="100" step="5" value="-50" oninput="updateVal('emax1'); runSim();">
+                        <div class="value" id="emax1Val">-50</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Half-life (hrs):</label>
+                        <input type="range" id="halflife1" min="0.5" max="24" step="0.5" value="6.9" oninput="updateVal('halflife1'); runSim();">
+                        <div class="value" id="halflife1Val">6.9 hrs</div>
                     </div>
                 </div>
                 
@@ -273,218 +182,156 @@
                     </div>
                     
                     <div class="dosing-section">
-                        <h4 class="collapsible-header" onclick="toggleSection(this)">
-                            Dosing Parameters
-                            <span class="collapsible-arrow expanded">▶</span>
-                        </h4>
-                        <div class="collapsible-content expanded">
-                            <div class="collapsible-inner">
-                                <div class="control-group">
-                                    <label>Dose (mg):</label>
-                                    <input type="range" id="dose2" min="0" max="500" value="75" oninput="updateVal('dose2'); runSim();">
-                                    <div class="value" id="dose2Val">75 mg</div>
-                                </div>
-                                <div class="control-group">
-                                    <label>Admin Time (hrs):</label>
-                                    <input type="range" id="adminTime2" min="0" max="12" step="0.5" value="0" oninput="updateVal('adminTime2'); runSim();">
-                                    <div class="value" id="adminTime2Val">0 hrs</div>
-                                </div>
-                                <div class="control-group">
-                                    <label>Dosing Interval (hrs):</label>
-                                    <input type="range" id="interval2" min="0" max="24" step="1" value="0" oninput="updateVal('interval2'); runSim();">
-                                    <div class="value" id="interval2Val">0 hrs (single dose)</div>
-                                </div>
-                                <div class="control-group">
-                                    <label>Number of Doses:</label>
-                                    <input type="range" id="numDoses2" min="1" max="90" step="1" value="1" oninput="updateVal('numDoses2'); runSim();">
-                                    <div class="value" id="numDoses2Val">1</div>
-                                </div>
-                                <div class="control-group">
-                                    <label>Dissolution Rate:</label>
-                                    <input type="range" id="dissolution2" min="0" max="10" step="0.01" value="0.15" oninput="updateVal('dissolution2'); runSim();">
-                                    <div class="value" id="dissolution2Val">0.15</div>
-                                </div>
-                            </div>
+                        <h4>Dosing Parameters</h4>
+                        <div class="control-group">
+                            <label>Dose (mg):</label>
+                            <input type="range" id="dose2" min="0" max="500" value="75" oninput="updateVal('dose2'); runSim();">
+                            <div class="value" id="dose2Val">75 mg</div>
                         </div>
-                    </div>
-                    
-                    <div class="transit-section">
-                        <h4 class="collapsible-header" onclick="toggleSection(this)">
-                            Transit Parameters
-                            <span class="collapsible-arrow">▶</span>
-                        </h4>
-                        <div class="collapsible-content">
-                            <div class="collapsible-inner">
-                                <div class="control-group">
-                                    <label>Stomach Transit:</label>
-                                    <input type="range" id="stomachTransit2" min="0.01" max="0.5" step="0.01" value="0.2" oninput="updateVal('stomachTransit2'); runSim();">
-                                    <div class="value" id="stomachTransit2Val">0.2</div>
-                                </div>
-                                <div class="control-group">
-                                    <label>Intestine Transit:</label>
-                                    <input type="range" id="intestineTransit2" min="0.01" max="0.5" step="0.01" value="0.15" oninput="updateVal('intestineTransit2'); runSim();">
-                                    <div class="value" id="intestineTransit2Val">0.15</div>
-                                </div>
-                                <div class="control-group">
-                                    <label>Waste Elimination (%):</label>
-                                    <input type="range" id="wasteElim2" min="0" max="50" step="1" value="10" oninput="updateVal('wasteElim2'); runSim();">
-                                    <div class="value" id="wasteElim2Val">10%</div>
-                                </div>
-                            </div>
+                        <div class="control-group">
+                            <label>Admin Time (hrs):</label>
+                            <input type="range" id="adminTime2" min="0" max="12" step="0.5" value="0" oninput="updateVal('adminTime2'); runSim();">
+                            <div class="value" id="adminTime2Val">0 hrs</div>
+                        </div>
+                        <div class="control-group">
+                            <label>Dosing Interval (hrs):</label>
+                            <input type="range" id="interval2" min="0" max="24" step="1" value="0" oninput="updateVal('interval2'); runSim();">
+                            <div class="value" id="interval2Val">0 hrs (single dose)</div>
+                        </div>
+                        <div class="control-group">
+                            <label>Number of Doses:</label>
+                            <input type="range" id="numDoses2" min="1" max="90" step="1" value="1" oninput="updateVal('numDoses2'); runSim();">
+                            <div class="value" id="numDoses2Val">1</div>
                         </div>
                     </div>
                     
                     <div class="absorption-section">
-                        <h4 class="collapsible-header" onclick="toggleSection(this)">
-                            Absorption Parameters
-                            <span class="collapsible-arrow">▶</span>
-                        </h4>
-                        <div class="collapsible-content">
-                            <div class="collapsible-inner">
-                                <div class="control-group">
-                                    <label>Stomach Absorption:</label>
-                                    <input type="range" id="stomachAbs2" min="0.01" max="0.5" step="0.01" value="0.03" oninput="updateVal('stomachAbs2'); runSim();">
-                                    <div class="value" id="stomachAbs2Val">0.03</div>
-                                </div>
-                                <div class="control-group">
-                                    <label>Small Intestine Absorption:</label>
-                                    <input type="range" id="siAbs2" min="0.01" max="0.8" step="0.01" value="0.4" oninput="updateVal('siAbs2'); runSim();">
-                                    <div class="value" id="siAbs2Val">0.4</div>
-                                </div>
-                                <div class="control-group">
-                                    <label>Large Intestine Absorption:</label>
-                                    <input type="range" id="liAbs2" min="0.01" max="0.3" step="0.01" value="0.08" oninput="updateVal('liAbs2'); runSim();">
-                                    <div class="value" id="liAbs2Val">0.08</div>
-                                </div>
-                                <div class="control-group">
-                                    <label>Distribution to Tissue:</label>
-                                    <input type="range" id="distribution2" min="0.01" max="0.5" step="0.01" value="0.1" oninput="updateVal('distribution2'); runSim();">
-                                    <div class="value" id="distribution2Val">0.1</div>
-                                </div>
-                                <div class="control-group">
-                                    <label>Redistribution from Tissue:</label>
-                                    <input type="range" id="redistribution2" min="0.01" max="0.3" step="0.01" value="0.05" oninput="updateVal('redistribution2'); runSim();">
-                                    <div class="value" id="redistribution2Val">0.05</div>
-                                </div>
-                            </div>
+                        <h4>Absorption Parameters</h4>
+                        <div class="control-group">
+                            <label>Stomach Absorption:</label>
+                            <input type="range" id="stomachAbs2" min="0.01" max="0.5" step="0.01" value="0.03" oninput="updateVal('stomachAbs2'); runSim();">
+                            <div class="value" id="stomachAbs2Val">0.03</div>
+                        </div>
+                        <div class="control-group">
+                            <label>Small Intestine Absorption:</label>
+                            <input type="range" id="siAbs2" min="0.01" max="0.8" step="0.01" value="0.4" oninput="updateVal('siAbs2'); runSim();">
+                            <div class="value" id="siAbs2Val">0.4</div>
+                        </div>
+                        <div class="control-group">
+                            <label>Large Intestine Absorption:</label>
+                            <input type="range" id="liAbs2" min="0.01" max="0.3" step="0.01" value="0.08" oninput="updateVal('liAbs2'); runSim();">
+                            <div class="value" id="liAbs2Val">0.08</div>
+                        </div>
+                        <div class="control-group">
+                            <label>Waste Elimination (%):</label>
+                            <input type="range" id="wasteElim2" min="0" max="50" step="1" value="10" oninput="updateVal('wasteElim2'); runSim();">
+                            <div class="value" id="wasteElim2Val">10%</div>
                         </div>
                     </div>
 
                     <div class="absorption-section">
-                        <h4 class="collapsible-header" onclick="toggleSection(this)">
-                            PK/PD Parameters
-                            <span class="collapsible-arrow">▶</span>
-                        </h4>
-                        <div class="collapsible-content">
-                            <div class="collapsible-inner">
-                                <div class="control-group">
-                                    <label>Bioavailability:</label>
-                                    <input type="range" id="bioavailability2" min="0.01" max="1.0" step="0.01" value="0.8" oninput="updateVal('bioavailability2'); runSim();">
-                                    <div class="value" id="bioavailability2Val">0.8</div>
-                                </div>
-                                <div class="control-group">
-                                    <label>EC50:</label>
-                                    <input type="range" id="ec502" min="0.1" max="50" step="0.1" value="5.0" oninput="updateVal('ec502'); runSim();">
-                                    <div class="value" id="ec502Val">5.0</div>
-                                </div>
-                                <div class="control-group">
-                                    <label>Emax:</label>
-                                    <input type="range" id="emax2" min="-100" max="100" step="5" value="-60" oninput="updateVal('emax2'); runSim();">
-                                    <div class="value" id="emax2Val">-60</div>
-                                </div>
-                                <div class="control-group">
-                                    <label>Half-life (hrs):</label>
-                                    <input type="range" id="halflife2" min="0.5" max="24" step="0.5" value="8.7" oninput="updateVal('halflife2'); runSim();">
-                                    <div class="value" id="halflife2Val">8.7 hrs</div>
-                                </div>
-                                <div class="control-group">
-                                    <label>Elimination Rate:</label>
-                                    <input type="range" id="elim2" min="0.01" max="0.3" step="0.01" value="0.08" oninput="updateVal('elim2'); runSim();">
-                                    <div class="value" id="elim2Val">0.08</div>
-                                </div>
-                            </div>
-                        </div>
+                        <h4>PK/PD Parameters</h4>
+                    <div class="control-group">
+                        <label>EC50:</label>
+                        <input type="range" id="ec502" min="0.1" max="50" step="0.1" value="5.0" oninput="updateVal('ec502'); runSim();">
+                        <div class="value" id="ec502Val">5.0</div>
                     </div>
-
-                    <div class="target-section">
-                        <h4 class="collapsible-header" onclick="toggleSection(this)">
-                            Drug B GI Target
-                            <span class="collapsible-arrow">▶</span>
-                        </h4>
-                        <div class="collapsible-content">
-                            <div class="collapsible-inner">
-                                <div class="control-group">
-                                    <label>GI Target Effect:</label>
-                                    <input type="range" id="giTargetEffect2" min="0" max="200" step="5" value="80" oninput="updateVal('giTargetEffect2'); runSim();">
-                                    <div class="value" id="giTargetEffect2Val">80</div>
-                                </div>
-                                <div class="control-group">
-                                    <label>GI Target Max (%):</label>
-                                    <input type="range" id="giTargetMax2" min="0" max="100" step="1" value="20" oninput="updateVal('giTargetMax2'); runSim();">
-                                    <div class="value" id="giTargetMax2Val">20%</div>
-                                </div>
-                                <div class="control-group">
-                                    <label>GI Target Min (%):</label>
-                                    <input type="range" id="giTargetMin2" min="0" max="100" step="1" value="15" oninput="updateVal('giTargetMin2'); runSim();">
-                                    <div class="value" id="giTargetMin2Val">15%</div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="control-group">
+                        <label>Emax:</label>
+                        <input type="range" id="emax2" min="-100" max="100" step="5" value="-60" oninput="updateVal('emax2'); runSim();">
+                        <div class="value" id="emax2Val">-60</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Half-life (hrs):</label>
+                        <input type="range" id="halflife2" min="0.5" max="24" step="0.5" value="8.7" oninput="updateVal('halflife2'); runSim();">
+                        <div class="value" id="halflife2Val">8.7 hrs</div>
                     </div>
                 </div>
+                    
+                    <div class="control-group">
+                        <label>Dissolution Rate:</label>
+                        <input type="range" id="dissolution2" min="0" max="10" step="0.01" value="0.15" oninput="updateVal('dissolution2'); runSim();">
+                        <div class="value" id="dissolution2Val">0.15</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Stomach Transit:</label>
+                        <input type="range" id="stomachTransit2" min="0.01" max="0.5" step="0.01" value="0.2" oninput="updateVal('stomachTransit2'); runSim();">
+                        <div class="value" id="stomachTransit2Val">0.2</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Intestine Transit:</label>
+                        <input type="range" id="intestineTransit2" min="0.01" max="0.5" step="0.01" value="0.15" oninput="updateVal('intestineTransit2'); runSim();">
+                        <div class="value" id="intestineTransit2Val">0.15</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Bioavailability:</label>
+                        <input type="range" id="bioavailability2" min="0.01" max="1.0" step="0.01" value="0.8" oninput="updateVal('bioavailability2'); runSim();">
+                        <div class="value" id="bioavailability2Val">0.8</div>
+                    </div>
+                    <div class="control-group">
+                        <label>Elimination Rate:</label>
+                        <input type="range" id="elim2" min="0.01" max="0.3" step="0.01" value="0.08" oninput="updateVal('elim2'); runSim();">
+                        <div class="value" id="elim2Val">0.08</div>
+                    </div>
+             </div>
                 
                 <div class="interaction-section">
-                    <h3 class="collapsible-header" onclick="toggleSection(this)">
-                        Drug Interactions
-                        <span class="collapsible-arrow expanded">▶</span>
-                    </h3>
-                    <div class="collapsible-content expanded">
-                        <div class="collapsible-inner">
-                            <div class="control-group">
-                                <label>Interaction Type:</label>
-                                <select id="interactionType" onchange="runSim()">
-                                    <option value="additive">Additive</option>
-                                    <option value="synergistic">Synergistic</option>
-                                    <option value="antagonistic">Antagonistic</option>
-                                </select>
-                            </div>
-                            <div class="control-group">
-                                <label>Interaction Factor:</label>
-                                <input type="range" id="interactionFactor" min="0.5" max="2.0" step="0.1" value="1.0" oninput="updateVal('interactionFactor'); runSim();">
-                                <div class="value" id="interactionFactorVal">1.0</div>
-                            </div>
-                        </div>
+                    <h3>Drug Interactions</h3>
+                    <div class="control-group">
+                        <label>Interaction Type:</label>
+                        <select id="interactionType" onchange="runSim()">
+                            <option value="additive">Additive</option>
+                            <option value="synergistic">Synergistic</option>
+                            <option value="antagonistic">Antagonistic</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Interaction Factor:</label>
+                        <input type="range" id="interactionFactor" min="0.5" max="2.0" step="0.1" value="1.0" oninput="updateVal('interactionFactor'); runSim();">
+                        <div class="value" id="interactionFactorVal">1.0</div>
                     </div>
                 </div>
                 
                 <div class="target-section">
-                    <h4 class="collapsible-header" onclick="toggleSection(this)">
-                        Pharmacodynamic Targets
-                        <span class="collapsible-arrow expanded">▶</span>
-                    </h4>
-                    <div class="collapsible-content expanded">
-                    <div class="collapsible-inner">
-                            <div class="control-group">
-                                <label>Baseline Effect:</label>
-                                <input type="range" id="baseline" min="50" max="200" step="5" value="120" oninput="updateVal('baseline'); runSim();">
-                                <div class="value" id="baselineVal">120</div>
-                            </div>
-                            <div class="control-group">
-                                <label>PD Target Effect:</label>
-                                <input type="range" id="pdTargetEffect" min="50" max="200" step="5" value="90" oninput="updateVal('pdTargetEffect'); runSim();">
-                                <div class="value" id="pdTargetEffectVal">90</div>
-                            </div>
-                            <div class="control-group">
-                                <label>PD Target Max (%):</label>
-                                <input type="range" id="pdTargetMax" min="1" max="50" step="1" value="10" oninput="updateVal('pdTargetMax'); runSim();">
-                                <div class="value" id="pdTargetMaxVal">10%</div>
-                            </div>
-                            <div class="control-group">
-                                <label>PD Target Min (%):</label>
-                                <input type="range" id="pdTargetMin" min="1" max="50" step="1" value="10" oninput="updateVal('pdTargetMin'); runSim();">
-                                <div class="value" id="pdTargetMinVal">10%</div>
-                            </div>
-                        </div>
+                    <h4>GI Distribution Targets</h4>
+                    <div class="control-group">
+                        <label>GI Target Effect:</label>
+                        <input type="range" id="giTargetEffect" min="0" max="200" step="5" value="90" oninput="updateVal('giTargetEffect'); runSim();">
+                        <div class="value" id="giTargetEffectVal">90</div>
+                    </div>
+                    <div class="control-group">
+                        <label>GI Target Max (%):</label>
+                        <input type="range" id="giTargetMax" min="0" max="100" step="1" value="15" oninput="updateVal('giTargetMax'); runSim();">
+                        <div class="value" id="giTargetMaxVal">15%</div>
+                    </div>
+                    <div class="control-group">
+                        <label>GI Target Min (%):</label>
+                        <input type="range" id="giTargetMin" min="0" max="100" step="1" value="10" oninput="updateVal('giTargetMin'); runSim();">
+                        <div class="value" id="giTargetMinVal">10%</div>
+                    </div>
+                </div>
+                
+                <div class="target-section">
+                    <h4>Pharmacodynamic Targets</h4>
+                    <div class="control-group">
+                        <label>Baseline Effect:</label>
+                        <input type="range" id="baseline" min="50" max="200" step="5" value="120" oninput="updateVal('baseline'); runSim();">
+                        <div class="value" id="baselineVal">120</div>
+                    </div>
+                    <div class="control-group">
+                        <label>PD Target Effect:</label>
+                        <input type="range" id="pdTargetEffect" min="50" max="200" step="5" value="90" oninput="updateVal('pdTargetEffect'); runSim();">
+                        <div class="value" id="pdTargetEffectVal">90</div>
+                    </div>
+                    <div class="control-group">
+                        <label>PD Target Max (%):</label>
+                        <input type="range" id="pdTargetMax" min="1" max="50" step="1" value="10" oninput="updateVal('pdTargetMax'); runSim();">
+                        <div class="value" id="pdTargetMaxVal">10%</div>
+                    </div>
+                    <div class="control-group">
+                        <label>PD Target Min (%):</label>
+                        <input type="range" id="pdTargetMin" min="1" max="50" step="1" value="10" oninput="updateVal('pdTargetMin'); runSim();">
+                        <div class="value" id="pdTargetMinVal">10%</div>
                     </div>
                 </div>
                 
@@ -511,7 +358,7 @@
                     <div class="chart-wrapper">
                         <canvas id="chart2"></canvas>
                     </div>
-                    <div class="chart-info">Complete drug journey: GI + plasma + tissue distribution with drug-specific GI therapeutic guidelines</div>
+                    <div class="chart-info">Complete drug journey: GI + plasma + tissue distribution with GI-specific therapeutic guidelines</div>
                 </div>
                 
                 <div class="chart-container">
@@ -532,12 +379,10 @@
                         <div class="stat-card drug-b"><div class="stat-value" id="tmax2">-</div><div class="stat-label">Drug B Tmax</div></div>
                         <div class="stat-card drug-b"><div class="stat-value" id="auc2">-</div><div class="stat-label">Drug B AUC</div></div>
                         <div class="stat-card combined"><div class="stat-value" id="maxEffect">-</div><div class="stat-label">Max Effect</div></div>
-                        <div class="stat-card assessment"><div class="stat-value" id="giAssessmentGrade1">-</div><div class="stat-label">GI A Assessment</div></div>
-                        <div class="stat-card assessment"><div class="stat-value" id="giAssessmentGrade2">-</div><div class="stat-label">GI B Assessment</div></div>
+                        <div class="stat-card assessment"><div class="stat-value" id="giAssessmentGrade">-</div><div class="stat-label">GI Assessment</div></div>
                         <div class="stat-card assessment"><div class="stat-value" id="assessmentGrade">-</div><div class="stat-label">PD Assessment</div></div>
                     </div>
-                    <div class="assessment-feedback" id="giAssessmentFeedback1"></div>
-                    <div class="assessment-feedback" id="giAssessmentFeedback2"></div>
+                    <div class="assessment-feedback" id="giAssessmentFeedback"></div>
                     <div class="assessment-feedback" id="assessmentFeedback"></div>
                 </div>
             </div>
@@ -546,19 +391,6 @@
 
 <script>
 var charts = {};
-
-function toggleSection(header) {
-    var content = header.nextElementSibling;
-    var arrow = header.querySelector('.collapsible-arrow');
-    
-    if (content.classList.contains('expanded')) {
-        content.classList.remove('expanded');
-        arrow.classList.remove('expanded');
-    } else {
-        content.classList.add('expanded');
-        arrow.classList.add('expanded');
-    }
-}
 
 function switchTab(n) {
     document.querySelectorAll('.drug-tab').forEach(function(t) { t.classList.remove('active'); });
@@ -652,14 +484,14 @@ function assessTherapeuticWindow(data, baseline, target, targetUpper, targetLowe
     };
 }
 
-function assessGIWindow(data, baseline, target, targetUpper, targetLower, drugNum) {
+function assessGIWindow(data, baseline, target, targetUpper, targetLower) {
     var firstInRange = -1;
     var totalInRange = 0;
     var failureAfterSuccess = false;
     
     for (var i = 0; i < data.length; i++) {
-        var plasma = drugNum === 1 ? data[i].drug1.plasma : data[i].drug2.plasma;
-        var inRange = plasma >= targetLower && plasma <= targetUpper;
+        var maxPlasma = Math.max(data[i].drug1.plasma, data[i].drug2.plasma);
+        var inRange = maxPlasma >= targetLower && maxPlasma <= targetUpper;
         
         if (inRange) {
             if (firstInRange === -1) firstInRange = i;
@@ -689,7 +521,7 @@ function assessGIWindow(data, baseline, target, targetUpper, targetLower, drugNu
         reachesTarget: reachesTarget,
         maintainsTarget: maintainsTarget,
         grade: passed ? 'PASS' : 'FAIL',
-        feedback: generateGIFeedback(passed, reachesTarget, maintainsTarget, percentInRange, timeToTarget, drugNum)
+        feedback: generateGIFeedback(passed, reachesTarget, maintainsTarget, percentInRange, timeToTarget)
     };
 }
 
@@ -718,27 +550,25 @@ function generateFeedback(passed, reachesTarget, maintainsTarget, percentInRange
     return feedback.join('. ');
 }
 
-function generateGIFeedback(passed, reachesTarget, maintainsTarget, percentInRange, timeToTarget, drugNum) {
-    var drugName = drugNum === 1 ? 'Drug A' : 'Drug B';
-    
+function generateGIFeedback(passed, reachesTarget, maintainsTarget, percentInRange, timeToTarget) {
     if (passed) {
-        return drugName + ' GI target achieved and maintained - optimal drug distribution.';
+        return 'GI target achieved and maintained - optimal drug distribution.';
     }
     
     var feedback = [];
     if (!reachesTarget) {
         if (timeToTarget === null) {
-            feedback.push(drugName + ' GI target never reached - consider increasing doses or improving formulation');
+            feedback.push('GI target never reached - consider increasing doses or improving formulation');
         } else {
-            feedback.push(drugName + ' GI target reached too late - optimize absorption parameters');
+            feedback.push('GI target reached too late - optimize absorption parameters');
         }
     }
     
     if (!maintainsTarget) {
         if (percentInRange < 50) {
-            feedback.push('Poor ' + drugName + ' GI maintenance (' + percentInRange.toFixed(1) + '%) - review elimination and distribution rates');
+            feedback.push('Poor GI maintenance (' + percentInRange.toFixed(1) + '%) - review elimination and distribution rates');
         } else if (percentInRange < 80) {
-            feedback.push('Adequate ' + drugName + ' GI maintenance (' + percentInRange.toFixed(1) + '%) - fine-tune PK parameters');
+            feedback.push('Adequate GI maintenance (' + percentInRange.toFixed(1) + '%) - fine-tune PK parameters');
         }
     }
     
@@ -949,9 +779,9 @@ function setupCharts() {
     charts.release = new Chart(document.getElementById('chart1').getContext('2d'), {
         type: 'line',
         data: { labels: [], datasets: [
-            { label: 'Drug A Tablet', data: [], borderColor: '#27ae60', borderWidth: 3, fill: false, pointRadius: 0 },
+            { label: 'Drug A Tablet', data: [], borderColor: '#e74c3c', borderWidth: 3, fill: false, pointRadius: 0 },
             { label: 'Drug B Tablet', data: [], borderColor: '#3498db', borderWidth: 3, fill: false, pointRadius: 0 },
-            { label: 'Drug A Dissolved', data: [], borderColor: '#27ae60', borderWidth: 2, borderDash: [5, 5], fill: false, pointRadius: 0 },
+            { label: 'Drug A Dissolved', data: [], borderColor: '#e74c3c', borderWidth: 2, borderDash: [5, 5], fill: false, pointRadius: 0 },
             { label: 'Drug B Dissolved', data: [], borderColor: '#3498db', borderWidth: 2, borderDash: [5, 5], fill: false, pointRadius: 0 }
         ]},
         options: opts
@@ -960,22 +790,19 @@ function setupCharts() {
     charts.gi = new Chart(document.getElementById('chart2').getContext('2d'), {
         type: 'line',
         data: { labels: [], datasets: [
-            { label: 'Drug A Stomach', data: [], borderColor: '#27ae60', borderWidth: 2, fill: false, pointRadius: 0 },
-            { label: 'Drug A Small Intestine', data: [], borderColor: '#229954', borderWidth: 2, fill: false, pointRadius: 0 },
-            { label: 'Drug A Large Intestine', data: [], borderColor: '#1e8449', borderWidth: 2, fill: false, pointRadius: 0 },
-            { label: 'Drug A Plasma', data: [], borderColor: '#27ae60', borderWidth: 4, fill: false, pointRadius: 0 },
-            { label: 'Drug A Tissue', data: [], borderColor: '#27ae60', borderWidth: 2, borderDash: [3, 3], fill: false, pointRadius: 0 },
+            { label: 'Drug A Stomach', data: [], borderColor: '#e74c3c', borderWidth: 2, fill: false, pointRadius: 0 },
+            { label: 'Drug A Small Intestine', data: [], borderColor: '#c0392b', borderWidth: 2, fill: false, pointRadius: 0 },
+            { label: 'Drug A Large Intestine', data: [], borderColor: '#a93226', borderWidth: 2, fill: false, pointRadius: 0 },
+            { label: 'Drug A Plasma', data: [], borderColor: '#e74c3c', borderWidth: 4, fill: false, pointRadius: 0 },
+            { label: 'Drug A Tissue', data: [], borderColor: '#e74c3c', borderWidth: 2, borderDash: [3, 3], fill: false, pointRadius: 0 },
             { label: 'Drug B Stomach', data: [], borderColor: '#3498db', borderWidth: 2, fill: false, pointRadius: 0 },
             { label: 'Drug B Small Intestine', data: [], borderColor: '#2980b9', borderWidth: 2, fill: false, pointRadius: 0 },
             { label: 'Drug B Large Intestine', data: [], borderColor: '#1f618d', borderWidth: 2, fill: false, pointRadius: 0 },
             { label: 'Drug B Plasma', data: [], borderColor: '#3498db', borderWidth: 4, fill: false, pointRadius: 0 },
             { label: 'Drug B Tissue', data: [], borderColor: '#3498db', borderWidth: 2, borderDash: [3, 3], fill: false, pointRadius: 0 },
-            { label: 'Drug A GI Target', data: [], borderColor: '#27ae60', borderWidth: 2, borderDash: [10, 3], fill: false, pointRadius: 0 },
-            { label: 'Drug A GI Upper', data: [], borderColor: '#27ae60', borderWidth: 1, borderDash: [3, 3], fill: false, pointRadius: 0 },
-            { label: 'Drug A GI Lower', data: [], borderColor: '#27ae60', borderWidth: 1, borderDash: [3, 3], fill: false, pointRadius: 0 },
-            { label: 'Drug B GI Target', data: [], borderColor: '#3498db', borderWidth: 2, borderDash: [10, 3], fill: false, pointRadius: 0 },
-            { label: 'Drug B GI Upper', data: [], borderColor: '#3498db', borderWidth: 1, borderDash: [3, 3], fill: false, pointRadius: 0 },
-            { label: 'Drug B GI Lower', data: [], borderColor: '#3498db', borderWidth: 1, borderDash: [3, 3], fill: false, pointRadius: 0 }
+            { label: 'GI Target Effect Level', data: [], borderColor: '#27ae60', borderWidth: 2, borderDash: [10, 3], fill: false, pointRadius: 0 },
+            { label: 'GI Target Upper', data: [], borderColor: '#f39c12', borderWidth: 1, borderDash: [3, 3], fill: false, pointRadius: 0 },
+            { label: 'GI Target Lower', data: [], borderColor: '#f39c12', borderWidth: 1, borderDash: [3, 3], fill: false, pointRadius: 0 }
         ]},
         options: opts
     });
@@ -1002,11 +829,11 @@ function setupCharts() {
     charts.effects = new Chart(document.getElementById('chart3').getContext('2d'), {
         type: 'line',
         data: { labels: [], datasets: [
-            { label: 'Drug A Effect', data: [], borderColor: '#27ae60', borderWidth: 2, fill: false, pointRadius: 0 },
+            { label: 'Drug A Effect', data: [], borderColor: '#e74c3c', borderWidth: 2, fill: false, pointRadius: 0 },
             { label: 'Drug B Effect', data: [], borderColor: '#3498db', borderWidth: 2, fill: false, pointRadius: 0 },
             { label: 'Combined Effect', data: [], borderColor: '#9b59b6', borderWidth: 4, fill: false, pointRadius: 0 },
             { label: 'Baseline', data: [], borderColor: '#95a5a6', borderWidth: 2, borderDash: [5, 5], fill: false, pointRadius: 0 },
-            { label: 'PD Target Effect', data: [], borderColor: '#e67e22', borderWidth: 2, borderDash: [10, 3], fill: false, pointRadius: 0 },
+            { label: 'PD Target Effect', data: [], borderColor: '#27ae60', borderWidth: 2, borderDash: [10, 3], fill: false, pointRadius: 0 },
             { label: 'PD Target Upper', data: [], borderColor: '#e67e22', borderWidth: 1, borderDash: [3, 3], fill: false, pointRadius: 0 },
             { label: 'PD Target Lower', data: [], borderColor: '#e67e22', borderWidth: 1, borderDash: [3, 3], fill: false, pointRadius: 0 }
         ]},
@@ -1022,21 +849,12 @@ function runSim() {
         var times = data.map(function(d) { return d.time; });
         var baseline = getVal('baseline');
         
-        // Drug A GI targets
-        var giTarget1 = getVal('giTargetEffect1');
-        var giMaxPercent1 = getVal('giTargetMax1') / 100;
-        var giMinPercent1 = getVal('giTargetMin1') / 100;
-        var giTargetUpper1 = giTarget1 * (1 + giMaxPercent1);
-        var giTargetLower1 = giTarget1 * (1 - giMinPercent1);
+        var giTarget = getVal('giTargetEffect');
+        var giMaxPercent = getVal('giTargetMax') / 100;
+        var giMinPercent = getVal('giTargetMin') / 100;
+        var giTargetUpper = giTarget * (1 + giMaxPercent);
+        var giTargetLower = giTarget * (1 - giMinPercent);
         
-        // Drug B GI targets
-        var giTarget2 = getVal('giTargetEffect2');
-        var giMaxPercent2 = getVal('giTargetMax2') / 100;
-        var giMinPercent2 = getVal('giTargetMin2') / 100;
-        var giTargetUpper2 = giTarget2 * (1 + giMaxPercent2);
-        var giTargetLower2 = giTarget2 * (1 - giMinPercent2);
-        
-        // PD targets
         var pdTarget = getVal('pdTargetEffect');
         var pdMaxPercent = getVal('pdTargetMax') / 100;
         var pdMinPercent = getVal('pdTargetMin') / 100;
@@ -1045,8 +863,7 @@ function runSim() {
         
         var stats = calculateStats(data);
         var pdAssessment = assessTherapeuticWindow(data, baseline, pdTarget, pdTargetUpper, pdTargetLower);
-        var giAssessment1 = assessGIWindow(data, baseline, giTarget1, giTargetUpper1, giTargetLower1, 1);
-        var giAssessment2 = assessGIWindow(data, baseline, giTarget2, giTargetUpper2, giTargetLower2, 2);
+        var giAssessment = assessGIWindow(data, baseline, giTarget, giTargetUpper, giTargetLower);
         
         var allEffects = [];
         data.forEach(function(d) {
@@ -1085,21 +902,11 @@ function runSim() {
         charts.gi.data.datasets[7].data = data.map(function(d) { return d.drug2.li; });
         charts.gi.data.datasets[8].data = data.map(function(d) { return d.drug2.plasma; });
         charts.gi.data.datasets[9].data = data.map(function(d) { return d.drug2.tissue; });
-        
-        // Drug A GI target lines
-        charts.gi.data.datasets[10].data = times.map(function() { return giTarget1; });
-        charts.gi.data.datasets[11].data = times.map(function() { return giTargetUpper1; });
-        charts.gi.data.datasets[12].data = times.map(function() { return giTargetLower1; });
-        charts.gi.data.datasets[11].label = 'Drug A GI +' + getVal('giTargetMax1') + '%';
-        charts.gi.data.datasets[12].label = 'Drug A GI -' + getVal('giTargetMin1') + '%';
-        
-        // Drug B GI target lines
-        charts.gi.data.datasets[13].data = times.map(function() { return giTarget2; });
-        charts.gi.data.datasets[14].data = times.map(function() { return giTargetUpper2; });
-        charts.gi.data.datasets[15].data = times.map(function() { return giTargetLower2; });
-        charts.gi.data.datasets[14].label = 'Drug B GI +' + getVal('giTargetMax2') + '%';
-        charts.gi.data.datasets[15].label = 'Drug B GI -' + getVal('giTargetMin2') + '%';
-        
+        charts.gi.data.datasets[10].data = times.map(function() { return giTarget; });
+        charts.gi.data.datasets[11].data = times.map(function() { return giTargetUpper; });
+        charts.gi.data.datasets[12].data = times.map(function() { return giTargetLower; });
+        charts.gi.data.datasets[11].label = 'GI Target +' + getVal('giTargetMax') + '%';
+        charts.gi.data.datasets[12].label = 'GI Target -' + getVal('giTargetMin') + '%';
         charts.gi.update();
         
         charts.effects.data.labels = times;
@@ -1122,7 +929,6 @@ function runSim() {
         document.getElementById('auc2').textContent = stats.auc2.toFixed(1);
         document.getElementById('maxEffect').textContent = stats.maxEffect.toFixed(1);
         
-        // PD Assessment
         var assessmentCard = document.getElementById('assessmentGrade').parentElement;
         var assessmentGrade = document.getElementById('assessmentGrade');
         var assessmentFeedback = document.getElementById('assessmentFeedback');
@@ -1135,31 +941,17 @@ function runSim() {
         assessmentFeedback.style.color = pdAssessment.passed ? '#155724' : '#721c24';
         assessmentFeedback.style.border = '1px solid ' + (pdAssessment.passed ? '#c3e6cb' : '#f5c6cb');
         
-        // Drug A GI Assessment
-        var giAssessmentCard1 = document.getElementById('giAssessmentGrade1').parentElement;
-        var giAssessmentGrade1 = document.getElementById('giAssessmentGrade1');
-        var giAssessmentFeedback1 = document.getElementById('giAssessmentFeedback1');
+        var giAssessmentCard = document.getElementById('giAssessmentGrade').parentElement;
+        var giAssessmentGrade = document.getElementById('giAssessmentGrade');
+        var giAssessmentFeedback = document.getElementById('giAssessmentFeedback');
         
-        giAssessmentGrade1.textContent = giAssessment1.grade;
-        giAssessmentFeedback1.textContent = giAssessment1.feedback;
+        giAssessmentGrade.textContent = giAssessment.grade;
+        giAssessmentFeedback.textContent = giAssessment.feedback;
         
-        giAssessmentCard1.className = 'stat-card assessment ' + (giAssessment1.passed ? 'pass' : 'fail');
-        giAssessmentFeedback1.style.backgroundColor = giAssessment1.passed ? '#d4edda' : '#f8d7da';
-        giAssessmentFeedback1.style.color = giAssessment1.passed ? '#155724' : '#721c24';
-        giAssessmentFeedback1.style.border = '1px solid ' + (giAssessment1.passed ? '#c3e6cb' : '#f5c6cb');
-        
-        // Drug B GI Assessment
-        var giAssessmentCard2 = document.getElementById('giAssessmentGrade2').parentElement;
-        var giAssessmentGrade2 = document.getElementById('giAssessmentGrade2');
-        var giAssessmentFeedback2 = document.getElementById('giAssessmentFeedback2');
-        
-        giAssessmentGrade2.textContent = giAssessment2.grade;
-        giAssessmentFeedback2.textContent = giAssessment2.feedback;
-        
-        giAssessmentCard2.className = 'stat-card assessment ' + (giAssessment2.passed ? 'pass' : 'fail');
-        giAssessmentFeedback2.style.backgroundColor = giAssessment2.passed ? '#d4edda' : '#f8d7da';
-        giAssessmentFeedback2.style.color = giAssessment2.passed ? '#155724' : '#721c24';
-        giAssessmentFeedback2.style.border = '1px solid ' + (giAssessment2.passed ? '#c3e6cb' : '#f5c6cb');
+        giAssessmentCard.className = 'stat-card assessment ' + (giAssessment.passed ? 'pass' : 'fail');
+        giAssessmentFeedback.style.backgroundColor = giAssessment.passed ? '#d4edda' : '#f8d7da';
+        giAssessmentFeedback.style.color = giAssessment.passed ? '#155724' : '#721c24';
+        giAssessmentFeedback.style.border = '1px solid ' + (giAssessment.passed ? '#c3e6cb' : '#f5c6cb');
         
     } catch (error) {
         console.error('Error in runSim:', error);
@@ -1175,8 +967,7 @@ window.onload = function() {
                    'distribution1', 'distribution2', 'redistribution1', 'redistribution2',
                    'bioavailability1', 'bioavailability2',
                    'elim2', 'ec501', 'ec502', 'emax1', 'emax2', 'halflife1', 'halflife2',
-                   'baseline', 'giTargetEffect1', 'giTargetMax1', 'giTargetMin1',
-                   'giTargetEffect2', 'giTargetMax2', 'giTargetMin2',
+                   'baseline', 'giTargetEffect', 'giTargetMax', 'giTargetMin', 
                    'pdTargetEffect', 'pdTargetMax', 'pdTargetMin', 'simTime', 'interactionFactor'];
     
     controls.forEach(function(id) { updateVal(id); });
