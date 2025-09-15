@@ -254,14 +254,9 @@
                                 <div class="value" id="giTargetEffect1Val">90</div>
                             </div>
                             <div class="control-group">
-                                <label>GI Target Max (%):</label>
-                                <input type="range" id="giTargetMax1" min="0" max="100" step="1" value="15" oninput="updateVal('giTargetMax1'); runSim();">
-                                <div class="value" id="giTargetMax1Val">15%</div>
-                            </div>
-                            <div class="control-group">
-                                <label>GI Target Min (%):</label>
-                                <input type="range" id="giTargetMin1" min="0" max="100" step="1" value="10" oninput="updateVal('giTargetMin1'); runSim();">
-                                <div class="value" id="giTargetMin1Val">10%</div>
+                                <label>GI Target Range (±%):</label>
+                                <input type="range" id="giTargetRange1" min="1" max="50" step="1" value="12" oninput="updateVal('giTargetRange1'); runSim();">
+                                <div class="value" id="giTargetRange1Val">±12%</div>
                             </div>
                         </div>
                     </div>
@@ -410,14 +405,9 @@
                                 <div class="value" id="giTargetEffect2Val">80</div>
                             </div>
                             <div class="control-group">
-                                <label>GI Target Max (%):</label>
-                                <input type="range" id="giTargetMax2" min="0" max="100" step="1" value="20" oninput="updateVal('giTargetMax2'); runSim();">
-                                <div class="value" id="giTargetMax2Val">20%</div>
-                            </div>
-                            <div class="control-group">
-                                <label>GI Target Min (%):</label>
-                                <input type="range" id="giTargetMin2" min="0" max="100" step="1" value="15" oninput="updateVal('giTargetMin2'); runSim();">
-                                <div class="value" id="giTargetMin2Val">15%</div>
+                                <label>GI Target Range (±%):</label>
+                                <input type="range" id="giTargetRange2" min="1" max="50" step="1" value="18" oninput="updateVal('giTargetRange2'); runSim();">
+                                <div class="value" id="giTargetRange2Val">±18%</div>
                             </div>
                         </div>
                     </div>
@@ -462,14 +452,9 @@
                             <div class="value" id="pdTargetEffectVal">90</div>
                         </div>
                         <div class="control-group">
-                            <label>PD Target Max (%):</label>
-                            <input type="range" id="pdTargetMax" min="1" max="50" step="1" value="10" oninput="updateVal('pdTargetMax'); runSim();">
-                            <div class="value" id="pdTargetMaxVal">10%</div>
-                        </div>
-                        <div class="control-group">
-                            <label>PD Target Min (%):</label>
-                            <input type="range" id="pdTargetMin" min="1" max="50" step="1" value="10" oninput="updateVal('pdTargetMin'); runSim();">
-                            <div class="value" id="pdTargetMinVal">10%</div>
+                            <label>PD Target Range (±%):</label>
+                            <input type="range" id="pdTargetRange" min="1" max="50" step="1" value="10" oninput="updateVal('pdTargetRange'); runSim();">
+                            <div class="value" id="pdTargetRangeVal">±10%</div>
                         </div>
                     </div>
                 </div>
@@ -562,7 +547,8 @@ function updateVal(id) {
         var v = el.value;
         if (id.includes('dose')) v += ' mg';
         else if (id.includes('Time') || id.includes('halflife')) v += ' hrs';
-        else if (id.includes('Max') || id.includes('Min') || id.includes('wasteElim')) v += '%';
+        else if (id.includes('wasteElim')) v += '%';
+        else if (id.includes('Range')) v = '±' + v + '%';
         else if (id.includes('interval')) {
             if (parseFloat(v) === 0) v += ' hrs (single dose)';
             else v += ' hrs';
@@ -1012,24 +998,21 @@ function runSim() {
         
         // Drug A GI targets
         var giTarget1 = getVal('giTargetEffect1');
-        var giMaxPercent1 = getVal('giTargetMax1') / 100;
-        var giMinPercent1 = getVal('giTargetMin1') / 100;
-        var giTargetUpper1 = giTarget1 * (1 + giMaxPercent1);
-        var giTargetLower1 = giTarget1 * (1 - giMinPercent1);
+        var giRangePercent1 = getVal('giTargetRange1') / 100;
+        var giTargetUpper1 = giTarget1 * (1 + giRangePercent1);
+        var giTargetLower1 = giTarget1 * (1 - giRangePercent1);
         
         // Drug B GI targets
         var giTarget2 = getVal('giTargetEffect2');
-        var giMaxPercent2 = getVal('giTargetMax2') / 100;
-        var giMinPercent2 = getVal('giTargetMin2') / 100;
-        var giTargetUpper2 = giTarget2 * (1 + giMaxPercent2);
-        var giTargetLower2 = giTarget2 * (1 - giMinPercent2);
+        var giRangePercent2 = getVal('giTargetRange2') / 100;
+        var giTargetUpper2 = giTarget2 * (1 + giRangePercent2);
+        var giTargetLower2 = giTarget2 * (1 - giRangePercent2);
         
         // PD targets
         var pdTarget = getVal('pdTargetEffect');
-        var pdMaxPercent = getVal('pdTargetMax') / 100;
-        var pdMinPercent = getVal('pdTargetMin') / 100;
-        var pdTargetUpper = pdTarget * (1 + pdMaxPercent);
-        var pdTargetLower = pdTarget * (1 - pdMinPercent);
+        var pdRangePercent = getVal('pdTargetRange') / 100;
+        var pdTargetUpper = pdTarget * (1 + pdRangePercent);
+        var pdTargetLower = pdTarget * (1 - pdRangePercent);
         
         var stats = calculateStats(data);
         var pdAssessment = assessTherapeuticWindow(data, baseline, pdTarget, pdTargetUpper, pdTargetLower);
@@ -1074,31 +1057,25 @@ function runSim() {
         charts.gi.data.datasets[8].data = data.map(function(d) { return d.drug2.plasma; });
         charts.gi.data.datasets[9].data = data.map(function(d) { return d.drug2.tissue; });
         
-        // Drug A GI target lines (only show if Drug A is enabled)
-        if (getCheck('enabled1')) {
-            charts.gi.data.datasets[10].data = times.map(function() { return giTarget1; });
-            charts.gi.data.datasets[11].data = times.map(function() { return giTargetUpper1; });
-            charts.gi.data.datasets[12].data = times.map(function() { return giTargetLower1; });
-        } else {
-            charts.gi.data.datasets[10].data = [];
-            charts.gi.data.datasets[11].data = [];
-            charts.gi.data.datasets[12].data = [];
-        }
-        charts.gi.data.datasets[11].label = 'Drug A GI +' + getVal('giTargetMax1') + '%';
-        charts.gi.data.datasets[12].label = 'Drug A GI -' + getVal('giTargetMin1') + '%';
+        // Drug A GI target lines - always update but hide via dataset visibility for disabled drugs
+        charts.gi.data.datasets[10].data = times.map(function() { return giTarget1; });
+        charts.gi.data.datasets[11].data = times.map(function() { return giTargetUpper1; });
+        charts.gi.data.datasets[12].data = times.map(function() { return giTargetLower1; });
+        charts.gi.data.datasets[10].hidden = !getCheck('enabled1');
+        charts.gi.data.datasets[11].hidden = !getCheck('enabled1');
+        charts.gi.data.datasets[12].hidden = !getCheck('enabled1');
+        charts.gi.data.datasets[11].label = 'Drug A GI +' + getVal('giTargetRange1') + '%';
+        charts.gi.data.datasets[12].label = 'Drug A GI -' + getVal('giTargetRange1') + '%';
         
-        // Drug B GI target lines (only show if Drug B is enabled)
-        if (getCheck('enabled2')) {
-            charts.gi.data.datasets[13].data = times.map(function() { return giTarget2; });
-            charts.gi.data.datasets[14].data = times.map(function() { return giTargetUpper2; });
-            charts.gi.data.datasets[15].data = times.map(function() { return giTargetLower2; });
-        } else {
-            charts.gi.data.datasets[13].data = [];
-            charts.gi.data.datasets[14].data = [];
-            charts.gi.data.datasets[15].data = [];
-        }
-        charts.gi.data.datasets[14].label = 'Drug B GI +' + getVal('giTargetMax2') + '%';
-        charts.gi.data.datasets[15].label = 'Drug B GI -' + getVal('giTargetMin2') + '%';
+        // Drug B GI target lines - always update but hide via dataset visibility for disabled drugs
+        charts.gi.data.datasets[13].data = times.map(function() { return giTarget2; });
+        charts.gi.data.datasets[14].data = times.map(function() { return giTargetUpper2; });
+        charts.gi.data.datasets[15].data = times.map(function() { return giTargetLower2; });
+        charts.gi.data.datasets[13].hidden = !getCheck('enabled2');
+        charts.gi.data.datasets[14].hidden = !getCheck('enabled2');
+        charts.gi.data.datasets[15].hidden = !getCheck('enabled2');
+        charts.gi.data.datasets[14].label = 'Drug B GI +' + getVal('giTargetRange2') + '%';
+        charts.gi.data.datasets[15].label = 'Drug B GI -' + getVal('giTargetRange2') + '%';
         
         charts.gi.update();
         
@@ -1110,8 +1087,8 @@ function runSim() {
         charts.effects.data.datasets[4].data = times.map(function() { return pdTarget; });
         charts.effects.data.datasets[5].data = times.map(function() { return pdTargetUpper; });
         charts.effects.data.datasets[6].data = times.map(function() { return pdTargetLower; });
-        charts.effects.data.datasets[5].label = 'PD Target +' + getVal('pdTargetMax') + '%';
-        charts.effects.data.datasets[6].label = 'PD Target -' + getVal('pdTargetMin') + '%';
+        charts.effects.data.datasets[5].label = 'PD Target +' + getVal('pdTargetRange') + '%';
+        charts.effects.data.datasets[6].label = 'PD Target -' + getVal('pdTargetRange') + '%';
         charts.effects.update();
         
         document.getElementById('cmax1').textContent = stats.cmax1.toFixed(2);
@@ -1175,9 +1152,9 @@ window.onload = function() {
                    'distribution1', 'distribution2', 'redistribution1', 'redistribution2',
                    'bioavailability1', 'bioavailability2',
                    'elim2', 'ec501', 'ec502', 'emax1', 'emax2', 'halflife1', 'halflife2',
-                   'baseline', 'giTargetEffect1', 'giTargetMax1', 'giTargetMin1',
-                   'giTargetEffect2', 'giTargetMax2', 'giTargetMin2',
-                   'pdTargetEffect', 'pdTargetMax', 'pdTargetMin', 'simTime', 'interactionFactor'];
+                   'baseline', 'giTargetEffect1', 'giTargetRange1',
+                   'giTargetEffect2', 'giTargetRange2',
+                   'pdTargetEffect', 'pdTargetRange', 'simTime', 'interactionFactor'];
     
     controls.forEach(function(id) { updateVal(id); });
     
