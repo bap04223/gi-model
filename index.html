@@ -14,7 +14,7 @@
         .control-group { margin-bottom: 15px; }
         .control-group label { display: block; font-size: 0.9rem; margin-bottom: 5px; }
         .control-group input[type="range"] { width: 100%; margin-bottom: 5px; }
-        .control-group select { width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ddd; }
+        .control-group select { width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ddd; margin-bottom: 5px; }
         .value { font-size: 0.8rem; color: #666; }
         .drug-tabs { display: flex; margin-bottom: 15px; }
         .drug-tab { flex: 1; padding: 10px; background: #f0f0f0; border: none; cursor: pointer; }
@@ -100,6 +100,23 @@
             border-radius: 4px; 
             margin-top: 8px; 
             font-size: 0.75rem; 
+        }
+        
+        /* Dose Selection Styles */
+        .dose-selection { 
+            background: #e8f5e8; 
+            padding: 10px; 
+            border-radius: 5px; 
+            margin-bottom: 10px; 
+            border: 2px solid #27ae60;
+        }
+        .dose-dropdown { 
+            width: 100%; 
+            padding: 8px; 
+            border-radius: 4px; 
+            border: 2px solid #27ae60; 
+            background: white; 
+            font-weight: bold; 
         }
         
         /* Collapsible section styles */
@@ -244,8 +261,14 @@
                         </h4>
                         <div class="collapsible-content">
                             <div class="control-group">
-                                <label>Dose (mg):</label>
-                                <input type="range" id="dose1" min="0" max="500" value="50" oninput="updateVal('dose1'); runSim();">
+                                <label>Available Doses:</label>
+                                <div class="dose-selection">
+                                    <select id="doseSelect1" class="dose-dropdown" onchange="updateDoseFromSelect(1); runSim();">
+                                        <option value="">Select drug first...</option>
+                                    </select>
+                                </div>
+                                <label>Custom Dose (mg):</label>
+                                <input type="range" id="dose1" min="0" max="500" value="50" oninput="updateVal('dose1'); updateDoseSelectFromSlider(1); runSim();">
                                 <div class="value" id="dose1Val">50 mg</div>
                             </div>
                             <div class="control-group">
@@ -411,8 +434,14 @@
                         </h4>
                         <div class="collapsible-content">
                             <div class="control-group">
-                                <label>Dose (mg):</label>
-                                <input type="range" id="dose2" min="0" max="500" value="75" oninput="updateVal('dose2'); runSim();">
+                                <label>Available Doses:</label>
+                                <div class="dose-selection">
+                                    <select id="doseSelect2" class="dose-dropdown" onchange="updateDoseFromSelect(2); runSim();">
+                                        <option value="">Select drug first...</option>
+                                    </select>
+                                </div>
+                                <label>Custom Dose (mg):</label>
+                                <input type="range" id="dose2" min="0" max="500" value="75" oninput="updateVal('dose2'); updateDoseSelectFromSlider(2); runSim();">
                                 <div class="value" id="dose2Val">75 mg</div>
                             </div>
                             <div class="control-group">
@@ -497,7 +526,7 @@
                     </div>
 
                     <div class="absorption-section">
-                        <h4 class="collapsible-header" onclick="toggleCollapse(this)">
+                    <h4 class="collapsible-header" onclick="toggleCollapse(this)">
                             PK/PD Parameters
                             <span class="collapse-icon">▼</span>
                         </h4>
@@ -543,7 +572,7 @@
                             </div>
                             <div class="control-group">
                                 <label>GI Target Range (±%):</label>
-                                <input type="range" id="giTargetRange2" min="1" max="100" step="1" value="18" oninput="updateVal('giTargetRange2'); runSim();">
+                                <input type="range" id="giTargetRange2" min="1" max="50" step="1" value="18" oninput="updateVal('giTargetRange2'); runSim();">
                                 <div class="value" id="giTargetRange2Val">±18%</div>
                             </div>
                         </div>
@@ -937,7 +966,25 @@ function populateDrugParameters(drugSlot, drug) {
         updateVal(`vd${drugSlot}`);
     }
     
-    // Update dose range to match available doses
+    // Populate dose dropdown with available doses
+    const doseSelectElement = document.getElementById(`doseSelect${drugSlot}`);
+    if (doseSelectElement && drug.doses.length > 0) {
+        doseSelectElement.innerHTML = '';
+        
+        // Add option for each available dose
+        drug.doses.forEach(function(dose) {
+            const option = document.createElement('option');
+            option.value = dose;
+            option.textContent = dose + ' mg';
+            doseSelectElement.appendChild(option);
+        });
+        
+        // Set default to first available dose
+        doseSelectElement.value = drug.doses[0];
+        updateDoseFromSelect(drugSlot);
+    }
+    
+    // Update dose slider range to match available doses
     const doseElement = document.getElementById(`dose${drugSlot}`);
     if (doseElement && drug.doses.length > 0) {
         const maxDose = Math.max(...drug.doses);
@@ -946,6 +993,34 @@ function populateDrugParameters(drugSlot, drug) {
         doseElement.min = Math.max(minDose / 2, 1);
         doseElement.value = drug.doses[0]; // Default to lowest dose
         updateVal(`dose${drugSlot}`);
+    }
+}
+
+function updateDoseFromSelect(drugSlot) {
+    const doseSelectElement = document.getElementById(`doseSelect${drugSlot}`);
+    const doseSliderElement = document.getElementById(`dose${drugSlot}`);
+    
+    if (doseSelectElement && doseSliderElement && doseSelectElement.value) {
+        const selectedDose = parseFloat(doseSelectElement.value);
+        doseSliderElement.value = selectedDose;
+        updateVal(`dose${drugSlot}`);
+    }
+}
+
+function updateDoseSelectFromSlider(drugSlot) {
+    const doseSelectElement = document.getElementById(`doseSelect${drugSlot}`);
+    const doseSliderElement = document.getElementById(`dose${drugSlot}`);
+    
+    if (doseSelectElement && doseSliderElement && selectedDrugs[drugSlot]) {
+        const sliderValue = parseFloat(doseSliderElement.value);
+        const availableDoses = selectedDrugs[drugSlot].doses;
+        
+        // Only update dropdown if slider value exactly matches an available dose
+        if (availableDoses.includes(sliderValue)) {
+            doseSelectElement.value = sliderValue;
+        } else {
+            doseSelectElement.value = '';
+        }
     }
 }
 
@@ -1120,7 +1195,7 @@ function assessGIWindow(data, baseline, target, targetUpper, targetLower, drugNu
 
 function generateFeedback(passed, reachesTarget, maintainsTarget, percentInRange, timeToTarget) {
     if (passed) {
-        return 'Excellent! Therapeutic target achieved and maintained.';
+        return 'Therapeutic target achieved and maintained successfully.';
     }
     
     var feedback = [];
@@ -1637,6 +1712,7 @@ function runSim() {
         document.querySelector('#tmax1').parentElement.querySelector('.stat-label').textContent = drug1Name + ' Tmax';
         document.querySelector('#auc1').parentElement.querySelector('.stat-label').textContent = drug1Name + ' AUC';
         document.querySelector('#cmax2').parentElement.querySelector('.stat-label').textContent = drug2Name + ' Cmax';
+        document.querySelector('#tmax2').parentElement.querySelector('.stat-label').textContent = drug2Name + ' Tmax';
         document.querySelector('#auc2').parentElement.querySelector('.stat-label').textContent = drug2Name + ' AUC';
         document.querySelector('#giAssessmentGrade1').parentElement.querySelector('.stat-label').textContent = 'GI ' + drug1Name + ' Assessment';
         document.querySelector('#giAssessmentGrade2').parentElement.querySelector('.stat-label').textContent = 'GI ' + drug2Name + ' Assessment';
@@ -1671,4 +1747,4 @@ window.onload = function() {
 };
 </script>
 </body>
-</html>
+</html>                    
