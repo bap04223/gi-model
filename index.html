@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dual Drug GI PKPD Simulator</title>
+    <title>Enhanced Dual Drug GI PKPD Simulator</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
         body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; margin: 0; padding: 20px; }
@@ -25,6 +25,82 @@
         .chart-container { background: white; border-radius: 15px; padding: 20px; }
         .chart-wrapper { height: 300px; margin-bottom: 10px; position: relative; }
         .chart-info { font-size: 0.8rem; color: #666; background: #f8f8f8; padding: 10px; border-radius: 5px; }
+        
+        /* Drug Selection Styles */
+        .drug-selection-section { 
+            background: #f0f8ff; 
+            border-radius: 8px; 
+            padding: 15px; 
+            margin-bottom: 15px; 
+            border: 2px solid #667eea;
+        }
+        .drug-selection-section h4 { 
+            color: #1565c0; 
+            margin-top: 0; 
+        }
+        .drug-buttons { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 10px; 
+            margin-bottom: 15px; 
+        }
+        .drug-category-btn { 
+            padding: 8px 12px; 
+            background: #667eea; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-size: 0.85rem;
+            transition: background 0.3s;
+        }
+        .drug-category-btn:hover { 
+            background: #5a6fd8; 
+        }
+        .drug-category-btn.selected { 
+            background: #2c3e50; 
+        }
+        .drug-details { 
+            background: white; 
+            border: 1px solid #ddd; 
+            border-radius: 5px; 
+            padding: 12px; 
+            margin-top: 10px; 
+            max-height: 200px; 
+            overflow-y: auto;
+        }
+        .drug-item { 
+            padding: 8px; 
+            margin-bottom: 8px; 
+            border: 1px solid #eee; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            transition: background 0.2s;
+        }
+        .drug-item:hover { 
+            background: #f8f9fa; 
+        }
+        .drug-item.selected { 
+            background: #e3f2fd; 
+            border-color: #667eea; 
+        }
+        .drug-name { 
+            font-weight: bold; 
+            color: #2c3e50; 
+            margin-bottom: 4px; 
+        }
+        .drug-info { 
+            font-size: 0.8rem; 
+            color: #666; 
+            line-height: 1.3; 
+        }
+        .quick-params { 
+            background: #fff3cd; 
+            padding: 8px; 
+            border-radius: 4px; 
+            margin-top: 8px; 
+            font-size: 0.75rem; 
+        }
         
         /* Collapsible section styles */
         .interaction-section, .target-section, .dosing-section, .absorption-section, .transit-section { 
@@ -127,7 +203,8 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Dual Drug GI PKPD Simulator</h1>
+            <h1>Enhanced Dual Drug GI PKPD Simulator</h1>
+            <p>Select from real cardiovascular drugs with authentic PK/PD parameters</p>
         </div>
         
         <div class="main-grid">
@@ -142,6 +219,22 @@
                 <div class="drug-panel active" id="panel1">
                     <div class="control-group">
                         <label><input type="checkbox" id="enabled1" checked onchange="runSim()"> Enable Drug A</label>
+                    </div>
+                    
+                    <div class="drug-selection-section">
+                        <h4 class="collapsible-header" onclick="toggleCollapse(this)">
+                            Select Drug A
+                            <span class="collapse-icon">▼</span>
+                        </h4>
+                        <div class="collapsible-content">
+                            <div class="drug-buttons">
+                                <button class="drug-category-btn" onclick="showDrugCategory(1, 'arb')">ARBs</button>
+                                <button class="drug-category-btn" onclick="showDrugCategory(1, 'beta')">Beta Blockers</button>
+                                <button class="drug-category-btn" onclick="showDrugCategory(1, 'ccb')">CCBs</button>
+                                <button class="drug-category-btn" onclick="showDrugCategory(1, 'ace')">ACE Inhibitors</button>
+                            </div>
+                            <div class="drug-details" id="drugDetails1"></div>
+                        </div>
                     </div>
                     
                     <div class="dosing-section">
@@ -243,7 +336,7 @@
                         </h4>
                         <div class="collapsible-content">
                             <div class="control-group">
-                                <label>EC50:</label>
+                                <label>EC50 (nM):</label>
                                 <input type="range" id="ec501" min="0.1" max="50" step="0.1" value="2.0" oninput="updateVal('ec501'); runSim();">
                                 <div class="value" id="ec501Val">2.0</div>
                             </div>
@@ -261,6 +354,11 @@
                                 <label>Half-life (hrs):</label>
                                 <input type="range" id="halflife1" min="0.5" max="24" step="0.5" value="6.9" oninput="updateVal('halflife1'); runSim();">
                                 <div class="value" id="halflife1Val">6.9 hrs</div>
+                            </div>
+                            <div class="control-group">
+                                <label>Volume of Distribution (L/kg):</label>
+                                <input type="range" id="vd1" min="0.1" max="25" step="0.1" value="0.7" oninput="updateVal('vd1'); runSim();">
+                                <div class="value" id="vd1Val">0.7 L/kg</div>
                             </div>
                         </div>
                     </div>
@@ -288,6 +386,22 @@
                 <div class="drug-panel" id="panel2">
                     <div class="control-group">
                         <label><input type="checkbox" id="enabled2" checked onchange="runSim()"> Enable Drug B</label>
+                    </div>
+                    
+                    <div class="drug-selection-section">
+                        <h4 class="collapsible-header" onclick="toggleCollapse(this)">
+                            Select Drug B
+                            <span class="collapse-icon">▼</span>
+                        </h4>
+                        <div class="collapsible-content">
+                            <div class="drug-buttons">
+                                <button class="drug-category-btn" onclick="showDrugCategory(2, 'arb')">ARBs</button>
+                                <button class="drug-category-btn" onclick="showDrugCategory(2, 'beta')">Beta Blockers</button>
+                                <button class="drug-category-btn" onclick="showDrugCategory(2, 'ccb')">CCBs</button>
+                                <button class="drug-category-btn" onclick="showDrugCategory(2, 'ace')">ACE Inhibitors</button>
+                            </div>
+                            <div class="drug-details" id="drugDetails2"></div>
+                        </div>
                     </div>
                     
                     <div class="dosing-section">
@@ -389,7 +503,7 @@
                         </h4>
                         <div class="collapsible-content">
                             <div class="control-group">
-                                <label>EC50:</label>
+                                <label>EC50 (nM):</label>
                                 <input type="range" id="ec502" min="0.1" max="50" step="0.1" value="5.0" oninput="updateVal('ec502'); runSim();">
                                 <div class="value" id="ec502Val">5.0</div>
                             </div>
@@ -407,6 +521,11 @@
                                 <label>Half-life (hrs):</label>
                                 <input type="range" id="halflife2" min="0.5" max="24" step="0.5" value="8.7" oninput="updateVal('halflife2'); runSim();">
                                 <div class="value" id="halflife2Val">8.7 hrs</div>
+                            </div>
+                            <div class="control-group">
+                                <label>Volume of Distribution (L/kg):</label>
+                                <input type="range" id="vd2" min="0.1" max="25" step="0.1" value="0.8" oninput="updateVal('vd2'); runSim();">
+                                <div class="value" id="vd2Val">0.8 L/kg</div>
                             </div>
                         </div>
                     </div>
@@ -548,7 +667,306 @@
     </div>
 
 <script>
+// Drug database from the provided table
+const drugDatabase = {
+    arb: [
+        {
+            name: "Losartan",
+            ec50: 20,
+            emax: 35,
+            bioavailability: 0.33,
+            halflife: 2,
+            vd: 0.7,
+            therapeuticRange: "0.2–1",
+            doses: [25, 50, 100],
+            formulations: ["Tablet"]
+        },
+        {
+            name: "Candesartan", 
+            ec50: 0.3,
+            emax: 35,
+            bioavailability: 0.15,
+            halflife: 9,
+            vd: 0.13,
+            therapeuticRange: "0.1–0.3",
+            doses: [4, 8, 16, 32],
+            formulations: ["Tablet"]
+        },
+        {
+            name: "Valsartan",
+            ec50: 2,
+            emax: 30,
+            bioavailability: 0.25,
+            halflife: 6,
+            vd: 0.88,
+            therapeuticRange: "1–3",
+            doses: [40, 80, 160, 320],
+            formulations: ["Tablet"]
+        },
+        {
+            name: "Irbesartan",
+            ec50: 1.3,
+            emax: 30,
+            bioavailability: 0.70,
+            halflife: 13,
+            vd: 0.9,
+            therapeuticRange: "1–3",
+            doses: [75, 150, 300],
+            formulations: ["Tablet"]
+        },
+        {
+            name: "Telmisartan",
+            ec50: 0.5,
+            emax: 40,
+            bioavailability: 0.42,
+            halflife: 24,
+            vd: 3.2,
+            therapeuticRange: "0.5–2",
+            doses: [20, 40, 80],
+            formulations: ["Tablet"]
+        }
+    ],
+    beta: [
+        {
+            name: "Metoprolol",
+            ec50: 35,
+            emax: 25,
+            bioavailability: 0.5,
+            halflife: 5,
+            vd: 3.5,
+            therapeuticRange: "0.035–0.5",
+            doses: [25, 50, 100, 200],
+            formulations: ["Tablet (IR/ER)", "Injection"]
+        },
+        {
+            name: "Propranolol",
+            ec50: 20,
+            emax: 30,
+            bioavailability: 0.25,
+            halflife: 6,
+            vd: 3.5,
+            therapeuticRange: "0.05–0.1",
+            doses: [10, 20, 40, 80],
+            formulations: ["Tablet", "Capsule", "Injection"]
+        },
+        {
+            name: "Bisoprolol",
+            ec50: 7.5,
+            emax: 35,
+            bioavailability: 0.9,
+            halflife: 12,
+            vd: 3.5,
+            therapeuticRange: "0.01–0.1",
+            doses: [2.5, 5, 10],
+            formulations: ["Tablet"]
+        },
+        {
+            name: "Carvedilol",
+            ec50: 3,
+            emax: 40,
+            bioavailability: 0.3,
+            halflife: 10,
+            vd: 1.5,
+            therapeuticRange: "0.005–0.05",
+            doses: [3.125, 6.25, 12.5, 25],
+            formulations: ["Tablet"]
+        }
+    ],
+    ccb: [
+        {
+            name: "Amlodipine",
+            ec50: 1,
+            emax: 40,
+            bioavailability: 0.65,
+            halflife: 40,
+            vd: 21,
+            therapeuticRange: "0.003–0.015",
+            doses: [2.5, 5, 10],
+            formulations: ["Tablet"]
+        },
+        {
+            name: "Verapamil",
+            ec50: 15,
+            emax: 25,
+            bioavailability: 0.25,
+            halflife: 7,
+            vd: 3.8,
+            therapeuticRange: "0.08–0.3",
+            doses: [40, 80, 160, 240],
+            formulations: ["Tablet", "Capsule", "Injection"]
+        },
+        {
+            name: "Diltiazem",
+            ec50: 7,
+            emax: 20,
+            bioavailability: 0.5,
+            halflife: 5,
+            vd: 3.5,
+            therapeuticRange: "0.05–0.2 µg/mL",
+            doses: [30, 60, 120, 240, 360],
+            formulations: ["Tablet", "Capsule", "Injection"]
+        }
+    ],
+    ace: [
+        {
+            name: "Lisinopril",
+            ec50: 4,
+            emax: 30,
+            bioavailability: 0.25,
+            halflife: 12,
+            vd: 0.7,
+            therapeuticRange: "0.1–0.3",
+            doses: [2.5, 5, 10, 20, 40],
+            formulations: ["Tablet"]
+        },
+        {
+            name: "Enalapril",
+            ec50: 7,
+            emax: 35,
+            bioavailability: 0.6,
+            halflife: 11,
+            vd: 0.8,
+            therapeuticRange: "0.05–0.2",
+            doses: [2.5, 5, 10, 20],
+            formulations: ["Tablet"]
+        },
+        {
+            name: "Ramipril",
+            ec50: 2,
+            emax: 35,
+            bioavailability: 0.55,
+            halflife: 17,
+            vd: 0.9,
+            therapeuticRange: "0.01–0.05",
+            doses: [1.25, 2.5, 5, 10],
+            formulations: ["Capsule", "Tablet"]
+        }
+    ]
+};
+
 var charts = {};
+var selectedDrugs = {1: null, 2: null}; // Track selected drugs for each slot
+
+function showDrugCategory(drugSlot, category) {
+    // Update button states
+    const buttons = document.querySelectorAll(`#panel${drugSlot} .drug-category-btn`);
+    buttons.forEach(btn => btn.classList.remove('selected'));
+    event.target.classList.add('selected');
+    
+    // Get drugs for this category
+    const drugs = drugDatabase[category] || [];
+    const detailsContainer = document.getElementById(`drugDetails${drugSlot}`);
+    
+    if (drugs.length === 0) {
+        detailsContainer.innerHTML = '<p>No drugs available in this category.</p>';
+        return;
+    }
+    
+    // Generate drug list HTML
+    let html = '';
+    drugs.forEach((drug, index) => {
+        const isSelected = selectedDrugs[drugSlot] && selectedDrugs[drugSlot].name === drug.name;
+        html += `
+            <div class="drug-item ${isSelected ? 'selected' : ''}" onclick="selectDrug(${drugSlot}, '${category}', ${index})">
+                <div class="drug-name">${drug.name}</div>
+                <div class="drug-info">
+                    EC50: ${drug.ec50} nM | Emax: ${drug.emax} | Half-life: ${drug.halflife} hrs<br>
+                    Bioavailability: ${Math.round(drug.bioavailability * 100)}% | Vd: ${drug.vd} L/kg<br>
+                    Doses: ${drug.doses.join(', ')} mg | Forms: ${drug.formulations.join(', ')}<br>
+                    Therapeutic Range: ${drug.therapeuticRange}
+                </div>
+            </div>
+        `;
+    });
+    
+    detailsContainer.innerHTML = html;
+}
+
+function selectDrug(drugSlot, category, drugIndex) {
+    const drug = drugDatabase[category][drugIndex];
+    selectedDrugs[drugSlot] = drug;
+    
+    // Update UI to show selection
+    const drugItems = document.querySelectorAll(`#drugDetails${drugSlot} .drug-item`);
+    drugItems.forEach(item => item.classList.remove('selected'));
+    drugItems[drugIndex].classList.add('selected');
+    
+    // Auto-populate parameters based on selected drug
+    populateDrugParameters(drugSlot, drug);
+    
+    // Show quick parameter summary
+    showQuickParameters(drugSlot, drug);
+    
+    // Run simulation with new parameters
+    runSim();
+}
+
+function populateDrugParameters(drugSlot, drug) {
+    // Update EC50 (convert from nM to the range expected by the slider)
+    const ec50Element = document.getElementById(`ec50${drugSlot}`);
+    if (ec50Element) {
+        ec50Element.value = drug.ec50;
+        updateVal(`ec50${drugSlot}`);
+    }
+    
+    // Update Emax (convert to negative for therapeutic effect)
+    const emaxElement = document.getElementById(`emax${drugSlot}`);
+    if (emaxElement) {
+        emaxElement.value = -Math.abs(drug.emax);
+        updateVal(`emax${drugSlot}`);
+    }
+    
+    // Update Bioavailability
+    const bioavailabilityElement = document.getElementById(`bioavailability${drugSlot}`);
+    if (bioavailabilityElement) {
+        bioavailabilityElement.value = drug.bioavailability;
+        updateVal(`bioavailability${drugSlot}`);
+    }
+    
+    // Update Half-life
+    const halflifeElement = document.getElementById(`halflife${drugSlot}`);
+    if (halflifeElement) {
+        halflifeElement.value = drug.halflife;
+        updateVal(`halflife${drugSlot}`);
+    }
+    
+    // Update Volume of Distribution
+    const vdElement = document.getElementById(`vd${drugSlot}`);
+    if (vdElement) {
+        vdElement.value = drug.vd;
+        updateVal(`vd${drugSlot}`);
+    }
+    
+    // Update dose range to match available doses
+    const doseElement = document.getElementById(`dose${drugSlot}`);
+    if (doseElement && drug.doses.length > 0) {
+        const maxDose = Math.max(...drug.doses);
+        const minDose = Math.min(...drug.doses);
+        doseElement.max = Math.max(maxDose * 2, 500); // Allow some flexibility
+        doseElement.min = Math.max(minDose / 2, 1);
+        doseElement.value = drug.doses[0]; // Default to lowest dose
+        updateVal(`dose${drugSlot}`);
+    }
+}
+
+function showQuickParameters(drugSlot, drug) {
+    const detailsContainer = document.getElementById(`drugDetails${drugSlot}`);
+    const existingQuickParams = detailsContainer.querySelector('.quick-params');
+    if (existingQuickParams) {
+        existingQuickParams.remove();
+    }
+    
+    const quickParamsHtml = `
+        <div class="quick-params">
+            <strong>Applied Parameters:</strong><br>
+            EC50: ${drug.ec50} nM | Emax: ${drug.emax} | Bioavailability: ${Math.round(drug.bioavailability * 100)}%<br>
+            Half-life: ${drug.halflife} hrs | Vd: ${drug.vd} L/kg<br>
+            Available doses: ${drug.doses.join(', ')} mg
+        </div>
+    `;
+    
+    detailsContainer.insertAdjacentHTML('beforeend', quickParamsHtml);
+}
 
 function toggleCollapse(header) {
     var content = header.nextElementSibling;
@@ -581,6 +999,7 @@ function updateVal(id) {
         else if (id.includes('Time') || id.includes('halflife')) v += ' hrs';
         else if (id.includes('wasteElim')) v += '%';
         else if (id.includes('Range')) v = '±' + v + '%';
+        else if (id.includes('vd')) v += ' L/kg';
         else if (id.includes('interval')) {
             if (parseFloat(v) === 0) v += ' hrs (single dose)';
             else v += ' hrs';
@@ -726,25 +1145,27 @@ function generateFeedback(passed, reachesTarget, maintainsTarget, percentInRange
 
 function generateGIFeedback(passed, reachesTarget, maintainsTarget, percentInRange, timeToTarget, drugNum) {
     var drugName = drugNum === 1 ? 'Drug A' : 'Drug B';
+    var selectedDrug = selectedDrugs[drugNum];
+    var drugDisplayName = selectedDrug ? selectedDrug.name : drugName;
     
     if (passed) {
-        return drugName + ' GI target achieved and maintained - optimal drug distribution.';
+        return drugDisplayName + ' GI target achieved and maintained - optimal drug distribution.';
     }
     
     var feedback = [];
     if (!reachesTarget) {
         if (timeToTarget === null) {
-            feedback.push(drugName + ' GI target never reached - consider increasing doses or improving formulation');
+            feedback.push(drugDisplayName + ' GI target never reached - consider increasing doses or improving formulation');
         } else {
-            feedback.push(drugName + ' GI target reached too late - optimize absorption parameters');
+            feedback.push(drugDisplayName + ' GI target reached too late - optimize absorption parameters');
         }
     }
     
     if (!maintainsTarget) {
         if (percentInRange < 50) {
-            feedback.push('Poor ' + drugName + ' GI maintenance (' + percentInRange.toFixed(1) + '%) - review elimination and distribution rates');
+            feedback.push('Poor ' + drugDisplayName + ' GI maintenance (' + percentInRange.toFixed(1) + '%) - review elimination and distribution rates');
         } else if (percentInRange < 80) {
-            feedback.push('Adequate ' + drugName + ' GI maintenance (' + percentInRange.toFixed(1) + '%) - fine-tune PK parameters');
+            feedback.push('Adequate ' + drugDisplayName + ' GI maintenance (' + percentInRange.toFixed(1) + '%) - fine-tune PK parameters');
         }
     }
     
@@ -1076,12 +1497,33 @@ function runSim() {
         charts.effects.options.scales.y.min = minEffect - padding;
         charts.effects.options.scales.y.max = maxEffect + padding;
         
+        // Update chart labels with drug names if selected
+        var drug1Name = selectedDrugs[1] ? selectedDrugs[1].name : 'Drug A';
+        var drug2Name = selectedDrugs[2] ? selectedDrugs[2].name : 'Drug B';
+        
+        charts.release.data.datasets[0].label = drug1Name + ' Tablet';
+        charts.release.data.datasets[1].label = drug2Name + ' Tablet';
+        charts.release.data.datasets[2].label = drug1Name + ' Dissolved';
+        charts.release.data.datasets[3].label = drug2Name + ' Dissolved';
+        
         charts.release.data.labels = times;
         charts.release.data.datasets[0].data = data.map(function(d) { return d.drug1.tablet; });
         charts.release.data.datasets[1].data = data.map(function(d) { return d.drug2.tablet; });
         charts.release.data.datasets[2].data = data.map(function(d) { return d.dissolvedDrug1; });
         charts.release.data.datasets[3].data = data.map(function(d) { return d.dissolvedDrug2; });
         charts.release.update();
+        
+        // Update GI chart labels
+        charts.gi.data.datasets[0].label = drug1Name + ' Stomach';
+        charts.gi.data.datasets[1].label = drug1Name + ' Small Intestine';
+        charts.gi.data.datasets[2].label = drug1Name + ' Large Intestine';
+        charts.gi.data.datasets[3].label = drug1Name + ' Plasma';
+        charts.gi.data.datasets[4].label = drug1Name + ' Tissue';
+        charts.gi.data.datasets[5].label = drug2Name + ' Stomach';
+        charts.gi.data.datasets[6].label = drug2Name + ' Small Intestine';
+        charts.gi.data.datasets[7].label = drug2Name + ' Large Intestine';
+        charts.gi.data.datasets[8].label = drug2Name + ' Plasma';
+        charts.gi.data.datasets[9].label = drug2Name + ' Tissue';
         
         charts.gi.data.labels = times;
         charts.gi.data.datasets[0].data = data.map(function(d) { return d.drug1.stomach; });
@@ -1102,8 +1544,9 @@ function runSim() {
         charts.gi.data.datasets[10].hidden = !getCheck('enabled1');
         charts.gi.data.datasets[11].hidden = !getCheck('enabled1');
         charts.gi.data.datasets[12].hidden = !getCheck('enabled1');
-        charts.gi.data.datasets[11].label = 'Drug A GI +' + getVal('giTargetRange1') + '%';
-        charts.gi.data.datasets[12].label = 'Drug A GI -' + getVal('giTargetRange1') + '%';
+        charts.gi.data.datasets[10].label = drug1Name + ' GI Target';
+        charts.gi.data.datasets[11].label = drug1Name + ' GI +' + getVal('giTargetRange1') + '%';
+        charts.gi.data.datasets[12].label = drug1Name + ' GI -' + getVal('giTargetRange1') + '%';
         
         // Drug B GI target lines - always update but hide via dataset visibility for disabled drugs
         charts.gi.data.datasets[13].data = times.map(function() { return giTarget2; });
@@ -1112,10 +1555,15 @@ function runSim() {
         charts.gi.data.datasets[13].hidden = !getCheck('enabled2');
         charts.gi.data.datasets[14].hidden = !getCheck('enabled2');
         charts.gi.data.datasets[15].hidden = !getCheck('enabled2');
-        charts.gi.data.datasets[14].label = 'Drug B GI +' + getVal('giTargetRange2') + '%';
-        charts.gi.data.datasets[15].label = 'Drug B GI -' + getVal('giTargetRange2') + '%';
+        charts.gi.data.datasets[13].label = drug2Name + ' GI Target';
+        charts.gi.data.datasets[14].label = drug2Name + ' GI +' + getVal('giTargetRange2') + '%';
+        charts.gi.data.datasets[15].label = drug2Name + ' GI -' + getVal('giTargetRange2') + '%';
         
         charts.gi.update();
+        
+        // Update effects chart labels
+        charts.effects.data.datasets[0].label = drug1Name + ' Effect';
+        charts.effects.data.datasets[1].label = drug2Name + ' Effect';
         
         charts.effects.data.labels = times;
         charts.effects.data.datasets[0].data = data.map(function(d) { return baseline + d.effect1; });
@@ -1184,6 +1632,15 @@ function runSim() {
         giAssessmentFeedback2.style.color = giAssessment2.passed ? '#155724' : '#721c24';
         giAssessmentFeedback2.style.border = '1px solid ' + (giAssessment2.passed ? '#c3e6cb' : '#f5c6cb');
         
+        // Update stat card labels with drug names
+        document.querySelector('#cmax1').parentElement.querySelector('.stat-label').textContent = drug1Name + ' Cmax';
+        document.querySelector('#tmax1').parentElement.querySelector('.stat-label').textContent = drug1Name + ' Tmax';
+        document.querySelector('#auc1').parentElement.querySelector('.stat-label').textContent = drug1Name + ' AUC';
+        document.querySelector('#cmax2').parentElement.querySelector('.stat-label').textContent = drug2Name + ' Cmax';
+        document.querySelector('#auc2').parentElement.querySelector('.stat-label').textContent = drug2Name + ' AUC';
+        document.querySelector('#giAssessmentGrade1').parentElement.querySelector('.stat-label').textContent = 'GI ' + drug1Name + ' Assessment';
+        document.querySelector('#giAssessmentGrade2').parentElement.querySelector('.stat-label').textContent = 'GI ' + drug2Name + ' Assessment';
+        
     } catch (error) {
         console.error('Error in runSim:', error);
     }
@@ -1196,7 +1653,7 @@ window.onload = function() {
                    'wasteElim1', 'wasteElim2',
                    'stomachTransit1', 'stomachTransit2', 'intestineTransit1', 'intestineTransit2',
                    'distribution1', 'distribution2', 'redistribution1', 'redistribution2',
-                   'bioavailability1', 'bioavailability2',
+                   'bioavailability1', 'bioavailability2', 'vd1', 'vd2',
                    'elim2', 'ec501', 'ec502', 'emax1', 'emax2', 'halflife1', 'halflife2',
                    'baseline', 'giTargetEffect1', 'giTargetRange1',
                    'giTargetEffect2', 'giTargetRange2',
