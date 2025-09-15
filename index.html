@@ -1074,17 +1074,29 @@ function runSim() {
         charts.gi.data.datasets[8].data = data.map(function(d) { return d.drug2.plasma; });
         charts.gi.data.datasets[9].data = data.map(function(d) { return d.drug2.tissue; });
         
-        // Drug A GI target lines
-        charts.gi.data.datasets[10].data = times.map(function() { return giTarget1; });
-        charts.gi.data.datasets[11].data = times.map(function() { return giTargetUpper1; });
-        charts.gi.data.datasets[12].data = times.map(function() { return giTargetLower1; });
+        // Drug A GI target lines (only show if Drug A is enabled)
+        if (getCheck('enabled1')) {
+            charts.gi.data.datasets[10].data = times.map(function() { return giTarget1; });
+            charts.gi.data.datasets[11].data = times.map(function() { return giTargetUpper1; });
+            charts.gi.data.datasets[12].data = times.map(function() { return giTargetLower1; });
+        } else {
+            charts.gi.data.datasets[10].data = [];
+            charts.gi.data.datasets[11].data = [];
+            charts.gi.data.datasets[12].data = [];
+        }
         charts.gi.data.datasets[11].label = 'Drug A GI +' + getVal('giTargetMax1') + '%';
         charts.gi.data.datasets[12].label = 'Drug A GI -' + getVal('giTargetMin1') + '%';
         
-        // Drug B GI target lines
-        charts.gi.data.datasets[13].data = times.map(function() { return giTarget2; });
-        charts.gi.data.datasets[14].data = times.map(function() { return giTargetUpper2; });
-        charts.gi.data.datasets[15].data = times.map(function() { return giTargetLower2; });
+        // Drug B GI target lines (only show if Drug B is enabled)
+        if (getCheck('enabled2')) {
+            charts.gi.data.datasets[13].data = times.map(function() { return giTarget2; });
+            charts.gi.data.datasets[14].data = times.map(function() { return giTargetUpper2; });
+            charts.gi.data.datasets[15].data = times.map(function() { return giTargetLower2; });
+        } else {
+            charts.gi.data.datasets[13].data = [];
+            charts.gi.data.datasets[14].data = [];
+            charts.gi.data.datasets[15].data = [];
+        }
         charts.gi.data.datasets[14].label = 'Drug B GI +' + getVal('giTargetMax2') + '%';
         charts.gi.data.datasets[15].label = 'Drug B GI -' + getVal('giTargetMin2') + '%';
         
