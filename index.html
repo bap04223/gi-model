@@ -142,36 +142,36 @@
                         <h5 style="margin: 0 0 10px 0; color: #2d5016; font-size: 0.9rem;">Patient Data</h5>
                         <div class="control-group" style="margin-bottom: 8px;">
                             <label style="font-size: 0.8rem;">Patient Sheet ID:</label>
-                            <input type="text" id="patientSheetId" placeholder="Enter Google Sheet ID" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.8rem;">
+                            <input type="text" id="patientSheetId" placeholder="Enter Google Sheet ID" style="width: calc(100% - 12px); padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.8rem; box-sizing: border-box;">
                         </div>
                         <div class="control-group" style="margin-bottom: 8px;">
                             <label style="font-size: 0.8rem;">Select Patient:</label>
-                            <select id="patientSelect" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.8rem;" onchange="loadPatientData()">
+                            <select id="patientSelect" style="width: calc(100% - 12px); padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.8rem; box-sizing: border-box;" onchange="loadPatientData()">
                                 <option value="">Select a patient...</option>
                             </select>
                         </div>
-                        <button onclick="loadPatientSheet()" style="background: #27ae60; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; width: 100%;">Load Patient Sheet</button>
+                        <button onclick="loadPatientSheet()" style="background: #27ae60; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; width: 100%; box-sizing: border-box;">Load Patient Sheet</button>
                     </div>
                     
                     <div class="source-section" style="background: #e3f2fd; padding: 12px; border-radius: 8px;">
                         <h5 style="margin: 0 0 10px 0; color: #1565c0; font-size: 0.9rem;">Drug Data</h5>
                         <div class="control-group" style="margin-bottom: 8px;">
                             <label style="font-size: 0.8rem;">Drug Sheet ID:</label>
-                            <input type="text" id="drugSheetId" placeholder="Enter Google Sheet ID" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.8rem;">
+                            <input type="text" id="drugSheetId" placeholder="Enter Google Sheet ID" style="width: calc(100% - 12px); padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.8rem; box-sizing: border-box;">
                         </div>
                         <div class="control-group" style="margin-bottom: 4px;">
                             <label style="font-size: 0.8rem;">Select Drug A:</label>
-                            <select id="drugASelect" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.8rem;" onchange="loadDrugData('A')">
+                            <select id="drugASelect" style="width: calc(100% - 12px); padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.8rem; box-sizing: border-box;" onchange="loadDrugData('A')">
                                 <option value="">Select drug A...</option>
                             </select>
                         </div>
                         <div class="control-group" style="margin-bottom: 8px;">
                             <label style="font-size: 0.8rem;">Select Drug B:</label>
-                            <select id="drugBSelect" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.8rem;" onchange="loadDrugData('B')">
+                            <select id="drugBSelect" style="width: calc(100% - 12px); padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.8rem; box-sizing: border-box;" onchange="loadDrugData('B')">
                                 <option value="">Select drug B...</option>
                             </select>
                         </div>
-                        <button onclick="loadDrugSheet()" style="background: #3498db; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; width: 100%;">Load Drug Sheet</button>
+                        <button onclick="loadDrugSheet()" style="background: #3498db; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; width: 100%; box-sizing: border-box;">Load Drug Sheet</button>
                     </div>
                 </div>
                 
@@ -1485,4 +1485,4 @@ window.onload = function() {
 };
 </script>
 </body>
-</html>                 
+</html>              
