@@ -658,6 +658,10 @@ function parseCSV(csvText) {
             headers.forEach((header, index) => {
                 row[header] = values[index] || '';
             });
+            // Also store the first column as 'Name' for consistency
+            if (values[0]) {
+                row['Name'] = values[0];
+            }
             data.push(row);
         }
     }
@@ -672,7 +676,9 @@ function populatePatientDropdown() {
     patientData.forEach((patient, index) => {
         var option = document.createElement('option');
         option.value = index;
-        option.textContent = patient.Name || `Patient ${index + 1}`;
+        // Use the first column (column A) as the display name
+        var firstName = Object.values(patient)[0] || `Patient ${index + 1}`;
+        option.textContent = firstName;
         select.appendChild(option);
     });
 }
@@ -685,14 +691,17 @@ function populateDrugDropdowns() {
     selectB.innerHTML = '<option value="">Select drug B...</option>';
     
     drugData.forEach((drug, index) => {
+        // Use the first column (column A) as the display name
+        var drugName = Object.values(drug)[0] || `Drug ${index + 1}`;
+        
         var optionA = document.createElement('option');
         optionA.value = index;
-        optionA.textContent = drug.Name || `Drug ${index + 1}`;
+        optionA.textContent = drugName;
         selectA.appendChild(optionA);
         
         var optionB = document.createElement('option');
         optionB.value = index;
-        optionB.textContent = drug.Name || `Drug ${index + 1}`;
+        optionB.textContent = drugName;
         selectB.appendChild(optionB);
     });
 }
@@ -704,58 +713,45 @@ function loadPatientData() {
     var patient = patientData[patientIndex];
     if (!patient) return;
     
-    // Map patient data to UI controls
+    // Map patient data to UI controls with proper value updates
     // Transit parameters
     if (patient.StomachTransit) {
-        document.getElementById('stomachTransit1').value = patient.StomachTransit;
-        document.getElementById('stomachTransit2').value = patient.StomachTransit;
-        updateVal('stomachTransit1');
-        updateVal('stomachTransit2');
+        setSliderValue('stomachTransit1', patient.StomachTransit);
+        setSliderValue('stomachTransit2', patient.StomachTransit);
     }
     
     if (patient.IntestineTransit) {
-        document.getElementById('intestineTransit1').value = patient.IntestineTransit;
-        document.getElementById('intestineTransit2').value = patient.IntestineTransit;
-        updateVal('intestineTransit1');
-        updateVal('intestineTransit2');
+        setSliderValue('intestineTransit1', patient.IntestineTransit);
+        setSliderValue('intestineTransit2', patient.IntestineTransit);
     }
     
     // Absorption parameters
     if (patient.StomachAbsorption) {
-        document.getElementById('stomachAbs1').value = patient.StomachAbsorption;
-        document.getElementById('stomachAbs2').value = patient.StomachAbsorption;
-        updateVal('stomachAbs1');
-        updateVal('stomachAbs2');
+        setSliderValue('stomachAbs1', patient.StomachAbsorption);
+        setSliderValue('stomachAbs2', patient.StomachAbsorption);
     }
     
     if (patient.SmallIntestineAbsorption) {
-        document.getElementById('siAbs1').value = patient.SmallIntestineAbsorption;
-        document.getElementById('siAbs2').value = patient.SmallIntestineAbsorption;
-        updateVal('siAbs1');
-        updateVal('siAbs2');
+        setSliderValue('siAbs1', patient.SmallIntestineAbsorption);
+        setSliderValue('siAbs2', patient.SmallIntestineAbsorption);
     }
     
     if (patient.LargeIntestineAbsorption) {
-        document.getElementById('liAbs1').value = patient.LargeIntestineAbsorption;
-        document.getElementById('liAbs2').value = patient.LargeIntestineAbsorption;
-        updateVal('liAbs1');
-        updateVal('liAbs2');
+        setSliderValue('liAbs1', patient.LargeIntestineAbsorption);
+        setSliderValue('liAbs2', patient.LargeIntestineAbsorption);
     }
     
     // PD parameters
     if (patient.BaselineEffect) {
-        document.getElementById('baseline').value = patient.BaselineEffect;
-        updateVal('baseline');
+        setSliderValue('baseline', patient.BaselineEffect);
     }
     
     if (patient.PDTargetEffect) {
-        document.getElementById('pdTargetEffect').value = patient.PDTargetEffect;
-        updateVal('pdTargetEffect');
+        setSliderValue('pdTargetEffect', patient.PDTargetEffect);
     }
     
     if (patient.PDTargetRange) {
-        document.getElementById('pdTargetRange').value = patient.PDTargetRange;
-        updateVal('pdTargetRange');
+        setSliderValue('pdTargetRange', patient.PDTargetRange);
     }
     
     runSim();
@@ -771,58 +767,57 @@ function loadDrugData(drugSlot) {
     
     var drugNum = drugSlot === 'A' ? '1' : '2';
     
-    // Map drug data to UI controls
+    // Map drug data to UI controls with proper value updates
     if (drug.EC50) {
-        document.getElementById('ec50' + drugNum).value = drug.EC50;
-        updateVal('ec50' + drugNum);
+        setSliderValue('ec50' + drugNum, drug.EC50);
     }
     
     if (drug.Emax) {
-        document.getElementById('emax' + drugNum).value = drug.Emax;
-        updateVal('emax' + drugNum);
+        setSliderValue('emax' + drugNum, drug.Emax);
     }
     
     if (drug.Bioavailability) {
-        document.getElementById('bioavailability' + drugNum).value = drug.Bioavailability;
-        updateVal('bioavailability' + drugNum);
+        setSliderValue('bioavailability' + drugNum, drug.Bioavailability);
     }
     
     if (drug.HalfLife) {
-        document.getElementById('halflife' + drugNum).value = drug.HalfLife;
-        updateVal('halflife' + drugNum);
+        setSliderValue('halflife' + drugNum, drug.HalfLife);
     }
     
     if (drug.DissolutionRate) {
-        document.getElementById('dissolution' + drugNum).value = drug.DissolutionRate;
-        updateVal('dissolution' + drugNum);
+        setSliderValue('dissolution' + drugNum, drug.DissolutionRate);
     }
     
     if (drug.DistributionToTissue) {
-        document.getElementById('distribution' + drugNum).value = drug.DistributionToTissue;
-        updateVal('distribution' + drugNum);
+        setSliderValue('distribution' + drugNum, drug.DistributionToTissue);
     }
     
     if (drug.RedistributionFromTissue) {
-        document.getElementById('redistribution' + drugNum).value = drug.RedistributionFromTissue;
-        updateVal('redistribution' + drugNum);
+        setSliderValue('redistribution' + drugNum, drug.RedistributionFromTissue);
     }
     
     if (drug.GITargetEffect) {
-        document.getElementById('giTargetEffect' + drugNum).value = drug.GITargetEffect;
-        updateVal('giTargetEffect' + drugNum);
+        setSliderValue('giTargetEffect' + drugNum, drug.GITargetEffect);
     }
     
     if (drug.GITargetRange) {
-        document.getElementById('giTargetRange' + drugNum).value = drug.GITargetRange;
-        updateVal('giTargetRange' + drugNum);
+        setSliderValue('giTargetRange' + drugNum, drug.GITargetRange);
     }
     
     if (drug.VolumeOfDistribution) {
-        document.getElementById('vd' + drugNum).value = drug.VolumeOfDistribution;
-        updateVal('vd' + drugNum);
+        setSliderValue('vd' + drugNum, drug.VolumeOfDistribution);
     }
     
     runSim();
+}
+
+// Helper function to set slider value and update display
+function setSliderValue(sliderId, value) {
+    var slider = document.getElementById(sliderId);
+    if (slider) {
+        slider.value = value;
+        updateVal(sliderId);
+    }
 }
 function toggleCollapse(header) {
     var content = header.nextElementSibling;
@@ -1485,4 +1480,4 @@ window.onload = function() {
 };
 </script>
 </body>
-</html>         
+</html>   
