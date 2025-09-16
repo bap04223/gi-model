@@ -714,44 +714,61 @@ function loadPatientData() {
     if (!patient) return;
     
     // Map patient data to UI controls with proper value updates
-    // Transit parameters
-    if (patient.StomachTransit) {
-        setSliderValue('stomachTransit1', patient.StomachTransit);
-        setSliderValue('stomachTransit2', patient.StomachTransit);
+    // Transit parameters (case-sensitive field names from sheet)
+    if (patient['Stomach Transit']) {
+        setSliderValue('stomachTransit1', patient['Stomach Transit']);
+        setSliderValue('stomachTransit2', patient['Stomach Transit']);
     }
     
-    if (patient.IntestineTransit) {
-        setSliderValue('intestineTransit1', patient.IntestineTransit);
-        setSliderValue('intestineTransit2', patient.IntestineTransit);
+    if (patient['Intestine Transit']) {
+        setSliderValue('intestineTransit1', patient['Intestine Transit']);
+        setSliderValue('intestineTransit2', patient['Intestine Transit']);
     }
     
     // Absorption parameters
-    if (patient.StomachAbsorption) {
-        setSliderValue('stomachAbs1', patient.StomachAbsorption);
-        setSliderValue('stomachAbs2', patient.StomachAbsorption);
+    if (patient['Stomach Absorption']) {
+        setSliderValue('stomachAbs1', patient['Stomach Absorption']);
+        setSliderValue('stomachAbs2', patient['Stomach Absorption']);
     }
     
-    if (patient.SmallIntestineAbsorption) {
-        setSliderValue('siAbs1', patient.SmallIntestineAbsorption);
-        setSliderValue('siAbs2', patient.SmallIntestineAbsorption);
+    if (patient['Small Intestine Absorption']) {
+        setSliderValue('siAbs1', patient['Small Intestine Absorption']);
+        setSliderValue('siAbs2', patient['Small Intestine Absorption']);
     }
     
-    if (patient.LargeIntestineAbsorption) {
-        setSliderValue('liAbs1', patient.LargeIntestineAbsorption);
-        setSliderValue('liAbs2', patient.LargeIntestineAbsorption);
+    if (patient['Large Intestine Absorption']) {
+        setSliderValue('liAbs1', patient['Large Intestine Absorption']);
+        setSliderValue('liAbs2', patient['Large Intestine Absorption']);
+    }
+    
+    // Distribution parameters
+    if (patient['Distribution to Tissue']) {
+        setSliderValue('distribution1', patient['Distribution to Tissue']);
+        setSliderValue('distribution2', patient['Distribution to Tissue']);
+    }
+    
+    if (patient['Redistribution from Tissue']) {
+        setSliderValue('redistribution1', patient['Redistribution from Tissue']);
+        setSliderValue('redistribution2', patient['Redistribution from Tissue']);
+    }
+    
+    // Waste elimination
+    if (patient['Waste Elimination (%)']) {
+        setSliderValue('wasteElim1', patient['Waste Elimination (%)']);
+        setSliderValue('wasteElim2', patient['Waste Elimination (%)']);
     }
     
     // PD parameters
-    if (patient.BaselineEffect) {
-        setSliderValue('baseline', patient.BaselineEffect);
+    if (patient['Baseline Effect']) {
+        setSliderValue('baseline', patient['Baseline Effect']);
     }
     
-    if (patient.PDTargetEffect) {
-        setSliderValue('pdTargetEffect', patient.PDTargetEffect);
+    if (patient['PD Target Effect']) {
+        setSliderValue('pdTargetEffect', patient['PD Target Effect']);
     }
     
-    if (patient.PDTargetRange) {
-        setSliderValue('pdTargetRange', patient.PDTargetRange);
+    if (patient['PD Target Range']) {
+        setSliderValue('pdTargetRange', patient['PD Target Range']);
     }
     
     runSim();
@@ -768,44 +785,72 @@ function loadDrugData(drugSlot) {
     var drugNum = drugSlot === 'A' ? '1' : '2';
     
     // Map drug data to UI controls with proper value updates
-    if (drug.EC50) {
-        setSliderValue('ec50' + drugNum, drug.EC50);
+    // Use exact field names from the Google Sheet
+    if (drug['EC50 (nM)']) {
+        setSliderValue('ec50' + drugNum, drug['EC50 (nM)']);
     }
     
-    if (drug.Emax) {
-        setSliderValue('emax' + drugNum, drug.Emax);
+    if (drug['Emax']) {
+        setSliderValue('emax' + drugNum, drug['Emax']);
     }
     
-    if (drug.Bioavailability) {
-        setSliderValue('bioavailability' + drugNum, drug.Bioavailability);
+    if (drug['Bioavailability']) {
+        setSliderValue('bioavailability' + drugNum, drug['Bioavailability']);
     }
     
-    if (drug.HalfLife) {
-        setSliderValue('halflife' + drugNum, drug.HalfLife);
+    if (drug['Half-life (hrs)']) {
+        setSliderValue('halflife' + drugNum, drug['Half-life (hrs)']);
     }
     
-    if (drug.DissolutionRate) {
-        setSliderValue('dissolution' + drugNum, drug.DissolutionRate);
+    if (drug['Dissolution Rate']) {
+        setSliderValue('dissolution' + drugNum, drug['Dissolution Rate']);
     }
     
-    if (drug.DistributionToTissue) {
-        setSliderValue('distribution' + drugNum, drug.DistributionToTissue);
+    if (drug['Distribution to Tissue']) {
+        setSliderValue('distribution' + drugNum, drug['Distribution to Tissue']);
     }
     
-    if (drug.RedistributionFromTissue) {
-        setSliderValue('redistribution' + drugNum, drug.RedistributionFromTissue);
+    if (drug['Redistribution from Tissue']) {
+        setSliderValue('redistribution' + drugNum, drug['Redistribution from Tissue']);
     }
     
-    if (drug.GITargetEffect) {
-        setSliderValue('giTargetEffect' + drugNum, drug.GITargetEffect);
+    if (drug['GI Target Effect']) {
+        setSliderValue('giTargetEffect' + drugNum, drug['GI Target Effect']);
     }
     
-    if (drug.GITargetRange) {
-        setSliderValue('giTargetRange' + drugNum, drug.GITargetRange);
+    if (drug['GI Target Range']) {
+        setSliderValue('giTargetRange' + drugNum, drug['GI Target Range']);
     }
     
-    if (drug.VolumeOfDistribution) {
-        setSliderValue('vd' + drugNum, drug.VolumeOfDistribution);
+    if (drug['Volume of Distribution (L/kg)']) {
+        setSliderValue('vd' + drugNum, drug['Volume of Distribution (L/kg)']);
+    }
+    
+    // Additional absorption parameters from drug sheet
+    if (drug['Stomach Absorption']) {
+        setSliderValue('stomachAbs' + drugNum, drug['Stomach Absorption']);
+    }
+    
+    if (drug['Small Intestine Absorption']) {
+        setSliderValue('siAbs' + drugNum, drug['Small Intestine Absorption']);
+    }
+    
+    if (drug['Large Intestine Absorption']) {
+        setSliderValue('liAbs' + drugNum, drug['Large Intestine Absorption']);
+    }
+    
+    // Transit parameters from drug sheet
+    if (drug['Stomach Transit']) {
+        setSliderValue('stomachTransit' + drugNum, drug['Stomach Transit']);
+    }
+    
+    if (drug['Intestine Transit']) {
+        setSliderValue('intestineTransit' + drugNum, drug['Intestine Transit']);
+    }
+    
+    // Waste elimination
+    if (drug['Waste Elimination (%)']) {
+        setSliderValue('wasteElim' + drugNum, drug['Waste Elimination (%)']);
     }
     
     runSim();
@@ -814,9 +859,13 @@ function loadDrugData(drugSlot) {
 // Helper function to set slider value and update display
 function setSliderValue(sliderId, value) {
     var slider = document.getElementById(sliderId);
-    if (slider) {
-        slider.value = value;
-        updateVal(sliderId);
+    if (slider && value !== undefined && value !== '') {
+        // Convert string values to numbers
+        var numericValue = parseFloat(value);
+        if (!isNaN(numericValue)) {
+            slider.value = numericValue;
+            updateVal(sliderId);
+        }
     }
 }
 function toggleCollapse(header) {
