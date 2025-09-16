@@ -135,6 +135,46 @@
             <div class="controls">
                 <h3>Parameters</h3>
                 
+                <div class="data-sources-section" style="margin-bottom: 20px;">
+                    <h4>Data Sources</h4>
+                    
+                    <div class="source-section" style="background: #e8f5e8; padding: 12px; border-radius: 8px; margin-bottom: 10px;">
+                        <h5 style="margin: 0 0 10px 0; color: #2d5016; font-size: 0.9rem;">Patient Data</h5>
+                        <div class="control-group" style="margin-bottom: 8px;">
+                            <label style="font-size: 0.8rem;">Patient Sheet ID:</label>
+                            <input type="text" id="patientSheetId" placeholder="Enter Google Sheet ID" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.8rem;">
+                        </div>
+                        <div class="control-group" style="margin-bottom: 8px;">
+                            <label style="font-size: 0.8rem;">Select Patient:</label>
+                            <select id="patientSelect" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.8rem;" onchange="loadPatientData()">
+                                <option value="">Select a patient...</option>
+                            </select>
+                        </div>
+                        <button onclick="loadPatientSheet()" style="background: #27ae60; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; width: 100%;">Load Patient Sheet</button>
+                    </div>
+                    
+                    <div class="source-section" style="background: #e3f2fd; padding: 12px; border-radius: 8px;">
+                        <h5 style="margin: 0 0 10px 0; color: #1565c0; font-size: 0.9rem;">Drug Data</h5>
+                        <div class="control-group" style="margin-bottom: 8px;">
+                            <label style="font-size: 0.8rem;">Drug Sheet ID:</label>
+                            <input type="text" id="drugSheetId" placeholder="Enter Google Sheet ID" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.8rem;">
+                        </div>
+                        <div class="control-group" style="margin-bottom: 4px;">
+                            <label style="font-size: 0.8rem;">Select Drug A:</label>
+                            <select id="drugASelect" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.8rem;" onchange="loadDrugData('A')">
+                                <option value="">Select drug A...</option>
+                            </select>
+                        </div>
+                        <div class="control-group" style="margin-bottom: 8px;">
+                            <label style="font-size: 0.8rem;">Select Drug B:</label>
+                            <select id="drugBSelect" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.8rem;" onchange="loadDrugData('B')">
+                                <option value="">Select drug B...</option>
+                            </select>
+                        </div>
+                        <button onclick="loadDrugSheet()" style="background: #3498db; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; width: 100%;">Load Drug Sheet</button>
+                    </div>
+                </div>
+                
                 <div class="drug-tabs">
                     <button class="drug-tab active" onclick="switchTab(1)">Drug A</button>
                     <button class="drug-tab" onclick="switchTab(2)">Drug B</button>
@@ -263,7 +303,12 @@
                                 <input type="range" id="halflife1" min="0.5" max="24" step="0.5" value="6.9" oninput="updateVal('halflife1'); runSim();">
                                 <div class="value" id="halflife1Val">6.9 hrs</div>
                             </div>
-                         </div>
+                            <div class="control-group">
+                                <label>Volume of Distribution (L/kg):</label>
+                                <input type="range" id="vd1" min="0.1" max="25" step="0.1" value="0.7" oninput="updateVal('vd1'); runSim();">
+                                <div class="value" id="vd1Val">0.7 L/kg</div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="target-section">
@@ -409,6 +454,11 @@
                                 <input type="range" id="halflife2" min="0.5" max="24" step="0.5" value="8.7" oninput="updateVal('halflife2'); runSim();">
                                 <div class="value" id="halflife2Val">8.7 hrs</div>
                             </div>
+                            <div class="control-group">
+                                <label>Volume of Distribution (L/kg):</label>
+                                <input type="range" id="vd2" min="0.1" max="25" step="0.1" value="0.8" oninput="updateVal('vd2'); runSim();">
+                                <div class="value" id="vd2Val">0.8 L/kg</div>
+                            </div>
                         </div>
                     </div>
 
@@ -549,6 +599,231 @@
     </div>
 
 <script>
+// Global variables for sheet data
+var patientData = [];
+var drugData = [];
+
+// Google Sheets API functions
+function loadPatientSheet() {
+    var sheetId = document.getElementById('patientSheetId').value.trim();
+    if (!sheetId) {
+        alert('Please enter a Patient Sheet ID');
+        return;
+    }
+    
+    var url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=Sheet1`;
+    
+    fetch(url)
+        .then(response => response.text())
+        .then(data => {
+            patientData = parseCSV(data);
+            populatePatientDropdown();
+        })
+        .catch(error => {
+            console.error('Error loading patient sheet:', error);
+            alert('Error loading patient sheet. Please check the Sheet ID and make sure the sheet is publicly accessible.');
+        });
+}
+
+function loadDrugSheet() {
+    var sheetId = document.getElementById('drugSheetId').value.trim();
+    if (!sheetId) {
+        alert('Please enter a Drug Sheet ID');
+        return;
+    }
+    
+    var url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=Sheet1`;
+    
+    fetch(url)
+        .then(response => response.text())
+        .then(data => {
+            drugData = parseCSV(data);
+            populateDrugDropdowns();
+        })
+        .catch(error => {
+            console.error('Error loading drug sheet:', error);
+            alert('Error loading drug sheet. Please check the Sheet ID and make sure the sheet is publicly accessible.');
+        });
+}
+
+function parseCSV(csvText) {
+    var lines = csvText.split('\n');
+    var headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
+    var data = [];
+    
+    for (var i = 1; i < lines.length; i++) {
+        if (lines[i].trim()) {
+            var values = lines[i].split(',').map(v => v.replace(/"/g, '').trim());
+            var row = {};
+            headers.forEach((header, index) => {
+                row[header] = values[index] || '';
+            });
+            data.push(row);
+        }
+    }
+    
+    return data;
+}
+
+function populatePatientDropdown() {
+    var select = document.getElementById('patientSelect');
+    select.innerHTML = '<option value="">Select a patient...</option>';
+    
+    patientData.forEach((patient, index) => {
+        var option = document.createElement('option');
+        option.value = index;
+        option.textContent = patient.Name || `Patient ${index + 1}`;
+        select.appendChild(option);
+    });
+}
+
+function populateDrugDropdowns() {
+    var selectA = document.getElementById('drugASelect');
+    var selectB = document.getElementById('drugBSelect');
+    
+    selectA.innerHTML = '<option value="">Select drug A...</option>';
+    selectB.innerHTML = '<option value="">Select drug B...</option>';
+    
+    drugData.forEach((drug, index) => {
+        var optionA = document.createElement('option');
+        optionA.value = index;
+        optionA.textContent = drug.Name || `Drug ${index + 1}`;
+        selectA.appendChild(optionA);
+        
+        var optionB = document.createElement('option');
+        optionB.value = index;
+        optionB.textContent = drug.Name || `Drug ${index + 1}`;
+        selectB.appendChild(optionB);
+    });
+}
+
+function loadPatientData() {
+    var patientIndex = document.getElementById('patientSelect').value;
+    if (patientIndex === '') return;
+    
+    var patient = patientData[patientIndex];
+    if (!patient) return;
+    
+    // Map patient data to UI controls
+    // Transit parameters
+    if (patient.StomachTransit) {
+        document.getElementById('stomachTransit1').value = patient.StomachTransit;
+        document.getElementById('stomachTransit2').value = patient.StomachTransit;
+        updateVal('stomachTransit1');
+        updateVal('stomachTransit2');
+    }
+    
+    if (patient.IntestineTransit) {
+        document.getElementById('intestineTransit1').value = patient.IntestineTransit;
+        document.getElementById('intestineTransit2').value = patient.IntestineTransit;
+        updateVal('intestineTransit1');
+        updateVal('intestineTransit2');
+    }
+    
+    // Absorption parameters
+    if (patient.StomachAbsorption) {
+        document.getElementById('stomachAbs1').value = patient.StomachAbsorption;
+        document.getElementById('stomachAbs2').value = patient.StomachAbsorption;
+        updateVal('stomachAbs1');
+        updateVal('stomachAbs2');
+    }
+    
+    if (patient.SmallIntestineAbsorption) {
+        document.getElementById('siAbs1').value = patient.SmallIntestineAbsorption;
+        document.getElementById('siAbs2').value = patient.SmallIntestineAbsorption;
+        updateVal('siAbs1');
+        updateVal('siAbs2');
+    }
+    
+    if (patient.LargeIntestineAbsorption) {
+        document.getElementById('liAbs1').value = patient.LargeIntestineAbsorption;
+        document.getElementById('liAbs2').value = patient.LargeIntestineAbsorption;
+        updateVal('liAbs1');
+        updateVal('liAbs2');
+    }
+    
+    // PD parameters
+    if (patient.BaselineEffect) {
+        document.getElementById('baseline').value = patient.BaselineEffect;
+        updateVal('baseline');
+    }
+    
+    if (patient.PDTargetEffect) {
+        document.getElementById('pdTargetEffect').value = patient.PDTargetEffect;
+        updateVal('pdTargetEffect');
+    }
+    
+    if (patient.PDTargetRange) {
+        document.getElementById('pdTargetRange').value = patient.PDTargetRange;
+        updateVal('pdTargetRange');
+    }
+    
+    runSim();
+}
+
+function loadDrugData(drugSlot) {
+    var selectId = drugSlot === 'A' ? 'drugASelect' : 'drugBSelect';
+    var drugIndex = document.getElementById(selectId).value;
+    if (drugIndex === '') return;
+    
+    var drug = drugData[drugIndex];
+    if (!drug) return;
+    
+    var drugNum = drugSlot === 'A' ? '1' : '2';
+    
+    // Map drug data to UI controls
+    if (drug.EC50) {
+        document.getElementById('ec50' + drugNum).value = drug.EC50;
+        updateVal('ec50' + drugNum);
+    }
+    
+    if (drug.Emax) {
+        document.getElementById('emax' + drugNum).value = drug.Emax;
+        updateVal('emax' + drugNum);
+    }
+    
+    if (drug.Bioavailability) {
+        document.getElementById('bioavailability' + drugNum).value = drug.Bioavailability;
+        updateVal('bioavailability' + drugNum);
+    }
+    
+    if (drug.HalfLife) {
+        document.getElementById('halflife' + drugNum).value = drug.HalfLife;
+        updateVal('halflife' + drugNum);
+    }
+    
+    if (drug.DissolutionRate) {
+        document.getElementById('dissolution' + drugNum).value = drug.DissolutionRate;
+        updateVal('dissolution' + drugNum);
+    }
+    
+    if (drug.DistributionToTissue) {
+        document.getElementById('distribution' + drugNum).value = drug.DistributionToTissue;
+        updateVal('distribution' + drugNum);
+    }
+    
+    if (drug.RedistributionFromTissue) {
+        document.getElementById('redistribution' + drugNum).value = drug.RedistributionFromTissue;
+        updateVal('redistribution' + drugNum);
+    }
+    
+    if (drug.GITargetEffect) {
+        document.getElementById('giTargetEffect' + drugNum).value = drug.GITargetEffect;
+        updateVal('giTargetEffect' + drugNum);
+    }
+    
+    if (drug.GITargetRange) {
+        document.getElementById('giTargetRange' + drugNum).value = drug.GITargetRange;
+        updateVal('giTargetRange' + drugNum);
+    }
+    
+    if (drug.VolumeOfDistribution) {
+        document.getElementById('vd' + drugNum).value = drug.VolumeOfDistribution;
+        updateVal('vd' + drugNum);
+    }
+    
+    runSim();
+}
 function toggleCollapse(header) {
     var content = header.nextElementSibling;
     var icon = header.querySelector('.collapse-icon');
@@ -1210,4 +1485,4 @@ window.onload = function() {
 };
 </script>
 </body>
-</html>                   
+</html>                 
