@@ -914,17 +914,21 @@ function updateDissolutionVal(id) {
 // Function to populate dose dropdowns from drug data
 function populateDoseDropdowns() {
     if (!drugData.length) return;
+
+      // Debug: Check what data we have
+    console.log('Drug data:', drugData);
+    console.log('First drug columns:', Object.keys(drugData[0] || {}));
     
     var doses = new Set();
     
-    // Look for dose columns in the format "25mg", "50mg", etc.
+    // Look for dose columns in the format "25", "50", etc.
     var doseColumns = ['25', '50', '75', '100', '150', '200', '300', '400', '500'];
     
     drugData.forEach(function(drug) {
         doseColumns.forEach(function(doseCol) {
             if (drug[doseCol] && drug[doseCol].toLowerCase() === 'yes') {
-                // Extract the numeric value from the column name (e.g., "25mg" -> 25)
-                var doseValue = parseFloat(doseCol.replace('mg', ''));
+                // The column name is already the numeric value
+                var doseValue = parseFloat(doseCol);
                 if (!isNaN(doseValue)) {
                     doses.add(doseValue);
                 }
@@ -1019,12 +1023,12 @@ function populateDrugSpecificOptions(drugIndex, drugSlot) {
         var currentDoseValue = doseSelect.value;
         doseSelect.innerHTML = '';
         
-        var doseColumns = ['25mg', '50mg', '75mg', '100mg', '150mg', '200mg', '300mg', '400mg', '500mg'];
+       var doseColumns = ['25', '50', '75', '100', '150', '200', '300', '400', '500'];
         var availableDoses = [];
         
         doseColumns.forEach(function(doseCol) {
             if (drug[doseCol] && drug[doseCol].toLowerCase() === 'yes') {
-                var doseValue = parseFloat(doseCol.replace('mg', ''));
+                var doseValue = parseFloat(doseCol);
                 if (!isNaN(doseValue)) {
                     availableDoses.push(doseValue);
                 }
