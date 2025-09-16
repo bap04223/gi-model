@@ -913,47 +913,56 @@ function updateDissolutionVal(id) {
 
 // Function to populate dose dropdowns from drug data
 function populateDoseDropdowns() {
-    if (!drugData.length) return;
-
-      // Debug: Check what data we have
-    console.log('Drug data:', drugData);
-    console.log('First drug columns:', Object.keys(drugData[0] || {}));
+    if (!drugData.length) {
+        console.log('No drug data available');
+        return;
+    }
+    
+    console.log('Populating dose dropdowns, drug data length:', drugData.length);
     
     var doses = new Set();
-    
-    // Look for dose columns in the format "25", "50", etc.
     var doseColumns = ['25', '50', '75', '100', '150', '200', '300', '400', '500'];
     
-    drugData.forEach(function(drug) {
+    drugData.forEach(function(drug, index) {
+        console.log('Processing drug', index, ':', Object.keys(drug));
         doseColumns.forEach(function(doseCol) {
-            if (drug[doseCol] && drug[doseCol].toLowerCase() === 'yes') {
-                // The column name is already the numeric value
-                var doseValue = parseFloat(doseCol);
-                if (!isNaN(doseValue)) {
-                    doses.add(doseValue);
+            if (drug[doseCol]) {
+                console.log('Found dose column', doseCol, 'with value:', drug[doseCol]);
+                if (drug[doseCol].toLowerCase() === 'yes') {
+                    var doseValue = parseFloat(doseCol);
+                    if (!isNaN(doseValue)) {
+                        doses.add(doseValue);
+                        console.log('Added dose:', doseValue);
+                    }
                 }
             }
         });
     });
     
-    // Convert to sorted array
+    console.log('All available doses:', Array.from(doses));
+    
     var sortedDoses = Array.from(doses).sort(function(a, b) { return a - b; });
     
-    // Update both dropdowns
     ['dose1', 'dose2'].forEach(function(selectId) {
         var select = document.getElementById(selectId);
         if (select) {
             var currentValue = select.value;
             select.innerHTML = '';
             
-            sortedDoses.forEach(function(dose) {
+            if (sortedDoses.length === 0) {
                 var option = document.createElement('option');
-                option.value = dose;
-                option.textContent = dose + ' mg';
+                option.value = "50";
+                option.textContent = "50 mg (default)";
                 select.appendChild(option);
-            });
+            } else {
+                sortedDoses.forEach(function(dose) {
+                    var option = document.createElement('option');
+                    option.value = dose;
+                    option.textContent = dose + ' mg';
+                    select.appendChild(option);
+                });
+            }
             
-            // Restore previous value if it exists, otherwise use first option
             if (sortedDoses.includes(parseFloat(currentValue))) {
                 select.value = currentValue;
             } else if (sortedDoses.length > 0) {
@@ -1017,13 +1026,15 @@ function populateDrugSpecificOptions(drugIndex, drugSlot) {
     var drug = drugData[drugIndex];
     var drugNum = drugSlot === 'A' ? '1' : '2';
     
+    console.log('Populating options for drug:', drug);
+    
     // Populate drug-specific doses
     var doseSelect = document.getElementById('dose' + drugNum);
     if (doseSelect) {
         var currentDoseValue = doseSelect.value;
         doseSelect.innerHTML = '';
         
-       var doseColumns = ['25', '50', '75', '100', '150', '200', '300', '400', '500'];
+        var doseColumns = ['25', '50', '75', '100', '150', '200', '300', '400', '500'];
         var availableDoses = [];
         
         doseColumns.forEach(function(doseCol) {
@@ -1035,16 +1046,24 @@ function populateDrugSpecificOptions(drugIndex, drugSlot) {
             }
         });
         
+        console.log('Available doses for this drug:', availableDoses);
+        
         availableDoses.sort(function(a, b) { return a - b; });
         
-        availableDoses.forEach(function(dose) {
+        if (availableDoses.length === 0) {
             var option = document.createElement('option');
-            option.value = dose;
-            option.textContent = dose + ' mg';
+            option.value = "50";
+            option.textContent = "50 mg (default)";
             doseSelect.appendChild(option);
-        });
+        } else {
+            availableDoses.forEach(function(dose) {
+                var option = document.createElement('option');
+                option.value = dose;
+                option.textContent = dose + ' mg';
+                doseSelect.appendChild(option);
+            });
+        }
         
-        // Set to current value if available, otherwise first option
         if (availableDoses.includes(parseFloat(currentDoseValue))) {
             doseSelect.value = currentDoseValue;
         } else if (availableDoses.length > 0) {
@@ -1059,7 +1078,6 @@ function populateDrugSpecificOptions(drugIndex, drugSlot) {
     if (dissolutionSelect && drug['Dissolution Rate']) {
         var dissolutionRate = parseFloat(drug['Dissolution Rate']);
         if (!isNaN(dissolutionRate)) {
-            // Clear and add only this drug's dissolution rate
             dissolutionSelect.innerHTML = '';
             var option = document.createElement('option');
             option.value = dissolutionRate;
