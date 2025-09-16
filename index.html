@@ -795,6 +795,9 @@ function loadDrugData(drugSlot) {
     if (!drug) return;
     
     var drugNum = drugSlot === 'A' ? '1' : '2';
+
+    // Populate drug-specific dose and dissolution options
+    populateDrugSpecificOptions(drugIndex, drugSlot);
     
     // Map drug data to UI controls with proper value updates
     // Use exact field names from the Google Sheet
@@ -913,17 +916,20 @@ function populateDoseDropdowns() {
     if (!drugData.length) return;
     
     var doses = new Set();
+    
+    // Look for dose columns in the format "25mg", "50mg", etc.
+    var doseColumns = ['25', '50', '75', '100', '150', '200', '300', '400', '500'];
+    
     drugData.forEach(function(drug) {
-        if (drug['Available Doses']) {
-            // Split comma-separated doses and add to set
-            var drugDoses = drug['Available Doses'].split(',');
-            drugDoses.forEach(function(dose) {
-                var cleanDose = dose.trim();
-                if (cleanDose && !isNaN(parseFloat(cleanDose))) {
-                    doses.add(parseFloat(cleanDose));
+        doseColumns.forEach(function(doseCol) {
+            if (drug[doseCol] && drug[doseCol].toLowerCase() === 'yes') {
+                // Extract the numeric value from the column name (e.g., "25mg" -> 25)
+                var doseValue = parseFloat(doseCol.replace('mg', ''));
+                if (!isNaN(doseValue)) {
+                    doses.add(doseValue);
                 }
-            });
-        }
+            }
+        });
     });
     
     // Convert to sorted array
@@ -961,15 +967,11 @@ function populateDissolutionDropdowns() {
     
     var rates = new Set();
     drugData.forEach(function(drug) {
-        if (drug['Available Dissolution Rates']) {
-            // Split comma-separated rates and add to set
-            var drugRates = drug['Available Dissolution Rates'].split(',');
-            drugRates.forEach(function(rate) {
-                var cleanRate = rate.trim();
-                if (cleanRate && !isNaN(parseFloat(cleanRate))) {
-                    rates.add(parseFloat(cleanRate));
-                }
-            });
+        if (drug['Dissolution Rate']) {
+            var rate = parseFloat(drug['Dissolution Rate']);
+            if (!isNaN(rate)) {
+                rates.add(rate);
+            }
         }
     });
     
@@ -1001,6 +1003,72 @@ function populateDissolutionDropdowns() {
         }
     });
 }
+
+
+
+// Function to populate drug-specific dose and dissolution options when a drug is selected
+function populateDrugSpecificOptions(drugIndex, drugSlot) {
+    if (!drugData[drugIndex]) return;
+    
+    var drug = drugData[drugIndex];
+    var drugNum = drugSlot === 'A' ? '1' : '2';
+    
+    // Populate drug-specific doses
+    var doseSelect = document.getElementById('dose' + drugNum);
+    if (doseSelect) {
+        var currentDoseValue = doseSelect.value;
+        doseSelect.innerHTML = '';
+        
+        var doseColumns = ['25mg', '50mg', '75mg', '100mg', '150mg', '200mg', '300mg', '400mg', '500mg'];
+        var availableDoses = [];
+        
+        doseColumns.forEach(function(doseCol) {
+            if (drug[doseCol] && drug[doseCol].toLowerCase() === 'yes') {
+                var doseValue = parseFloat(doseCol.replace('mg', ''));
+                if (!isNaN(doseValue)) {
+                    availableDoses.push(doseValue);
+                }
+            }
+        });
+        
+        availableDoses.sort(function(a, b) { return a - b; });
+        
+        availableDoses.forEach(function(dose) {
+            var option = document.createElement('option');
+            option.value = dose;
+            option.textContent = dose + ' mg';
+            doseSelect.appendChild(option);
+        });
+        
+        // Set to current value if available, otherwise first option
+        if (availableDoses.includes(parseFloat(currentDoseValue))) {
+            doseSelect.value = currentDoseValue;
+        } else if (availableDoses.length > 0) {
+            doseSelect.value = availableDoses[0];
+        }
+        
+        updateDoseVal('dose' + drugNum);
+    }
+    
+    // Set dissolution rate for this specific drug
+    var dissolutionSelect = document.getElementById('dissolution' + drugNum);
+    if (dissolutionSelect && drug['Dissolution Rate']) {
+        var dissolutionRate = parseFloat(drug['Dissolution Rate']);
+        if (!isNaN(dissolutionRate)) {
+            // Clear and add only this drug's dissolution rate
+            dissolutionSelect.innerHTML = '';
+            var option = document.createElement('option');
+            option.value = dissolutionRate;
+            option.textContent = dissolutionRate;
+            dissolutionSelect.appendChild(option);
+            dissolutionSelect.value = dissolutionRate;
+            updateDissolutionVal('dissolution' + drugNum);
+        }
+    }
+}
+
+
+    
 
     
 function toggleCollapse(header) {
