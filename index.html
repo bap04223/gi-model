@@ -796,6 +796,10 @@ function loadDrugData(drugSlot) {
     
     var drugNum = drugSlot === 'A' ? '1' : '2';
 
+        // DEBUG: Log the drug data
+    console.log('Loading drug data for slot', drugSlot, ':', drug);
+    console.log('Drug columns:', Object.keys(drug));
+
     // Populate drug-specific dose and dissolution options
     populateDrugSpecificOptions(drugIndex, drugSlot);
     
@@ -815,10 +819,6 @@ function loadDrugData(drugSlot) {
     
     if (drug['Half-life (hrs)']) {
         setSliderValue('halflife' + drugNum, drug['Half-life (hrs)']);
-    }
-    
-    if (drug['Dissolution Rate']) {
-        setSliderValue('dissolution' + drugNum, drug['Dissolution Rate']);
     }
     
     if (drug['Distribution to Tissue']) {
@@ -1020,6 +1020,7 @@ function populateDissolutionDropdowns() {
 
 
 // Function to populate drug-specific dose and dissolution options when a drug is selected
+// Function to populate drug-specific dose and dissolution options when a drug is selected
 function populateDrugSpecificOptions(drugIndex, drugSlot) {
     if (!drugData[drugIndex]) return;
     
@@ -1051,10 +1052,15 @@ function populateDrugSpecificOptions(drugIndex, drugSlot) {
         availableDoses.sort(function(a, b) { return a - b; });
         
         if (availableDoses.length === 0) {
-            var option = document.createElement('option');
-            option.value = "50";
-            option.textContent = "50 mg (default)";
-            doseSelect.appendChild(option);
+            // If no specific doses found, use all available doses
+            var allDoses = [25, 50, 75, 100, 150, 200, 300, 400, 500];
+            allDoses.forEach(function(dose) {
+                var option = document.createElement('option');
+                option.value = dose;
+                option.textContent = dose + ' mg';
+                doseSelect.appendChild(option);
+            });
+            doseSelect.value = 50; // Default value
         } else {
             availableDoses.forEach(function(dose) {
                 var option = document.createElement('option');
@@ -1062,12 +1068,7 @@ function populateDrugSpecificOptions(drugIndex, drugSlot) {
                 option.textContent = dose + ' mg';
                 doseSelect.appendChild(option);
             });
-        }
-        
-        if (availableDoses.includes(parseFloat(currentDoseValue))) {
-            doseSelect.value = currentDoseValue;
-        } else if (availableDoses.length > 0) {
-            doseSelect.value = availableDoses[0];
+            doseSelect.value = availableDoses[0]; // Set to first available dose
         }
         
         updateDoseVal('dose' + drugNum);
@@ -1086,6 +1087,9 @@ function populateDrugSpecificOptions(drugIndex, drugSlot) {
             dissolutionSelect.value = dissolutionRate;
             updateDissolutionVal('dissolution' + drugNum);
         }
+    } else {
+        // If no dissolution rate found, populate with all available rates
+        populateDissolutionDropdowns();
     }
 }
 
