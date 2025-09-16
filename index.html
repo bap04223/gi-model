@@ -192,8 +192,10 @@
                         </h4>
                         <div class="collapsible-content">
                             <div class="control-group">
-                                <label>Dose (mg):</label>
-                                <input type="range" id="dose1" min="0" max="500" value="50" oninput="updateVal('dose1'); runSim();">
+                                <label>Available Doses:</label>
+                                <select id="dose1" onchange="updateDoseVal('dose1'); runSim();" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ddd; margin-bottom: 5px;">
+                                    <option value="50">50 mg</option>
+                                </select>
                                 <div class="value" id="dose1Val">50 mg</div>
                             </div>
                             <div class="control-group">
@@ -212,8 +214,10 @@
                                 <div class="value" id="numDoses1Val">1</div>
                             </div>
                             <div class="control-group">
-                                <label>Dissolution Rate:</label>
-                                <input type="range" id="dissolution1" min="0" max="10" step="0.01" value="0.1" oninput="updateVal('dissolution1'); runSim();">
+                                <label>Available Dissolution Rates:</label>
+                                <select id="dissolution1" onchange="updateDissolutionVal('dissolution1'); runSim();" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ddd; margin-bottom: 5px;">
+                                    <option value="0.1">0.1</option>
+                                </select>
                                 <div class="value" id="dissolution1Val">0.1</div>
                             </div>
                         </div>
@@ -343,8 +347,10 @@
                         </h4>
                         <div class="collapsible-content">
                             <div class="control-group">
-                                <label>Dose (mg):</label>
-                                <input type="range" id="dose2" min="0" max="500" value="75" oninput="updateVal('dose2'); runSim();">
+                                <label>Available Doses:</label>
+                                <select id="dose2" onchange="updateDoseVal('dose2'); runSim();" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ddd; margin-bottom: 5px;">
+                                    <option value="75">75 mg</option>
+                                </select>
                                 <div class="value" id="dose2Val">75 mg</div>
                             </div>
                             <div class="control-group">
@@ -363,8 +369,10 @@
                                 <div class="value" id="numDoses2Val">1</div>
                             </div>
                             <div class="control-group">
-                                <label>Dissolution Rate:</label>
-                                <input type="range" id="dissolution2" min="0" max="10" step="0.01" value="0.15" oninput="updateVal('dissolution2'); runSim();">
+                                <label>Available Dissolution Rates:</label>
+                                <select id="dissolution2" onchange="updateDissolutionVal('dissolution2'); runSim();" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ddd; margin-bottom: 5px;">
+                                    <option value="0.15">0.15</option>
+                                </select>
                                 <div class="value" id="dissolution2Val">0.15</div>
                             </div>
                         </div>
@@ -704,6 +712,10 @@ function populateDrugDropdowns() {
         optionB.textContent = drugName;
         selectB.appendChild(optionB);
     });
+    
+    // Populate dose and dissolution rate dropdowns
+    populateDoseDropdowns();
+    populateDissolutionDropdowns();
 }
 
 function loadPatientData() {
@@ -858,16 +870,139 @@ function loadDrugData(drugSlot) {
 
 // Helper function to set slider value and update display
 function setSliderValue(sliderId, value) {
-    var slider = document.getElementById(sliderId);
-    if (slider && value !== undefined && value !== '') {
+    var element = document.getElementById(sliderId);
+    if (element && value !== undefined && value !== '') {
         // Convert string values to numbers
         var numericValue = parseFloat(value);
         if (!isNaN(numericValue)) {
-            slider.value = numericValue;
-            updateVal(sliderId);
+            element.value = numericValue;
+            
+            // Handle different element types
+            if (sliderId.includes('dose')) {
+                updateDoseVal(sliderId);
+            } else if (sliderId.includes('dissolution')) {
+                updateDissolutionVal(sliderId);
+            } else {
+                updateVal(sliderId);
+            }
         }
     }
 }
+
+
+// Function to update dose dropdown display values
+function updateDoseVal(id) {
+    var el = document.getElementById(id);
+    var val = document.getElementById(id + 'Val');
+    if (el && val) {
+        val.textContent = el.value + ' mg';
+    }
+}
+
+// Function to update dissolution rate dropdown display values
+function updateDissolutionVal(id) {
+    var el = document.getElementById(id);
+    var val = document.getElementById(id + 'Val');
+    if (el && val) {
+        val.textContent = el.value;
+    }
+}
+
+// Function to populate dose dropdowns from drug data
+function populateDoseDropdowns() {
+    if (!drugData.length) return;
+    
+    var doses = new Set();
+    drugData.forEach(function(drug) {
+        if (drug['Available Doses']) {
+            // Split comma-separated doses and add to set
+            var drugDoses = drug['Available Doses'].split(',');
+            drugDoses.forEach(function(dose) {
+                var cleanDose = dose.trim();
+                if (cleanDose && !isNaN(parseFloat(cleanDose))) {
+                    doses.add(parseFloat(cleanDose));
+                }
+            });
+        }
+    });
+    
+    // Convert to sorted array
+    var sortedDoses = Array.from(doses).sort(function(a, b) { return a - b; });
+    
+    // Update both dropdowns
+    ['dose1', 'dose2'].forEach(function(selectId) {
+        var select = document.getElementById(selectId);
+        if (select) {
+            var currentValue = select.value;
+            select.innerHTML = '';
+            
+            sortedDoses.forEach(function(dose) {
+                var option = document.createElement('option');
+                option.value = dose;
+                option.textContent = dose + ' mg';
+                select.appendChild(option);
+            });
+            
+            // Restore previous value if it exists, otherwise use first option
+            if (sortedDoses.includes(parseFloat(currentValue))) {
+                select.value = currentValue;
+            } else if (sortedDoses.length > 0) {
+                select.value = sortedDoses[0];
+            }
+            
+            updateDoseVal(selectId);
+        }
+    });
+}
+
+// Function to populate dissolution rate dropdowns from drug data
+function populateDissolutionDropdowns() {
+    if (!drugData.length) return;
+    
+    var rates = new Set();
+    drugData.forEach(function(drug) {
+        if (drug['Available Dissolution Rates']) {
+            // Split comma-separated rates and add to set
+            var drugRates = drug['Available Dissolution Rates'].split(',');
+            drugRates.forEach(function(rate) {
+                var cleanRate = rate.trim();
+                if (cleanRate && !isNaN(parseFloat(cleanRate))) {
+                    rates.add(parseFloat(cleanRate));
+                }
+            });
+        }
+    });
+    
+    // Convert to sorted array
+    var sortedRates = Array.from(rates).sort(function(a, b) { return a - b; });
+    
+    // Update both dropdowns
+    ['dissolution1', 'dissolution2'].forEach(function(selectId) {
+        var select = document.getElementById(selectId);
+        if (select) {
+            var currentValue = select.value;
+            select.innerHTML = '';
+            
+            sortedRates.forEach(function(rate) {
+                var option = document.createElement('option');
+                option.value = rate;
+                option.textContent = rate;
+                select.appendChild(option);
+            });
+            
+            // Restore previous value if it exists, otherwise use first option
+            if (sortedRates.includes(parseFloat(currentValue))) {
+                select.value = currentValue;
+            } else if (sortedRates.length > 0) {
+                select.value = sortedRates[0];
+            }
+            
+            updateDissolutionVal(selectId);
+        }
+    });
+}
+
+    
 function toggleCollapse(header) {
     var content = header.nextElementSibling;
     var icon = header.querySelector('.collapse-icon');
@@ -1505,8 +1640,8 @@ function runSim() {
 }
 
 window.onload = function() {
-    var controls = ['dose1', 'dose2', 'adminTime1', 'adminTime2', 'interval1', 'interval2', 
-                   'numDoses1', 'numDoses2', 'dissolution1', 'dissolution2',
+    var controls = ['adminTime1', 'adminTime2', 'interval1', 'interval2', 
+                   'numDoses1', 'numDoses2',
                    'stomachAbs1', 'stomachAbs2', 'siAbs1', 'siAbs2', 'liAbs1', 'liAbs2',
                    'wasteElim1', 'wasteElim2',
                    'stomachTransit1', 'stomachTransit2', 'intestineTransit1', 'intestineTransit2',
