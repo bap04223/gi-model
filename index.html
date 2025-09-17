@@ -1951,15 +1951,33 @@ var doses = dosesStr.toString()
     .map(d => d.trim())
     .filter(d => d && d !== '');
 
-// Clean and parse dissolution rates  
-var dissolutions = dissolutionStr.toString()
-    .replace(/"/g, '')  // Remove any quotes
-    .split(',')
-    .map(d => d.trim())
-    .filter(d => d && d !== '');
+// Clean and parse dissolution rates with enhanced logic
+var dissolutions;
+if (dissolutionStr.includes(',')) {
+    dissolutions = dissolutionStr.toString()
+        .replace(/"/g, '')
+        .split(',')
+        .map(d => d.trim())
+        .filter(d => d && d !== '');
+} else {
+    // Generate multiple dissolution options from single base value
+    var baseDissolution = parseFloat(dissolutionStr);
+    if (!isNaN(baseDissolution)) {
+        dissolutions = [
+            (baseDissolution * 0.5).toFixed(2),
+            baseDissolution.toString(),
+            (baseDissolution * 1.5).toFixed(2),
+            (baseDissolution * 2).toFixed(2)
+        ];
+    } else {
+        dissolutions = [dissolutionStr];
+    }
+}
 
 // Debug output to console
 console.log('Drug:', drug['Drug Name'] || 'Unknown');
+console.log('Available columns:', Object.keys(drug));
+console.log('Dissolution Rate field:', drug['Dissolution Rate']);
 console.log('Raw doses string:', dosesStr);
 console.log('Parsed doses:', doses);
 console.log('Raw dissolution string:', dissolutionStr);
