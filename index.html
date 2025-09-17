@@ -909,13 +909,14 @@
                 <thead>
                     <tr>
                         <th>Drug Name</th>
-                        <th>EC50 (nM)</th>
-                        <th>Emax</th>
-                        <th>Half-life (hrs)</th>
-                        <th>Bioavailability</th>
-                        <th>Dose (mg)</th>
-                        <th>Dissolution Rate</th>
-                        <th>Action</th>
+<th>EC50 (nM)</th>
+<th>Emax</th>
+<th>Half-life (hrs)</th>
+<th>Bioavailability</th>
+<th>Volume of Distribution (L/kg)</th>
+<th>Dose (mg)</th>
+<th>Dissolution Rate</th>
+<th>Action</th>
                     </tr>
                 </thead>
                 <tbody id="drugTableBody">
@@ -1941,7 +1942,7 @@ function populateDrugTable() {
     tbody.innerHTML = '';
     
     if (drugData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px;">No drug data loaded. Please load the drug sheet first.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px;">No drug data loaded. Please load the drug sheet first.</td></tr>';
         return;
     }
     
@@ -1950,10 +1951,11 @@ function populateDrugTable() {
         
         // Extract values from your sheet structure
         var drugName = drug['Drug Name'] || drug['Name'] || Object.values(drug)[0] || `Drug ${index + 1}`;
-        var ec50 = drug['EC50 (nM)'] || drug['EC50'] || 'N/A';
-        var emax = drug['Emax'] || 'N/A';
-        var halflife = drug['Half-life (hrs)'] || drug['Half-life'] || 'N/A';
-        var bioavailability = drug['Bioavailability'] || 'N/A';
+      var ec50 = drug['EC50 (nM)'] || drug['EC50'] || 'N/A';
+var emax = drug['Emax'] || 'N/A';
+var halflife = drug['Half-life (hrs)'] || drug['Half-life'] || 'N/A';
+var bioavailability = drug['Bioavailability'] || 'N/A';
+var volumeOfDistribution = drug['Volume of Distribution (L/kg)'] || drug['Volume of Distribution'] || 'N/A';
         // Parse comma-separated values with better handling
 var dosesStr = drug['Dose (mg)'] || '50';
 var dissolutionStr = drug['Dissolution Rate'] || '0.1';
@@ -1982,19 +1984,20 @@ console.log('Raw dissolution string:', dissolutionStr);
 console.log('Parsed dissolutions:', dissolutions);
         
         row.innerHTML = `
-            <td style="font-weight: bold;">${drugName}</td>
-            <td>${ec50}</td>
-            <td>${emax}</td>
-            <td>${halflife}</td>
-            <td>${bioavailability}</td>
-            <td class="values-list">${doses.join(', ')}</td>
-            <td class="values-list">${dissolutions.join(', ')}</td>
-            <td>
-                <button class="select-drug-btn" onclick="openDrugConfig(${index})">
-                    Configure
-                </button>
-            </td>
-        `;
+    <td style="font-weight: bold;">${drugName}</td>
+    <td>${ec50}</td>
+    <td>${emax}</td>
+    <td>${halflife}</td>
+    <td>${bioavailability}</td>
+    <td>${volumeOfDistribution}</td>
+    <td class="values-list">${doses.join(', ')}</td>
+    <td class="values-list">${dissolutions.join(', ')}</td>
+    <td>
+        <button class="select-drug-btn" onclick="openDrugConfig(${index})">
+            Configure
+        </button>
+    </td>
+`;
         
         tbody.appendChild(row);
     });
