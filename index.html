@@ -450,6 +450,67 @@
         gap: 20px;
     }
 }     
+
+
+/* Scenario modal styles */
+.scenario-modal {
+    position: fixed;
+    z-index: 1001;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    backdrop-filter: blur(5px);
+}
+
+.scenario-modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 0;
+    border-radius: 15px;
+    width: 85%;
+    max-width: 800px;
+    max-height: 75vh;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.scenario-modal-header {
+    background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c8 100%);
+    color: #2d5016;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #27ae60;
+}
+
+.scenario-modal-header h3 {
+    margin: 0;
+    font-size: 1.3rem;
+}
+
+.scenario-modal-body {
+    padding: 25px;
+    max-height: 55vh;
+    overflow-y: auto;
+    line-height: 1.6;
+}
+
+.scenario-content {
+    font-size: 1rem;
+    color: #333;
+    white-space: pre-wrap;
+}
+
+.scenario-loading {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+    font-style: italic;
+}
+        
         
     </style>
 </head>
@@ -479,7 +540,12 @@
                                 <option value="">Select a patient...</option>
                             </select>
                         </div>
+                        <div class="control-group" style="margin-bottom: 8px;">
+    <label style="font-size: 0.8rem;">Scenario Document URL:</label>
+    <input type="text" id="scenarioUrl" placeholder="Google Doc URL will auto-populate" style="width: calc(100% - 12px); padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.8rem; box-sizing: border-box;" readonly>
+</div>
     <button id="loadPatientBtn" onclick="loadPatientSheet()" class="load-button not-loaded" style="color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; width: calc(100% - 12px); box-sizing: border-box;">Load Patient Sheet</button>
+                        <button id="scenarioBtn" onclick="openScenarioModal()" style="background: #f39c12; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; width: calc(100% - 12px); box-sizing: border-box; margin-top: 8px;" disabled>View Scenario </button>
                     </div>
                     
                     <div class="source-section" style="background: #e3f2fd; padding: 12px; border-radius: 8px;">
@@ -983,6 +1049,24 @@
     </div>
 </div>
 
+
+<!-- Scenario Description Modal -->
+<div id="scenarioModal" class="scenario-modal" style="display: none;">
+    <div class="scenario-modal-content">
+        <div class="scenario-modal-header">
+            <h3 id="scenarioModalTitle">Scenario Description</h3>
+            <span class="close" onclick="closeScenarioModal()">&times;</span>
+        </div>
+        <div class="scenario-modal-body">
+            <div id="scenarioContent" class="scenario-content">
+                <div class="scenario-loading">Loading scenario description...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    
 <script>
 // Global variables for sheet data
 var patientData = [];
@@ -1203,6 +1287,20 @@ function loadPatientData() {
     
     if (patient['PD Target Range']) {
         setSliderValue('pdTargetRange', patient['PD Target Range']);
+    }
+    
+    // Load scenario URL if available
+    var scenarioUrl = patient['Scenario URL'] || patient['Scenario Document'] || '';
+    document.getElementById('scenarioUrl').value = scenarioUrl;
+    
+    // Enable/disable scenario button based on URL availability
+    var scenarioBtn = document.getElementById('scenarioBtn');
+    if (scenarioUrl) {
+        scenarioBtn.disabled = false;
+        scenarioBtn.style.opacity = '1';
+    } else {
+        scenarioBtn.disabled = true;
+        scenarioBtn.style.opacity = '0.5';
     }
     
     runSim();
@@ -2142,13 +2240,16 @@ function loadDrugParameters(drug, drugNum) {
 window.onclick = function(event) {
     var drugModal = document.getElementById('drugModal');
     var configModal = document.getElementById('drugConfigModal');
+    var scenarioModal = document.getElementById('scenarioModal');
     
     if (event.target == drugModal) {
         closeDrugModal();
     } else if (event.target == configModal) {
         closeDrugConfigModal();
+    } else if (event.target == scenarioModal) {
+        closeScenarioModal();
     }
-}   
+}  
 
     function openDrugConfig(drugIndex) {
     currentDrugIndex = drugIndex;
@@ -2253,7 +2354,69 @@ function closeDrugConfigModal() {
     // Show the drug list modal again
     document.getElementById('drugModal').style.display = 'block';
 }
+
+// Scenario modal functions
+function openScenarioModal() {
+    var scenarioUrl = document.getElementById('scenarioUrl').value;
+    if (!scenarioUrl) {
+        alert('No scenario document URL available for this patient.');
+        return;
+    }
     
+    document.getElementById('scenarioModal').style.display = 'block';
+    loadScenarioContent(scenarioUrl);
+}
+
+function closeScenarioModal() {
+    document.getElementById('scenarioModal').style.display = 'none';
+}
+
+function loadScenarioContent(url) {
+    var contentDiv = document.getElementById('scenarioContent');
+    contentDiv.innerHTML = '<div class="scenario-loading">Loading scenario description...</div>';
+    
+    // Convert Google Doc sharing URL to plain text export URL
+    var docId = extractGoogleDocId(url);
+    if (!docId) {
+        contentDiv.innerHTML = '<div style="color: #e74c3c; text-align: center;">Invalid Google Doc URL format.</div>';
+        return;
+    }
+    
+    var exportUrl = `https://docs.google.com/document/d/${docId}/export?format=txt`;
+    
+    fetch(exportUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to load document');
+            }
+            return response.text();
+        })
+        .then(text => {
+            contentDiv.textContent = text || 'No content available in this document.';
+        })
+        .catch(error => {
+            console.error('Error loading scenario:', error);
+            contentDiv.innerHTML = '<div style="color: #e74c3c; text-align: center;">Error loading scenario description. Please check that the document is publicly accessible.</div>';
+        });
+}
+
+function extractGoogleDocId(url) {
+    // Extract document ID from various Google Doc URL formats
+    var patterns = [
+        /\/document\/d\/([a-zA-Z0-9-_]+)/,
+        /id=([a-zA-Z0-9-_]+)/,
+        /^([a-zA-Z0-9-_]+)$/
+    ];
+    
+    for (var i = 0; i < patterns.length; i++) {
+        var match = url.match(patterns[i]);
+        if (match) {
+            return match[1];
+        }
+    }
+    
+    return null;
+}    
     
 </script>
 </body>
