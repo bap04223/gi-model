@@ -540,10 +540,9 @@
                                 <option value="">Select a patient...</option>
                             </select>
                         </div>
-                        <div class="control-group" style="margin-bottom: 8px;">
-    <label style="font-size: 0.8rem;">Scenario Document URL:</label>
-    <input type="text" id="scenarioUrl" placeholder="Google Doc URL will auto-populate" style="width: calc(100% - 12px); padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.8rem; box-sizing: border-box;" readonly>
-</div>
+                        <!-- Hidden field to store scenario URL -->
+<input type="hidden" id="scenarioUrl">
+                        
     <button id="loadPatientBtn" onclick="loadPatientSheet()" class="load-button not-loaded" style="color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; width: calc(100% - 12px); box-sizing: border-box;">Load Patient Sheet</button>
                         <button id="scenarioBtn" onclick="openScenarioModal()" style="background: #f39c12; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; width: calc(100% - 12px); box-sizing: border-box; margin-top: 8px;" disabled>View Scenario </button>
                     </div>
