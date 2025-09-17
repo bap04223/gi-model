@@ -1928,13 +1928,30 @@ function populateDrugTable() {
         var emax = drug['Emax'] || 'N/A';
         var halflife = drug['Half-life (hrs)'] || drug['Half-life'] || 'N/A';
         var bioavailability = drug['Bioavailability'] || 'N/A';
-        
-// Parse comma-separated values
+        // Parse comma-separated values with better handling
 var dosesStr = drug['Dose (mg)'] || '50';
 var dissolutionStr = drug['Dissolution Rate'] || '0.1';
-        
-        var doses = dosesStr.toString().split(',').map(d => d.trim()).filter(d => d);
-        var dissolutions = dissolutionStr.toString().split(',').map(d => d.trim()).filter(d => d);
+
+// Clean and parse doses
+var doses = dosesStr.toString()
+    .replace(/"/g, '')  // Remove any quotes
+    .split(',')
+    .map(d => d.trim())
+    .filter(d => d && d !== '');
+
+// Clean and parse dissolution rates  
+var dissolutions = dissolutionStr.toString()
+    .replace(/"/g, '')  // Remove any quotes
+    .split(',')
+    .map(d => d.trim())
+    .filter(d => d && d !== '');
+
+// Debug output to console
+console.log('Drug:', drug['Drug Name'] || 'Unknown');
+console.log('Raw doses string:', dosesStr);
+console.log('Parsed doses:', doses);
+console.log('Raw dissolution string:', dissolutionStr);
+console.log('Parsed dissolutions:', dissolutions);
         
         row.innerHTML = `
             <td style="font-weight: bold;">${drugName}</td>
