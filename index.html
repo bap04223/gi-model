@@ -1004,10 +1004,10 @@ function loadDrugSheet() {
     
     fetch(url)
         .then(response => response.text())
-        .then(data => {
-            drugData = parseCSV(data);
-            populateDrugDropdowns();
-        })
+       .then(data => {
+    drugData = parseCSV(data);
+    console.log('Drug data loaded successfully. ' + drugData.length + ' drugs available.');
+})
         .catch(error => {
             console.error('Error loading drug sheet:', error);
             alert('Error loading drug sheet. Please check the Sheet ID and make sure the sheet is publicly accessible.');
@@ -1052,26 +1052,8 @@ function populatePatientDropdown() {
 }
 
 function populateDrugDropdowns() {
-    var selectA = document.getElementById('drugASelect');
-    var selectB = document.getElementById('drugBSelect');
-    
-    selectA.innerHTML = '<option value="">Select drug A...</option>';
-    selectB.innerHTML = '<option value="">Select drug B...</option>';
-    
-    drugData.forEach((drug, index) => {
-        // Use the first column (column A) as the display name
-        var drugName = Object.values(drug)[0] || `Drug ${index + 1}`;
-        
-        var optionA = document.createElement('option');
-        optionA.value = index;
-        optionA.textContent = drugName;
-        selectA.appendChild(optionA);
-        
-        var optionB = document.createElement('option');
-        optionB.value = index;
-        optionB.textContent = drugName;
-        selectB.appendChild(optionB);
-    });
+    // Drugs are now selected via popup modal, no dropdowns to populate
+    console.log('Drug data loaded successfully. ' + drugData.length + ' drugs available.');
 }
 
 function loadPatientData() {
