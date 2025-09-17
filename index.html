@@ -2097,11 +2097,25 @@ populateOptions('doseOptions', doses, 'dose');
 
 // Parse and populate dissolution options - only actual sheet values
 var dissolutionStr = currentDrugData['Dissolution Rate'] || '0.1';
+
+// Enhanced debugging
+console.log('=== DISSOLUTION DEBUG ===');
+console.log('Raw dissolution string:', JSON.stringify(dissolutionStr));
+console.log('String length:', dissolutionStr.length);
+console.log('Contains comma?', dissolutionStr.includes(','));
+console.log('Character codes:', Array.from(dissolutionStr).map(c => c.charCodeAt(0)));
+
 var dissolutions = dissolutionStr.toString()
     .replace(/"/g, '')  // Remove any quotes
+    .replace(/'/g, '')  // Remove single quotes too
     .split(',')
     .map(d => d.trim())
     .filter(d => d && d !== '');
+
+console.log('After processing:', dissolutions);
+console.log('Number of dissolution options:', dissolutions.length);
+console.log('=== END DEBUG ===');
+
 populateOptions('dissolutionOptions', dissolutions, 'dissolution');
 
 // Debug output
@@ -2110,12 +2124,7 @@ console.log('Config - Parsed doses:', doses);
 console.log('Config - Raw dissolution:', dissolutionStr);
 console.log('Config - Parsed dissolutions:', dissolutions);
 
-// Debug output
-console.log('Config - Raw doses:', dosesStr);
-console.log('Config - Parsed doses:', doses);
-console.log('Config - Raw dissolution:', dissolutionStr);
-console.log('Config - Parsed dissolutions:', dissolutions);
-    
+   
     // Reset selection displays
     document.getElementById('selectedDose').textContent = 'None';
     document.getElementById('selectedDissolution').textContent = 'None';
