@@ -1041,6 +1041,12 @@ function parseCSV(csvText) {
     return data;
 }
 
+    // Debug output to console
+console.log('Available columns:', Object.keys(drug));
+console.log('Dissolution Rate field:', drug['Dissolution Rate']);
+console.log('Raw dissolution string:', dissolutionStr);
+console.log('Parsed dissolutions:', dissolutions);
+
 // Helper function to properly parse CSV lines with quoted comma-separated values
 function parseCSVLine(line) {
     var result = [];
