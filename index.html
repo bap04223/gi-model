@@ -988,10 +988,16 @@
                 </div>
                 
                 <div class="control-group">
-                    <label>Simulation Time (hrs):</label>
-                    <input type="range" id="simTime" min="0" max="720" step="6" value="24" oninput="updateVal('simTime'); runSim();">
-                    <div class="value" id="simTimeVal">24 hrs</div>
-                </div>
+    <label>Simulation Time (hrs):</label>
+    <div style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
+        <button id="simTimeBackBtn" onclick="changeSimTime(-1)" style="background: #e74c3c; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold;">◀</button>
+        <div style="flex: 1; text-align: center; font-weight: bold; padding: 8px; background: #f8f9fa; border-radius: 4px; border: 1px solid #ddd;">
+            <span id="simTimeDisplay">24 hrs</span>
+        </div>
+        <button id="simTimeForwardBtn" onclick="changeSimTime(1)" style="background: #27ae60; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold;">▶</button>
+    </div>
+    <input type="hidden" id="simTime" value="24">
+</div>
                 
              <button class="run-button" onclick="runSim()" style="display: none;">Run Simulation</button>
             </div>
@@ -2138,7 +2144,7 @@ window.onload = function() {
                    'ec501', 'ec502', 'emax1', 'emax2', 'halflife1', 'halflife2',
                    'baseline', 'giTargetEffect1', 'giTargetRange1',
                    'giTargetEffect2', 'giTargetRange2',
-                   'pdTargetEffect', 'pdTargetRange', 'simTime', 'interactionFactor'];
+                   'pdTargetEffect', 'pdTargetRange', 'interactionFactor'];
     
     controls.forEach(function(id) { updateVal(id); });
     
@@ -2146,6 +2152,9 @@ window.onload = function() {
     document.querySelectorAll('.collapsible-content').forEach(function(content) {
         content.style.maxHeight = content.scrollHeight + 'px';
     });
+    
+    // Initialize simulation time buttons
+    initializeSimTimeButtons();
     
     setupCharts();
     runSim();
@@ -2534,6 +2543,57 @@ function cleanGoogleDocHtml(html) {
     });
     
     return bodyContent.innerHTML;
+}
+
+
+// Simulation time control
+var simTimeValues = [24, 48, 72, 168, 336, 720];
+var currentSimTimeIndex = 0;
+
+function changeSimTime(direction) {
+    currentSimTimeIndex += direction;
+    
+    // Clamp to valid range
+    if (currentSimTimeIndex < 0) currentSimTimeIndex = 0;
+    if (currentSimTimeIndex >= simTimeValues.length) currentSimTimeIndex = simTimeValues.length - 1;
+    
+    var newValue = simTimeValues[currentSimTimeIndex];
+    
+    // Update hidden input and display
+    document.getElementById('simTime').value = newValue;
+    document.getElementById('simTimeDisplay').textContent = newValue + ' hrs';
+    
+    // Update button states
+    var backBtn = document.getElementById('simTimeBackBtn');
+    var forwardBtn = document.getElementById('simTimeForwardBtn');
+    
+    backBtn.disabled = currentSimTimeIndex === 0;
+    forwardBtn.disabled = currentSimTimeIndex === simTimeValues.length - 1;
+    
+    // Apply visual styling for disabled state
+    if (backBtn.disabled) {
+        backBtn.style.opacity = '0.5';
+        backBtn.style.cursor = 'not-allowed';
+    } else {
+        backBtn.style.opacity = '1';
+        backBtn.style.cursor = 'pointer';
+    }
+    
+    if (forwardBtn.disabled) {
+        forwardBtn.style.opacity = '0.5';
+        forwardBtn.style.cursor = 'not-allowed';
+    } else {
+        forwardBtn.style.opacity = '1';
+        forwardBtn.style.cursor = 'pointer';
+    }
+    
+    // Run simulation with new time
+    runSim();
+}
+
+// Initialize simulation time buttons on page load
+function initializeSimTimeButtons() {
+    changeSimTime(0); // Set initial state
 }
     
     
