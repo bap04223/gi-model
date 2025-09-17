@@ -501,7 +501,57 @@
 .scenario-content {
     font-size: 1rem;
     color: #333;
-    white-space: pre-wrap;
+    line-height: 1.6;
+}
+
+.scenario-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+    font-size: 0.9rem;
+}
+
+.scenario-content table, 
+.scenario-content th, 
+.scenario-content td {
+    border: 1px solid #ddd;
+}
+
+.scenario-content th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+    padding: 12px 8px;
+    text-align: left;
+}
+
+.scenario-content td {
+    padding: 10px 8px;
+    vertical-align: top;
+}
+
+.scenario-content tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.scenario-content tr:hover {
+    background-color: #e8f4fd;
+}
+
+.scenario-content p {
+    margin: 10px 0;
+}
+
+.scenario-content h1, 
+.scenario-content h2, 
+.scenario-content h3 {
+    color: #2d5016;
+    margin: 20px 0 10px 0;
+}
+
+.scenario-content ul, 
+.scenario-content ol {
+    margin: 10px 0;
+    padding-left: 30px;
 }
 
 .scenario-loading {
@@ -2381,18 +2431,20 @@ function loadScenarioContent(url) {
         return;
     }
     
-    var exportUrl = `https://docs.google.com/document/d/${docId}/export?format=txt`;
-    
-    fetch(exportUrl)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to load document');
-            }
-            return response.text();
-        })
-        .then(text => {
-            contentDiv.textContent = text || 'No content available in this document.';
-        })
+    var exportUrl = `https://docs.google.com/document/d/${docId}/export?format=html`;
+
+fetch(exportUrl)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to load document');
+        }
+        return response.text();
+    })
+    .then(html => {
+        // Clean and display the HTML content
+        var cleanedHtml = cleanGoogleDocHtml(html);
+        contentDiv.innerHTML = cleanedHtml || 'No content available in this document.';
+    })
         .catch(error => {
             console.error('Error loading scenario:', error);
             contentDiv.innerHTML = '<div style="color: #e74c3c; text-align: center;">Error loading scenario description. Please check that the document is publicly accessible.</div>';
@@ -2416,6 +2468,50 @@ function extractGoogleDocId(url) {
     
     return null;
 }    
+
+
+function cleanGoogleDocHtml(html) {
+    // Create a temporary div to parse the HTML
+    var tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    
+    // Remove unwanted elements (scripts, styles, etc.)
+    var unwantedSelectors = ['script', 'style', 'link', 'meta', 'title'];
+    unwantedSelectors.forEach(selector => {
+        var elements = tempDiv.querySelectorAll(selector);
+        elements.forEach(el => el.remove());
+    });
+    
+    // Find the body content or main content area
+    var bodyContent = tempDiv.querySelector('body') || tempDiv;
+    
+    // Clean up inline styles that might interfere with our styling
+    var allElements = bodyContent.querySelectorAll('*');
+    allElements.forEach(el => {
+        // Remove most inline styles but keep some table formatting
+        if (el.style) {
+            var keepStyles = [];
+            if (el.tagName === 'TABLE' || el.tagName === 'TD' || el.tagName === 'TH') {
+                // Keep border and padding styles for tables
+                if (el.style.border) keepStyles.push('border: ' + el.style.border);
+                if (el.style.padding) keepStyles.push('padding: ' + el.style.padding);
+                if (el.style.borderCollapse) keepStyles.push('border-collapse: ' + el.style.borderCollapse);
+            }
+            el.style.cssText = keepStyles.join('; ');
+        }
+        
+        // Remove specific Google Docs classes and IDs
+        if (el.className && el.className.includes('c')) {
+            el.className = '';
+        }
+        if (el.id) {
+            el.id = '';
+        }
+    });
+    
+    return bodyContent.innerHTML;
+}
+    
     
 </script>
 </body>
