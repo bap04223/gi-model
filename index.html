@@ -913,8 +913,8 @@
                         <th>Emax</th>
                         <th>Half-life (hrs)</th>
                         <th>Bioavailability</th>
-                        <th>Available Doses (mg)</th>
-                        <th>Available Dissolution Rates</th>
+                        <th>Dose (mg)</th>
+                        <th>Dissolution Rate</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -1929,9 +1929,9 @@ function populateDrugTable() {
         var halflife = drug['Half-life (hrs)'] || drug['Half-life'] || 'N/A';
         var bioavailability = drug['Bioavailability'] || 'N/A';
         
-        // Parse comma-separated values - THIS IS THE KEY CHANGE
-        var dosesStr = drug['Default Dose (mg)'] || drug['Default Dose'] || '50';
-        var dissolutionStr = drug['Default Dissolution Rate'] || drug['Default Dissolution'] || '0.1';
+// Parse comma-separated values
+var dosesStr = drug['Dose (mg)'] || '50';
+var dissolutionStr = drug['Dissolution Rate'] || '0.1';
         
         var doses = dosesStr.toString().split(',').map(d => d.trim()).filter(d => d);
         var dissolutions = dissolutionStr.toString().split(',').map(d => d.trim()).filter(d => d);
@@ -2055,15 +2055,15 @@ window.onclick = function(event) {
     document.getElementById('selectedDrugName').textContent = drugName;
     document.getElementById('configModalTitle').textContent = `Configure ${drugName}`;
     
-    // Parse and populate dose options
-    var dosesStr = currentDrugData['Default Dose (mg)'] || currentDrugData['Default Dose'] || '50';
-    var doses = dosesStr.toString().split(',').map(d => d.trim()).filter(d => d);
-    populateOptions('doseOptions', doses, 'dose');
-    
-    // Parse and populate dissolution options
-    var dissolutionStr = currentDrugData['Default Dissolution Rate'] || currentDrugData['Default Dissolution'] || '0.1';
-    var dissolutions = dissolutionStr.toString().split(',').map(d => d.trim()).filter(d => d);
-    populateOptions('dissolutionOptions', dissolutions, 'dissolution');
+// Parse and populate dose options
+var dosesStr = currentDrugData['Dose (mg)'] || '50';
+var doses = dosesStr.toString().split(',').map(d => d.trim()).filter(d => d);
+populateOptions('doseOptions', doses, 'dose');
+
+// Parse and populate dissolution options
+var dissolutionStr = currentDrugData['Dissolution Rate'] || '0.1';
+var dissolutions = dissolutionStr.toString().split(',').map(d => d.trim()).filter(d => d);
+populateOptions('dissolutionOptions', dissolutions, 'dissolution');
     
     // Reset selection displays
     document.getElementById('selectedDose').textContent = 'None';
