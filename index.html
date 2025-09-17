@@ -589,9 +589,10 @@
                     <div class="source-section" style="background: #e8f5e8; padding: 12px; border-radius: 8px; margin-bottom: 10px;">
                         <h5 style="margin: 0 0 10px 0; color: #2d5016; font-size: 0.9rem;">Patient Data</h5>
                         <div class="control-group" style="margin-bottom: 8px;">
-                            <label style="font-size: 0.8rem;">Patient Sheet ID:</label>
-                            <input type="text" id="patientSheetId" placeholder="Enter Google Sheet ID" style="width: calc(100% - 12px); padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.8rem; box-sizing: border-box;">
-                        </div>
+    <label style="font-size: 0.8rem;">Patient Sheet ID:</label>
+    <input type="text" id="patientSheetId" placeholder="Enter Google Sheet ID" style="width: calc(100% - 12px); padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.8rem; box-sizing: border-box;">
+    <button id="loadPatientBtn" onclick="loadPatientSheet()" class="load-button not-loaded" style="color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; width: calc(100% - 12px); box-sizing: border-box; margin-top: 5px;">Load Patient Sheet</button>
+</div>
                         <div class="control-group" style="margin-bottom: 8px;">
                             <label style="font-size: 0.8rem;">Select Patient:</label>
                             <select id="patientSelect" style="width: calc(100% - 12px); padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.8rem; box-sizing: border-box;" onchange="loadPatientData()">
@@ -601,16 +602,16 @@
                         <!-- Hidden field to store scenario URL -->
 <input type="hidden" id="scenarioUrl">
                         
-    <button id="loadPatientBtn" onclick="loadPatientSheet()" class="load-button not-loaded" style="color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; width: calc(100% - 12px); box-sizing: border-box;">Load Patient Sheet</button>
-                        <button id="scenarioBtn" onclick="openScenarioModal()" style="background: #f39c12; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; width: calc(100% - 12px); box-sizing: border-box; margin-top: 8px;" disabled>View Scenario </button>
+<button id="scenarioBtn" onclick="openScenarioModal()" style="background: #f39c12; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; width: calc(100% - 12px); box-sizing: border-box;" disabled>View Scenario Description</button>
                     </div>
                     
                     <div class="source-section" style="background: #e3f2fd; padding: 12px; border-radius: 8px;">
                         <h5 style="margin: 0 0 10px 0; color: #1565c0; font-size: 0.9rem;">Drug Data</h5>
-                        <div class="control-group" style="margin-bottom: 8px;">
-                            <label style="font-size: 0.8rem;">Drug Sheet ID:</label>
-                            <input type="text" id="drugSheetId" placeholder="Enter Google Sheet ID" style="width: calc(100% - 12px); padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.8rem; box-sizing: border-box;">
-                        </div>
+        <div class="control-group" style="margin-bottom: 8px;">
+    <label style="font-size: 0.8rem;">Drug Sheet ID:</label>
+    <input type="text" id="drugSheetId" placeholder="Enter Google Sheet ID" style="width: calc(100% - 12px); padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.8rem; box-sizing: border-box;">
+    <button id="loadDrugBtn" onclick="loadDrugSheet()" class="load-button not-loaded" style="color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; width: calc(100% - 12px); box-sizing: border-box; margin-top: 5px;">Load Drug Sheet</button>
+</div>
                         <!-- Replace this section in your HTML -->
                     <div class="control-group" style="margin-bottom: 4px;">
                         <label style="font-size: 0.8rem;">Select Drug A:</label>
@@ -624,7 +625,7 @@
                             <span id="drugBSelected">Select Drug B...</span>
                         </button>
                     </div>
-            <button id="loadDrugBtn" onclick="loadDrugSheet()" class="load-button not-loaded" style="color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; width: calc(100% - 12px); box-sizing: border-box;">Load Drug Sheet</button>
+
                     </div>
                 </div>
                 
