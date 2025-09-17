@@ -1951,28 +1951,12 @@ var doses = dosesStr.toString()
     .map(d => d.trim())
     .filter(d => d && d !== '');
 
-// Clean and parse dissolution rates with enhanced logic
-var dissolutions;
-if (dissolutionStr.includes(',')) {
-    dissolutions = dissolutionStr.toString()
-        .replace(/"/g, '')
-        .split(',')
-        .map(d => d.trim())
-        .filter(d => d && d !== '');
-} else {
-    // Generate multiple dissolution options from single base value
-    var baseDissolution = parseFloat(dissolutionStr);
-    if (!isNaN(baseDissolution)) {
-        dissolutions = [
-            (baseDissolution * 0.5).toFixed(2),
-            baseDissolution.toString(),
-            (baseDissolution * 1.5).toFixed(2),
-            (baseDissolution * 2).toFixed(2)
-        ];
-    } else {
-        dissolutions = [dissolutionStr];
-    }
-}
+// Clean and parse dissolution rates - only actual sheet values
+var dissolutions = dissolutionStr.toString()
+    .replace(/"/g, '')
+    .split(',')
+    .map(d => d.trim())
+    .filter(d => d && d !== '');
 
 // Debug output to console
 console.log('Drug:', drug['Drug Name'] || 'Unknown');
@@ -2102,7 +2086,7 @@ window.onclick = function(event) {
     document.getElementById('selectedDrugName').textContent = drugName;
     document.getElementById('configModalTitle').textContent = `Configure ${drugName}`;
     
-// Parse and populate dose options using the same logic as the table
+// Parse and populate dose options - only actual sheet values
 var dosesStr = currentDrugData['Dose (mg)'] || '50';
 var doses = dosesStr.toString()
     .replace(/"/g, '')  // Remove any quotes
@@ -2111,30 +2095,20 @@ var doses = dosesStr.toString()
     .filter(d => d && d !== '');
 populateOptions('doseOptions', doses, 'dose');
 
-// Parse and populate dissolution options using enhanced logic
+// Parse and populate dissolution options - only actual sheet values
 var dissolutionStr = currentDrugData['Dissolution Rate'] || '0.1';
-var dissolutions;
-if (dissolutionStr.includes(',')) {
-    dissolutions = dissolutionStr.toString()
-        .replace(/"/g, '')
-        .split(',')
-        .map(d => d.trim())
-        .filter(d => d && d !== '');
-} else {
-    // For single values, generate multiple options
-    var baseDissolution = parseFloat(dissolutionStr);
-    if (!isNaN(baseDissolution)) {
-        dissolutions = [
-            (baseDissolution * 0.5).toFixed(2),
-            baseDissolution.toString(),
-            (baseDissolution * 1.5).toFixed(2),
-            (baseDissolution * 2).toFixed(2)
-        ];
-    } else {
-        dissolutions = [dissolutionStr];
-    }
-}
+var dissolutions = dissolutionStr.toString()
+    .replace(/"/g, '')  // Remove any quotes
+    .split(',')
+    .map(d => d.trim())
+    .filter(d => d && d !== '');
 populateOptions('dissolutionOptions', dissolutions, 'dissolution');
+
+// Debug output
+console.log('Config - Raw doses:', dosesStr);
+console.log('Config - Parsed doses:', doses);
+console.log('Config - Raw dissolution:', dissolutionStr);
+console.log('Config - Parsed dissolutions:', dissolutions);
 
 // Debug output
 console.log('Config - Raw doses:', dosesStr);
