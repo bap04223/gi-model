@@ -1023,9 +1023,18 @@ function parseCSV(csvText) {
     var lines = csvText.split('\n');
     var data = [];
     
-    // Parse the header row
-    var headerLine = lines[0];
-    var headers = parseCSVLine(headerLine);
+  // Parse the header row
+var headerLine = lines[0];
+var headers = parseCSVLine(headerLine);
+console.log('=== PARSED HEADERS ===');
+console.log('Headers array:', headers);
+console.log('Number of headers:', headers.length);
+headers.forEach((header, index) => {
+    console.log(`Column ${index}: "${header}"`);
+});
+console.log('=== END HEADERS ===');
+
+    
     
     // Parse data rows
     for (var i = 1; i < lines.length; i++) {
