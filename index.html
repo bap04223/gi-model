@@ -1003,10 +1003,15 @@ function loadDrugSheet() {
     var url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=Sheet1`;
     
     fetch(url)
-        .then(response => response.text())
-       .then(data => {
-    drugData = parseCSV(data);
-    console.log('Drug data loaded successfully. ' + drugData.length + ' drugs available.');
+       fetch(url)
+    .then(response => response.text())
+   .then(data => {
+        console.log('=== RAW CSV DATA ===');
+        console.log(data);
+        console.log('=== END RAW CSV ===');
+        
+        drugData = parseCSV(data);
+        console.log('Drug data loaded successfully. ' + drugData.length + ' drugs available.');
 })
         .catch(error => {
             console.error('Error loading drug sheet:', error);
