@@ -1373,8 +1373,9 @@ function combineEffects(e1, e2, type, factor) {
 function assessTherapeuticWindow(data, baseline, target, targetUpper, targetLower) {
     var firstInRange = -1;
     var totalInRange = 0;
-    var failureAfterSuccess = false;
+    var consecutiveFailureAfterSuccess = false;
     
+    // Count all time points in range for percentage calculation
     for (var i = 0; i < data.length; i++) {
         var effect = data[i].combinedEffect;
         var inRange = effect >= targetLower && effect <= targetUpper;
@@ -1382,9 +1383,17 @@ function assessTherapeuticWindow(data, baseline, target, targetUpper, targetLowe
         if (inRange) {
             if (firstInRange === -1) firstInRange = i;
             totalInRange++;
-        } else {
-            if (firstInRange !== -1) {
-                failureAfterSuccess = true;
+        }
+    }
+    
+    // Check for sustained success (no gaps after first reaching target)
+    if (firstInRange !== -1) {
+        for (var i = firstInRange; i < data.length; i++) {
+            var effect = data[i].combinedEffect;
+            var inRange = effect >= targetLower && effect <= targetUpper;
+            
+            if (!inRange) {
+                consecutiveFailureAfterSuccess = true;
                 break;
             }
         }
@@ -1395,7 +1404,7 @@ function assessTherapeuticWindow(data, baseline, target, targetUpper, targetLowe
     
     var maxAllowedTime = data[data.length - 1].time * 0.75;
     var reachesTarget = timeToTarget !== null && timeToTarget <= maxAllowedTime;
-    var maintainsTarget = firstInRange !== -1 && !failureAfterSuccess;
+    var maintainsTarget = firstInRange !== -1 && !consecutiveFailureAfterSuccess;
     
     var passed = reachesTarget && maintainsTarget;
     
@@ -1414,8 +1423,9 @@ function assessTherapeuticWindow(data, baseline, target, targetUpper, targetLowe
 function assessGIWindow(data, baseline, target, targetUpper, targetLower, drugNum) {
     var firstInRange = -1;
     var totalInRange = 0;
-    var failureAfterSuccess = false;
+    var consecutiveFailureAfterSuccess = false;
     
+    // Count all time points in range for percentage calculation
     for (var i = 0; i < data.length; i++) {
         var plasma = drugNum === 1 ? data[i].drug1.plasma : data[i].drug2.plasma;
         var inRange = plasma >= targetLower && plasma <= targetUpper;
@@ -1423,9 +1433,17 @@ function assessGIWindow(data, baseline, target, targetUpper, targetLower, drugNu
         if (inRange) {
             if (firstInRange === -1) firstInRange = i;
             totalInRange++;
-        } else {
-            if (firstInRange !== -1) {
-                failureAfterSuccess = true;
+        }
+    }
+    
+    // Check for sustained success (no gaps after first reaching target)
+    if (firstInRange !== -1) {
+        for (var i = firstInRange; i < data.length; i++) {
+            var plasma = drugNum === 1 ? data[i].drug1.plasma : data[i].drug2.plasma;
+            var inRange = plasma >= targetLower && plasma <= targetUpper;
+            
+            if (!inRange) {
+                consecutiveFailureAfterSuccess = true;
                 break;
             }
         }
@@ -1436,7 +1454,7 @@ function assessGIWindow(data, baseline, target, targetUpper, targetLower, drugNu
     
     var maxAllowedTime = data[data.length - 1].time * 0.75;
     var reachesTarget = timeToTarget !== null && timeToTarget <= maxAllowedTime;
-    var maintainsTarget = firstInRange !== -1 && !failureAfterSuccess;
+    var maintainsTarget = firstInRange !== -1 && !consecutiveFailureAfterSuccess;
     
     var passed = reachesTarget && maintainsTarget;
     
