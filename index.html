@@ -1104,22 +1104,15 @@
         <div class="modal-body">
             <div class="config-section">
                 <h4 id="selectedDrugName">Drug Name</h4>
-                <div class="config-grid">
-                    <div class="config-group">
-                        <label>Select Dose:</label>
-                        <div id="doseOptions" class="option-grid">
-                            <!-- Dose buttons will be populated here -->
-                        </div>
-                        <div class="selected-value">Selected: <span id="selectedDose">None</span> mg</div>
-                    </div>
-                    <div class="config-group">
-                        <label>Select Dissolution Rate:</label>
-                        <div id="dissolutionOptions" class="option-grid">
-                            <!-- Dissolution buttons will be populated here -->
-                        </div>
-                        <div class="selected-value">Selected: <span id="selectedDissolution">None</span></div>
-                    </div>
-                </div>
+                <div class="config-section">
+    <div class="config-group" style="max-width: 400px; margin: 0 auto;">
+        <label>Select Dose:</label>
+        <div id="doseOptions" class="option-grid">
+            <!-- Dose buttons will be populated here -->
+        </div>
+        <div class="selected-value">Selected: <span id="selectedDose">None</span> mg</div>
+    </div>
+</div>
                 <div class="config-actions">
                     <button class="cancel-btn" onclick="closeDrugConfigModal()">Cancel</button>
                     <button class="choose-drug-btn" onclick="finalizeDrugSelection()" id="chooseDrugBtn" disabled>Choose Drug</button>
@@ -2364,40 +2357,22 @@ var doses = dosesStr.toString()
     .filter(d => d && d !== '');
 populateOptions('doseOptions', doses, 'dose');
 
-// Parse and populate dissolution options - only actual sheet values
+// Set default dissolution rate from sheet data
 var dissolutionStr = currentDrugData['Dissolution Rate'] || '0.1';
+var defaultDissolution = dissolutionStr.toString()
+    .replace(/"/g, '')
+    .split(',')[0]  // Take first value as default
+    .trim();
+selectedDissolution = parseFloat(defaultDissolution);
 
-// Enhanced debugging
-console.log('=== DISSOLUTION DEBUG ===');
-console.log('Raw dissolution string:', JSON.stringify(dissolutionStr));
-console.log('String length:', dissolutionStr.length);
-console.log('Contains comma?', dissolutionStr.includes(','));
-console.log('Character codes:', Array.from(dissolutionStr).map(c => c.charCodeAt(0)));
-
-var dissolutions = dissolutionStr.toString()
-    .replace(/"/g, '')  // Remove any quotes
-    .replace(/'/g, '')  // Remove single quotes too
-    .split(',')
-    .map(d => d.trim())
-    .filter(d => d && d !== '');
-
-console.log('After processing:', dissolutions);
-console.log('Number of dissolution options:', dissolutions.length);
-console.log('=== END DEBUG ===');
-
-populateOptions('dissolutionOptions', dissolutions, 'dissolution');
-
-// Debug output
 console.log('Config - Raw doses:', dosesStr);
 console.log('Config - Parsed doses:', doses);
-console.log('Config - Raw dissolution:', dissolutionStr);
-console.log('Config - Parsed dissolutions:', dissolutions);
+console.log('Config - Default dissolution rate:', selectedDissolution);
 
    
-    // Reset selection displays
-    document.getElementById('selectedDose').textContent = 'None';
-    document.getElementById('selectedDissolution').textContent = 'None';
-    document.getElementById('chooseDrugBtn').disabled = true;
+// Reset selection displays
+document.getElementById('selectedDose').textContent = 'None';
+document.getElementById('chooseDrugBtn').disabled = true;
     
     // Hide drug list modal and show config modal
     document.getElementById('drugModal').style.display = 'none';
@@ -2425,14 +2400,11 @@ function selectOption(type, value, buttonElement) {
     // Add selection to clicked button
     buttonElement.classList.add('selected');
     
-    // Update selection
-    if (type === 'dose') {
-        selectedDose = parseFloat(value);
-        document.getElementById('selectedDose').textContent = value;
-    } else if (type === 'dissolution') {
-        selectedDissolution = parseFloat(value);
-        document.getElementById('selectedDissolution').textContent = value;
-    }
+   // Update selection
+if (type === 'dose') {
+    selectedDose = parseFloat(value);
+    document.getElementById('selectedDose').textContent = value;
+}
     
     // Enable choose button if both are selected
     updateChooseButton();
@@ -2440,7 +2412,7 @@ function selectOption(type, value, buttonElement) {
 
 function updateChooseButton() {
     var chooseBtn = document.getElementById('chooseDrugBtn');
-    chooseBtn.disabled = !(selectedDose !== null && selectedDissolution !== null);
+    chooseBtn.disabled = !(selectedDose !== null);
 }
 
 function closeDrugConfigModal() {
