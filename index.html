@@ -1500,6 +1500,17 @@ function switchTab(n) {
     document.querySelectorAll('.drug-panel').forEach(function(p) { p.classList.remove('active'); });
     document.querySelector('.drug-tab:nth-child(' + n + ')').classList.add('active');
     document.getElementById('panel' + n).classList.add('active');
+    
+    // Ensure Drug B dosing parameters are expanded when switching to Drug B tab
+    if (n === 2) {
+        var drugBDosingSection = document.querySelector('#panel2 .dosing-section .collapsible-content');
+        var drugBDosingHeader = document.querySelector('#panel2 .dosing-section .collapsible-header');
+        if (drugBDosingSection && drugBDosingHeader) {
+            drugBDosingSection.classList.remove('collapsed');
+            drugBDosingSection.style.maxHeight = drugBDosingSection.scrollHeight + 'px';
+            drugBDosingHeader.querySelector('.collapse-icon').classList.remove('collapsed');
+        }
+    }
 }
 
 function updateVal(id) {
