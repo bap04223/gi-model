@@ -19,26 +19,9 @@
             zoom: 0.8;
         }
         .container { width: 97%; margin: 0 auto; }
-        .header { 
-    background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%); 
-    color: #e2e8f0; 
-    border-radius: 15px; 
-    padding: 20px; 
-    margin-bottom: 20px; 
-    text-align: center; 
-    border: 1px solid #4a5568; 
-}
+        .header { background: white; border-radius: 15px; padding: 20px; margin-bottom: 20px; text-align: center; }
         .main-grid { display: grid; grid-template-columns: 350px 1fr; gap: 20px; }
-       .controls { 
-    background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%); 
-    color: #e2e8f0; 
-    border-radius: 15px; 
-    padding: 20px; 
-    height: fit-content; 
-    max-height: 90vh; 
-    overflow-y: auto; 
-    border: 1px solid #4a5568; 
-}
+        .controls { background: white; border-radius: 15px; padding: 20px; height: fit-content; max-height: 90vh; overflow-y: auto; }
         .control-group { margin-bottom: 15px; }
         .control-group label { display: block; font-size: 0.9rem; margin-bottom: 5px; }
         .control-group input[type="range"] { width: 100%; margin-bottom: 5px; }
@@ -60,26 +43,11 @@
             padding: 15px; 
             margin-bottom: 15px; 
         }
-.interaction-section { 
-    background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%); 
-    border: 1px solid #d69e2e; 
-}
-.target-section { 
-    background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%); 
-    border: 1px solid #38a169; 
-}
-.dosing-section { 
-    background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%); 
-    border: 1px solid #3182ce; 
-}
-.absorption-section { 
-    background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%); 
-    border: 1px solid #0987a0; 
-}
-.transit-section { 
-    background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%); 
-    border: 1px solid #3182ce; 
-}
+        .interaction-section { background: #fff3cd; }
+        .target-section { background: #e8f5e8; }
+        .dosing-section { background: #e3f2fd; }
+        .absorption-section { background: #e1f5fe; }
+        .transit-section { background: #e8f4fd; }
         
         .collapsible-header {
             cursor: pointer;
@@ -179,8 +147,7 @@
 }
 
 .modal-content {
-    background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
-    color: #e2e8f0;
+    background-color: white;
     margin: 5% auto;
     padding: 0;
     border-radius: 15px;
@@ -188,8 +155,7 @@
     max-width: 1400px;
     max-height: 80vh;
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    border: 1px solid #4a5568;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
 .modal-header {
@@ -510,8 +476,7 @@
 }
 
 .scenario-modal-content {
-    background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
-    color: #e2e8f0;
+    background-color: white;
     margin: 5% auto;
     padding: 0;
     border-radius: 15px;
@@ -519,8 +484,7 @@
     max-width: 1400px;
     max-height: 75vh;
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    border: 1px solid #4a5568;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
 .scenario-modal-header {
@@ -2639,4 +2603,4 @@ function initializeSimTimeButtons() {
     
 </script>
 </body>
-</html>              
+</html>                        
