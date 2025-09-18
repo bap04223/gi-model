@@ -22,7 +22,7 @@
         .drug-panel { display: none; }
         .drug-panel.active { display: block; }
         .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
- .chart-container { background: white; border-radius: 15px; padding: 20px; }
+        .chart-container { background: white; border-radius: 15px; padding: 20px; }
         .chart-wrapper { height: 300px; margin-bottom: 10px; position: relative; }
         .chart-info { font-size: 0.8rem; color: #666; background: #f8f8f8; padding: 10px; border-radius: 5px; }
         
@@ -73,42 +73,17 @@
         .transit-section h4 { color: #1e88e5; }
         
         .run-button { background: #667eea; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 15px; }
-      .stats-grid { 
-    display: grid; 
-    grid-template-columns: repeat(3, 1fr); 
-    gap: 18px; 
-    margin-top: 15px; 
-}
-.stat-card { 
-    color: white; 
-    padding: 18px 15px; 
-    border-radius: 8px; 
-    text-align: center; 
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-height: 70px;
-}
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px; }
+        .stat-card { color: white; padding: 15px; border-radius: 8px; text-align: center; }
         .stat-card.drug-a { background: #27ae60; }
         .stat-card.drug-b { background: #3498db; }
         .stat-card.combined { background: #9b59b6; }
         .stat-card.assessment { background: #2c3e50; }
         .stat-card.assessment.pass { background: #27ae60; }
         .stat-card.assessment.fail { background: #e74c3c; }
-     .stat-value { 
-    font-size: 1.3rem; 
-    font-weight: bold; 
-    margin-bottom: 6px;
-}
-.stat-label { 
-    font-size: 0.8rem; 
-}
-       .assessment-feedback { 
-    margin-top: 18px; 
-    padding: 12px; 
-    border-radius: 5px; 
-    font-size: 0.9rem; 
-}
+        .stat-value { font-size: 1.2rem; font-weight: bold; }
+        .stat-label { font-size: 0.8rem; }
+        .assessment-feedback { margin-top: 15px; padding: 10px; border-radius: 5px; font-size: 0.9rem; }
         
         /* Max effects grid under PD chart */
         .max-effects-grid { 
@@ -669,22 +644,10 @@
                     </div>
                 </div>
                 
-                <div class="control-group" style="margin-bottom: 15px;">
-    <label>Simulation Time (hrs):</label>
-    <div style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
-        <button id="simTimeBackBtn" onclick="changeSimTime(-1)" style="background: #e74c3c; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold;">◀</button>
-        <div style="flex: 1; text-align: center; font-weight: bold; padding: 8px; background: #f8f9fa; border-radius: 4px; border: 1px solid #ddd;">
-            <span id="simTimeDisplay">24 hrs</span>
-        </div>
-        <button id="simTimeForwardBtn" onclick="changeSimTime(1)" style="background: #27ae60; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold;">▶</button>
-    </div>
-    <input type="hidden" id="simTime" value="24">
-</div>
-
-<div class="drug-tabs">
-    <button class="drug-tab active" onclick="switchTab(1)">Drug A</button>
-    <button class="drug-tab" onclick="switchTab(2)">Drug B</button>
-</div>
+                <div class="drug-tabs">
+                    <button class="drug-tab active" onclick="switchTab(1)">Drug A</button>
+                    <button class="drug-tab" onclick="switchTab(2)">Drug B</button>
+                </div>
                 
                 <div class="drug-panel active" id="panel1">
                     <div class="control-group">
@@ -1024,7 +987,18 @@
                     </div>
                 </div>
                 
-                               
+                <div class="control-group">
+    <label>Simulation Time (hrs):</label>
+    <div style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
+        <button id="simTimeBackBtn" onclick="changeSimTime(-1)" style="background: #e74c3c; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold;">◀</button>
+        <div style="flex: 1; text-align: center; font-weight: bold; padding: 8px; background: #f8f9fa; border-radius: 4px; border: 1px solid #ddd;">
+            <span id="simTimeDisplay">24 hrs</span>
+        </div>
+        <button id="simTimeForwardBtn" onclick="changeSimTime(1)" style="background: #27ae60; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold;">▶</button>
+    </div>
+    <input type="hidden" id="simTime" value="24">
+</div>
+                
              <button class="run-button" onclick="runSim()" style="display: none;">Run Simulation</button>
             </div>
             
@@ -2625,4 +2599,4 @@ function initializeSimTimeButtons() {
     
 </script>
 </body>
-</html>    
+</html>      
