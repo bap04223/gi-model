@@ -6,15 +6,15 @@
     <title>Dual Drug GI PKPD Simulator</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; margin: 0; padding: 20px; }
+    body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); min-height: 100vh; margin: 0; padding: 20px; }
         .container { width: 97%; margin: 0 auto; }
-        .header { background: white; border-radius: 15px; padding: 20px; margin-bottom: 20px; text-align: center; }
+        .header { background: #2d3748; color: #e2e8f0; border-radius: 15px; padding: 20px; margin-bottom: 20px; text-align: center; border: 1px solid #4a5568; }
         .main-grid { display: grid; grid-template-columns: 350px 1fr; gap: 20px; }
-        .controls { background: white; border-radius: 15px; padding: 20px; height: fit-content; max-height: 90vh; overflow-y: auto; }
+       .controls { background: #2d3748; color: #e2e8f0; border-radius: 15px; padding: 20px; height: fit-content; max-height: 90vh; overflow-y: auto; border: 1px solid #4a5568; }
         .control-group { margin-bottom: 15px; }
         .control-group label { display: block; font-size: 0.9rem; margin-bottom: 5px; }
         .control-group input[type="range"] { width: 100%; margin-bottom: 5px; }
-        .control-group select { width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ddd; margin-bottom: 5px; }
+       .control-group select { width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #4a5568; margin-bottom: 5px; background: #1a202c; color: #e2e8f0; }
         .value { font-size: 0.8rem; color: #666; }
         .drug-tabs { display: flex; margin-bottom: 15px; }
         .drug-tab { flex: 1; padding: 10px; background: #f0f0f0; border: none; cursor: pointer; }
@@ -22,9 +22,9 @@
         .drug-panel { display: none; }
         .drug-panel.active { display: block; }
         .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .chart-container { background: white; border-radius: 15px; padding: 20px; }
+      .chart-container { background: #2d3748; color: #e2e8f0; border-radius: 15px; padding: 20px; border: 1px solid #4a5568; }
         .chart-wrapper { height: 300px; margin-bottom: 10px; position: relative; }
-        .chart-info { font-size: 0.8rem; color: #666; background: #f8f8f8; padding: 10px; border-radius: 5px; }
+        .chart-info { font-size: 0.8rem; color: #a0aec0; background: #1a202c; padding: 10px; border-radius: 5px; border: 1px solid #4a5568; }
         
         /* Collapsible section styles */
         .interaction-section, .target-section, .dosing-section, .absorption-section, .transit-section { 
@@ -32,11 +32,11 @@
             padding: 15px; 
             margin-bottom: 15px; 
         }
-        .interaction-section { background: #fff3cd; }
-        .target-section { background: #e8f5e8; }
-        .dosing-section { background: #e3f2fd; }
-        .absorption-section { background: #e1f5fe; }
-        .transit-section { background: #e8f4fd; }
+       .interaction-section { background: #2d3748; border: 1px solid #d69e2e; }
+.target-section { background: #2d3748; border: 1px solid #38a169; }
+.dosing-section { background: #2d3748; border: 1px solid #3182ce; }
+.absorption-section { background: #2d3748; border: 1px solid #0987a0; }
+.transit-section { background: #2d3748; border: 1px solid #3182ce; }
         
         .collapsible-header {
             cursor: pointer;
@@ -136,7 +136,8 @@
 }
 
 .modal-content {
-    background-color: white;
+    background-color: #2d3748;
+    color: #e2e8f0;
     margin: 5% auto;
     padding: 0;
     border-radius: 15px;
@@ -144,7 +145,8 @@
     max-width: 1400px;
     max-height: 80vh;
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border: 1px solid #4a5568;
 }
 
 .modal-header {
@@ -184,27 +186,35 @@
 }
 
 .drug-table th,
-.drug-table td {
-    border: 1px solid #ddd;
-    padding: 12px 8px;
-    text-align: left;
-    font-size: 0.9rem;
-}
-
 .drug-table th {
-    background-color: #f8f9fa;
+    background: linear-gradient(135deg, #4c51bf 0%, #553c9a 100%);
+    color: #e2e8f0;
+    border: 1px solid #4a5568;
+    padding: 12px 8px;
+    text-align: center;
     font-weight: bold;
     position: sticky;
     top: 0;
     z-index: 10;
+    font-size: 0.85rem;
 }
 
-.drug-table tr:nth-child(even) {
-    background-color: #f9f9f9;
+.drug-table td {
+    border: 1px solid #4a5568;
+    padding: 10px 8px;
+    text-align: center;
+    font-size: 0.9rem;
+    background: #1a202c;
+    color: #e2e8f0;
 }
 
-.drug-table tr:hover {
-    background-color: #e8f4fd;
+.drug-table tr:nth-child(even) td {
+    background-color: #2d3748;
+}
+
+.drug-table tr:hover td {
+    background-color: #4a5568;
+    transition: background-color 0.2s ease;
 }
 
 .select-drug-btn {
@@ -465,7 +475,8 @@
 }
 
 .scenario-modal-content {
-    background-color: white;
+    background-color: #2d3748;
+    color: #e2e8f0;
     margin: 5% auto;
     padding: 0;
     border-radius: 15px;
@@ -473,7 +484,8 @@
     max-width: 1400px;
     max-height: 75vh;
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border: 1px solid #4a5568;
 }
 
 .scenario-modal-header {
