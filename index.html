@@ -2158,6 +2158,15 @@ window.onload = function() {
         content.style.maxHeight = content.scrollHeight + 'px';
     });
     
+    // Collapse Drug Interactions section by default
+    var interactionSection = document.querySelector('.interaction-section .collapsible-content');
+    var interactionHeader = document.querySelector('.interaction-section .collapsible-header');
+    if (interactionSection && interactionHeader) {
+        interactionSection.classList.add('collapsed');
+        interactionSection.style.maxHeight = '0px';
+        interactionHeader.querySelector('.collapse-icon').classList.add('collapsed');
+    }
+    
     // Initialize simulation time buttons
     initializeSimTimeButtons();
     
